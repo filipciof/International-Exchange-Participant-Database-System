@@ -1,0 +1,1383 @@
+[
+    {
+        "model": "main.club",
+        "pk": 1,
+        "fields": {
+            "name": "Łódź",
+            "district": "łódzkie",
+            "country": "Poland"
+        }
+    },
+    {
+        "model": "main.club",
+        "pk": 2,
+        "fields": {
+            "name": "Warszawa",
+            "district": "mazowieckie",
+            "country": "Poland"
+        }
+    },
+    {
+        "model": "main.club",
+        "pk": 3,
+        "fields": {
+            "name": "Kraków",
+            "district": "małopolskie",
+            "country": "Poland"
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 1,
+        "fields": {
+            "name": "Pikor",
+            "club": 1
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 2,
+        "fields": {
+            "name": "Pyza",
+            "club": 3
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 3,
+        "fields": {
+            "name": "Mich",
+            "club": 1
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 4,
+        "fields": {
+            "name": "Gajowiak",
+            "club": 1
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 5,
+        "fields": {
+            "name": "Broszkiewicz",
+            "club": 1
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 6,
+        "fields": {
+            "name": "Jarczyk",
+            "club": 2
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 7,
+        "fields": {
+            "name": "Kojder",
+            "club": 2
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 8,
+        "fields": {
+            "name": "Fiedler",
+            "club": 3
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 9,
+        "fields": {
+            "name": "Moniuszko",
+            "club": 2
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 10,
+        "fields": {
+            "name": "Jaje",
+            "club": 1
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 11,
+        "fields": {
+            "name": "Matyjaszek",
+            "club": 2
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 12,
+        "fields": {
+            "name": "Szybiak",
+            "club": 1
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 13,
+        "fields": {
+            "name": "Herdzik",
+            "club": 1
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 14,
+        "fields": {
+            "name": "Sasak",
+            "club": 1
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 15,
+        "fields": {
+            "name": "Kik",
+            "club": 2
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 16,
+        "fields": {
+            "name": "Odrzywołek",
+            "club": 2
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 17,
+        "fields": {
+            "name": "Jędraszczyk",
+            "club": 3
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 18,
+        "fields": {
+            "name": "Gebauer",
+            "club": 2
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 19,
+        "fields": {
+            "name": "Kurant",
+            "club": 1
+        }
+    },
+    {
+        "model": "main.family",
+        "pk": 20,
+        "fields": {
+            "name": "Staś",
+            "club": 1
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 1,
+        "fields": {
+            "first_name": "Arkadiusz",
+            "last_name": "Cuch",
+            "families": [
+                15,
+                10,
+                18
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 2,
+        "fields": {
+            "first_name": "Kalina",
+            "last_name": "Zawiasa",
+            "families": [
+                18,
+                11
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 3,
+        "fields": {
+            "first_name": "Grzegorz",
+            "last_name": "Kurpisz",
+            "families": [
+                17,
+                2,
+                8
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 4,
+        "fields": {
+            "first_name": "Tobiasz",
+            "last_name": "Bielas",
+            "families": [
+                8
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 5,
+        "fields": {
+            "first_name": "Elżbieta",
+            "last_name": "Dziuban",
+            "families": [
+                11,
+                3,
+                4
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 6,
+        "fields": {
+            "first_name": "Adam",
+            "last_name": "Lazarek",
+            "families": [
+                2
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 7,
+        "fields": {
+            "first_name": "Borys",
+            "last_name": "Martynowicz",
+            "families": [
+                7,
+                17
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 8,
+        "fields": {
+            "first_name": "Bianka",
+            "last_name": "Szałaj",
+            "families": [
+                3,
+                1,
+                12
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 9,
+        "fields": {
+            "first_name": "Piotr",
+            "last_name": "Schubert",
+            "families": [
+                13,
+                20,
+                16
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 10,
+        "fields": {
+            "first_name": "Piotr",
+            "last_name": "Hamerla",
+            "families": [
+                15
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 11,
+        "fields": {
+            "first_name": "Kornelia",
+            "last_name": "Żbik",
+            "families": [
+                8
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 12,
+        "fields": {
+            "first_name": "Ryszard",
+            "last_name": "Zackiewicz",
+            "families": [
+                3
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 13,
+        "fields": {
+            "first_name": "Apolonia",
+            "last_name": "Dybał",
+            "families": [
+                14
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 14,
+        "fields": {
+            "first_name": "Liwia",
+            "last_name": "Milka",
+            "families": [
+                10,
+                5
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 15,
+        "fields": {
+            "first_name": "Igor",
+            "last_name": "Godzisz",
+            "families": [
+                12,
+                4,
+                6
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 16,
+        "fields": {
+            "first_name": "Tadeusz",
+            "last_name": "Warmuz",
+            "families": [
+                11,
+                6
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 17,
+        "fields": {
+            "first_name": "Kamil",
+            "last_name": "Masny",
+            "families": [
+                19,
+                13
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 18,
+        "fields": {
+            "first_name": "Norbert",
+            "last_name": "Mueller",
+            "families": [
+                14,
+                6
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 19,
+        "fields": {
+            "first_name": "Anastazja",
+            "last_name": "Dejneka",
+            "families": [
+                3
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 20,
+        "fields": {
+            "first_name": "Grzegorz",
+            "last_name": "Kuba",
+            "families": [
+                7,
+                20,
+                7
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 21,
+        "fields": {
+            "first_name": "Agnieszka",
+            "last_name": "Kuryłowicz",
+            "families": [
+                1,
+                11,
+                9
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 22,
+        "fields": {
+            "first_name": "Artur",
+            "last_name": "Golan",
+            "families": [
+                9,
+                18,
+                18
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 23,
+        "fields": {
+            "first_name": "Krystian",
+            "last_name": "Dziełak",
+            "families": [
+                15
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 24,
+        "fields": {
+            "first_name": "Wiktor",
+            "last_name": "Joniak",
+            "families": [
+                2,
+                20
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 25,
+        "fields": {
+            "first_name": "Gabriel",
+            "last_name": "Bernatowicz",
+            "families": [
+                6,
+                15
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 26,
+        "fields": {
+            "first_name": "Tymon",
+            "last_name": "Byra",
+            "families": [
+                1,
+                2
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 27,
+        "fields": {
+            "first_name": "Patryk",
+            "last_name": "Wlazły",
+            "families": [
+                3
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 28,
+        "fields": {
+            "first_name": "Aleks",
+            "last_name": "Faltyn",
+            "families": [
+                14
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 29,
+        "fields": {
+            "first_name": "Ryszard",
+            "last_name": "Jaśkowiec",
+            "families": [
+                2
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 30,
+        "fields": {
+            "first_name": "Kalina",
+            "last_name": "Miksza",
+            "families": [
+                13,
+                2
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 31,
+        "fields": {
+            "first_name": "Tadeusz",
+            "last_name": "Goik",
+            "families": [
+                8
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 32,
+        "fields": {
+            "first_name": "Hubert",
+            "last_name": "Samulak",
+            "families": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 33,
+        "fields": {
+            "first_name": "Artur",
+            "last_name": "Świadek",
+            "families": [
+                13
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 34,
+        "fields": {
+            "first_name": "Nela",
+            "last_name": "Mrotek",
+            "families": [
+                11,
+                17
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 35,
+        "fields": {
+            "first_name": "Karina",
+            "last_name": "Deneka",
+            "families": [
+                20,
+                2
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 36,
+        "fields": {
+            "first_name": "Franciszek",
+            "last_name": "Moj",
+            "families": [
+                10,
+                6,
+                2
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 37,
+        "fields": {
+            "first_name": "Inga",
+            "last_name": "Słobodzian",
+            "families": [
+                20,
+                9
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 38,
+        "fields": {
+            "first_name": "Albert",
+            "last_name": "Ochal",
+            "families": [
+                7,
+                5,
+                20
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 39,
+        "fields": {
+            "first_name": "Andrzej",
+            "last_name": "Dunal",
+            "families": [
+                17,
+                5
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 40,
+        "fields": {
+            "first_name": "Eliza",
+            "last_name": "Kościołek",
+            "families": [
+                10
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 41,
+        "fields": {
+            "first_name": "Nicole",
+            "last_name": "Sierpień",
+            "families": [
+                8,
+                3,
+                15
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 42,
+        "fields": {
+            "first_name": "Kamila",
+            "last_name": "Piekacz",
+            "families": [
+                12,
+                7
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 43,
+        "fields": {
+            "first_name": "Sylwia",
+            "last_name": "Borzym",
+            "families": [
+                19,
+                13
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 44,
+        "fields": {
+            "first_name": "Alan",
+            "last_name": "Szczubełek",
+            "families": [
+                19
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 45,
+        "fields": {
+            "first_name": "Mateusz",
+            "last_name": "Drewicz",
+            "families": [
+                7
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 46,
+        "fields": {
+            "first_name": "Lidia",
+            "last_name": "Dyka",
+            "families": [
+                20,
+                10,
+                6
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 47,
+        "fields": {
+            "first_name": "Aleksander",
+            "last_name": "Laszkiewicz",
+            "families": [
+                10
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 48,
+        "fields": {
+            "first_name": "Julian",
+            "last_name": "Brodowicz",
+            "families": [
+                19
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 49,
+        "fields": {
+            "first_name": "Daniel",
+            "last_name": "Siedlik",
+            "families": [
+                9,
+                19,
+                7
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 50,
+        "fields": {
+            "first_name": "Agnieszka",
+            "last_name": "Ćwierz",
+            "families": [
+                15
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 51,
+        "fields": {
+            "first_name": "Marcel",
+            "last_name": "Kaczmarkiewicz",
+            "families": [
+                10,
+                14
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 52,
+        "fields": {
+            "first_name": "Franciszek",
+            "last_name": "Kulon",
+            "families": [
+                2,
+                20
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 53,
+        "fields": {
+            "first_name": "Monika",
+            "last_name": "Łokaj",
+            "families": [
+                20
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 54,
+        "fields": {
+            "first_name": "Franciszek",
+            "last_name": "Godyń",
+            "families": [
+                11,
+                4,
+                4
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 55,
+        "fields": {
+            "first_name": "Anastazja",
+            "last_name": "Stranc",
+            "families": [
+                4
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 56,
+        "fields": {
+            "first_name": "Stanisław",
+            "last_name": "Giezek",
+            "families": [
+                6
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 57,
+        "fields": {
+            "first_name": "Sandra",
+            "last_name": "Szczap",
+            "families": [
+                12,
+                5
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 58,
+        "fields": {
+            "first_name": "Olga",
+            "last_name": "Letkiewicz",
+            "families": [
+                6,
+                18
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 59,
+        "fields": {
+            "first_name": "Alex",
+            "last_name": "Rzońca",
+            "families": [
+                7
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 60,
+        "fields": {
+            "first_name": "Dorota",
+            "last_name": "Olko",
+            "families": [
+                8,
+                17,
+                17
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 61,
+        "fields": {
+            "first_name": "Tomasz",
+            "last_name": "Majnusz",
+            "families": [
+                7,
+                13,
+                1
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 62,
+        "fields": {
+            "first_name": "Julianna",
+            "last_name": "Muskała",
+            "families": [
+                11
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 63,
+        "fields": {
+            "first_name": "Konrad",
+            "last_name": "Gregorek",
+            "families": [
+                10,
+                7,
+                2
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 64,
+        "fields": {
+            "first_name": "Ada",
+            "last_name": "Cibor",
+            "families": [
+                15,
+                13,
+                8
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 65,
+        "fields": {
+            "first_name": "Bartek",
+            "last_name": "Zagożdżon",
+            "families": [
+                9
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 66,
+        "fields": {
+            "first_name": "Jacek",
+            "last_name": "Wawszczak",
+            "families": [
+                6
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 67,
+        "fields": {
+            "first_name": "Maks",
+            "last_name": "Hasiak",
+            "families": [
+                7,
+                11
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 68,
+        "fields": {
+            "first_name": "Kornelia",
+            "last_name": "Brach",
+            "families": [
+                19,
+                18,
+                1
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 69,
+        "fields": {
+            "first_name": "Kornel",
+            "last_name": "Jędrys",
+            "families": [
+                6,
+                14,
+                6
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 70,
+        "fields": {
+            "first_name": "Alex",
+            "last_name": "Ośko",
+            "families": [
+                15,
+                20
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 71,
+        "fields": {
+            "first_name": "Kacper",
+            "last_name": "Wójt",
+            "families": [
+                14,
+                10
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 72,
+        "fields": {
+            "first_name": "Piotr",
+            "last_name": "Golonko",
+            "families": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 73,
+        "fields": {
+            "first_name": "Tobiasz",
+            "last_name": "Dawidczyk",
+            "families": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 74,
+        "fields": {
+            "first_name": "Jacek",
+            "last_name": "Szynkiewicz",
+            "families": [
+                10,
+                12,
+                8
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 75,
+        "fields": {
+            "first_name": "Ewa",
+            "last_name": "Ćwirko",
+            "families": [
+                7,
+                13,
+                2
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 76,
+        "fields": {
+            "first_name": "Kazimierz",
+            "last_name": "Szram",
+            "families": [
+                10
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 77,
+        "fields": {
+            "first_name": "Tymoteusz",
+            "last_name": "Kruś",
+            "families": [
+                5,
+                14
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 78,
+        "fields": {
+            "first_name": "Krystian",
+            "last_name": "Nóżka",
+            "families": [
+                16
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 79,
+        "fields": {
+            "first_name": "Roksana",
+            "last_name": "Sprawka",
+            "families": [
+                13
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 80,
+        "fields": {
+            "first_name": "Antoni",
+            "last_name": "Basak",
+            "families": [
+                18,
+                11
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 81,
+        "fields": {
+            "first_name": "Dagmara",
+            "last_name": "Dziduch",
+            "families": [
+                14
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 82,
+        "fields": {
+            "first_name": "Konstanty",
+            "last_name": "Kowalak",
+            "families": [
+                19,
+                3
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 83,
+        "fields": {
+            "first_name": "Liwia",
+            "last_name": "Koziatek",
+            "families": [
+                11,
+                6,
+                18
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 84,
+        "fields": {
+            "first_name": "Mieszko",
+            "last_name": "Pasich",
+            "families": [
+                18,
+                19
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 85,
+        "fields": {
+            "first_name": "Paweł",
+            "last_name": "Kruszka",
+            "families": [
+                17,
+                3
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 86,
+        "fields": {
+            "first_name": "Jakub",
+            "last_name": "Oleksak",
+            "families": [
+                9,
+                7,
+                10
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 87,
+        "fields": {
+            "first_name": "Dawid",
+            "last_name": "Słomiany",
+            "families": [
+                16,
+                7
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 88,
+        "fields": {
+            "first_name": "Kamila",
+            "last_name": "Łuc",
+            "families": [
+                9,
+                1,
+                10
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 89,
+        "fields": {
+            "first_name": "Julita",
+            "last_name": "Sondej",
+            "families": [
+                4,
+                12
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 90,
+        "fields": {
+            "first_name": "Alan",
+            "last_name": "Mądrzak",
+            "families": [
+                13
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 91,
+        "fields": {
+            "first_name": "Klara",
+            "last_name": "Zapaśnik",
+            "families": [
+                5,
+                20
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 92,
+        "fields": {
+            "first_name": "Hubert",
+            "last_name": "Rawa",
+            "families": [
+                3,
+                17
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 93,
+        "fields": {
+            "first_name": "Nikodem",
+            "last_name": "Kuder",
+            "families": [
+                15,
+                18,
+                9
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 94,
+        "fields": {
+            "first_name": "Olaf",
+            "last_name": "Świergiel",
+            "families": [
+                7
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 95,
+        "fields": {
+            "first_name": "Olgierd",
+            "last_name": "Krakowczyk",
+            "families": [
+                12,
+                4,
+                6
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 96,
+        "fields": {
+            "first_name": "Łukasz",
+            "last_name": "Portka",
+            "families": [
+                3
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 97,
+        "fields": {
+            "first_name": "Krystyna",
+            "last_name": "Knysak",
+            "families": [
+                3,
+                5
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 98,
+        "fields": {
+            "first_name": "Dominik",
+            "last_name": "Cierpka",
+            "families": [
+                5,
+                14
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 99,
+        "fields": {
+            "first_name": "Róża",
+            "last_name": "Szwaj",
+            "families": [
+                6,
+                15,
+                1
+            ]
+        }
+    },
+    {
+        "model": "main.student",
+        "pk": 100,
+        "fields": {
+            "first_name": "Ryszard",
+            "last_name": "Musiała",
+            "families": [
+                1,
+                9,
+                16
+            ]
+        }
+    }
+]
