@@ -2,6 +2,11 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from .models import Club, Family, Student
 from .serializers import ClubSerializer, FamilySerializer, StudentSerializer
+from django.http import Http404
+
+
+def not_found_view(request):
+    raise Http404("Not Found")
 
 
 class ClubViewSet(viewsets.ReadOnlyModelViewSet):

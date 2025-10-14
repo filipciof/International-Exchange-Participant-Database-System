@@ -15,7 +15,7 @@ export default function AxiosDataGrid({columns, endpoint}: AxiosDataGridProps) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/api/${endpoint}/`)
+      .get(`${import.meta.env.VITE_API_URL}/${endpoint}/`)
       .then((response) => {
         setRows(response.data);
         setLoading(false);

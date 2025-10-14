@@ -35,7 +35,7 @@ export default function Clubs() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/api/clubs/")
+      .get(`${import.meta.env.VITE_API_URL}/clubs/`)
       .then((response) => {
         setRows(response.data);
         setLoading(false);
