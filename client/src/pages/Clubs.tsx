@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import axios from "axios";
 import { useEffect, useState } from "react";
+import axiosClient from "../utils/axiosClient";
 
 interface Club {
   name: string;
@@ -10,7 +10,6 @@ interface Club {
 }
 
 const columns: GridColDef<Club>[] = [
-  { field: "id", headerName: "ID", width: 90 },
   {
     field: "name",
     headerName: "Name",
@@ -33,17 +32,19 @@ export default function Clubs() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const getRows = async () => {
+    try {
+      const response = await axiosClient.get(`/clubs/`);
+      setRows(response.data);
+      setLoading(false);
+    } catch (err: any) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/clubs/`)
-      .then((response) => {
-        setRows(response.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+    getRows();
   }, []);
 
   if (loading) return <div>Loading...</div>;

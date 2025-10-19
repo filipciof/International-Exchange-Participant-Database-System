@@ -8,7 +8,6 @@ interface Student {
 }
 
 const columns: GridColDef<Student>[] = [
-  { field: "id", headerName: "ID", width: 90 },
   {
     field: "first_name",
     headerName: "First name",
@@ -22,7 +21,7 @@ const columns: GridColDef<Student>[] = [
   {
     field: "families",
     headerName: "Families",
-    width: 150,
+    width: 200,
   },
 ];
 

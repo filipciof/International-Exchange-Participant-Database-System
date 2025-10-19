@@ -1,29 +1,34 @@
 import Box from "@mui/material/Box";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
-import axios from "axios";
 import { useEffect, useState } from "react";
+import axiosClient from "../utils/axiosClient";
 
 interface AxiosDataGridProps {
   columns: GridColDef[];
   endpoint: string;
 }
 
-export default function AxiosDataGrid({columns, endpoint}: AxiosDataGridProps) {
+export default function AxiosDataGrid({
+  columns,
+  endpoint,
+}: AxiosDataGridProps) {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const getRows = async () => {
+    try {
+      const response = await axiosClient.get(`/${endpoint}/`);
+      setRows(response.data);
+      setLoading(false);
+    } catch (err: any) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/${endpoint}/`)
-      .then((response) => {
-        setRows(response.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+    getRows();
   }, []);
 
   if (loading) return <div>Loading...</div>;

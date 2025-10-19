@@ -3,37 +3,62 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
-import SchoolIcon from "@mui/icons-material/School";
-import HouseIcon from "@mui/icons-material/House";
-import GroupsIcon from "@mui/icons-material/Groups";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import "./App.css";
-import MiniDrawer from "./components/MiniDrawer";
-import Students from "./pages/students";
-import Clubs from "./pages/clubs";
-import Families from "./pages/families";
-import NotFound from "./pages/notfound";
+import MainDrawer from "./components/MainDrawer";
+import Students from "./pages/Students";
+import Clubs from "./pages/Clubs";
+import Families from "./pages/Families";
+import NotFound from "./pages/NotFound";
+import SignIn from "./pages/SignIn";
+import ProtectedRoute from "./components/ProtectedRoute";
+import UserInfo from "./pages/UserInfo";
 
-const menuItems = [
-  { text: "Students", icon: <SchoolIcon />, path: "/" },
-  { text: "Clubs", icon: <GroupsIcon />, path: "/clubs" },
-  { text: "Families", icon: <HouseIcon />, path: "/families" },
-];
+const allowedGroups = ["admin", "correspondent", "club_officer", "kwm_officer"];
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
+          <Route path="/sign-in" element={<SignIn />} />
+
           <Route
             path="/"
-            element={<MiniDrawer header={"IEPDS"} menuItems={menuItems} />}
+            element={
+              <ProtectedRoute>
+                <MainDrawer />
+              </ProtectedRoute>
+            }
           >
-            <Route index element={<Students />} />
-            <Route path="clubs" element={<Clubs />} />
-            <Route path="families" element={<Families />} />
+            <Route index element={<UserInfo />} />
+            <Route
+              path="students"
+              element={
+                <ProtectedRoute allowedGroups={allowedGroups}>
+                  <Students />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="clubs"
+              element={
+                <ProtectedRoute allowedGroups={allowedGroups}>
+                  <Clubs />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="families"
+              element={
+                <ProtectedRoute allowedGroups={allowedGroups}>
+                  <Families />
+                </ProtectedRoute>
+              }
+            />
           </Route>
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

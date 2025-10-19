@@ -7,7 +7,6 @@ interface Family {
 }
 
 const columns: GridColDef<Family>[] = [
-  { field: "id", headerName: "ID", width: 90 },
   {
     field: "name",
     headerName: "Name",
@@ -16,7 +15,7 @@ const columns: GridColDef<Family>[] = [
   {
     field: "club",
     headerName: "Club",
-    width: 110,
+    width: 150,
   },
 ];
 

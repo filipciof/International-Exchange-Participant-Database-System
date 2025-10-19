@@ -109,7 +109,7 @@ const Drawer = styled(MuiDrawer, {
   ],
 }));
 
-interface MenuItem {
+export interface MenuItem {
   text: string;
   icon: React.ReactNode;
   path: string;
