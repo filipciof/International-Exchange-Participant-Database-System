@@ -1,0 +1,174 @@
+[
+    {
+        "model": "contacts.contact",
+        "pk": 1,
+        "fields": {
+            "first_name": "Thierry",
+            "last_name": "Gaillard",
+            "email": "thierrygaillard@example.com",
+            "phone": "+1-953-825-7143x96733",
+            "country": "Belgium",
+            "districts": [
+                "D8071",
+                "D9190",
+                "D5025"
+            ],
+            "photo": "contact_photos/thierrygaillard.jpg"
+        }
+    },
+    {
+        "model": "contacts.contact",
+        "pk": 2,
+        "fields": {
+            "first_name": "William",
+            "last_name": "Haglund",
+            "email": "williamhaglund@example.com",
+            "phone": "+46 (0)92 67 28 59",
+            "country": "Sweden",
+            "districts": [
+                "D1813",
+                "D4483",
+                "D3298",
+                "D8662"
+            ],
+            "photo": "contact_photos/williamhaglund.jpg"
+        }
+    },
+    {
+        "model": "contacts.contact",
+        "pk": 3,
+        "fields": {
+            "first_name": "Fryderyk",
+            "last_name": "Czak",
+            "email": "fryderykczak@example.net",
+            "phone": "534 025 144",
+            "country": "Poland",
+            "districts": [
+                "D5755",
+                "D7997",
+                "D5798",
+                "D9719",
+                "D1790"
+            ],
+            "photo": "contact_photos/fryderykczak.jpg"
+        }
+    },
+    {
+        "model": "contacts.contact",
+        "pk": 4,
+        "fields": {
+            "first_name": "Chenpi",
+            "last_name": "Hsia",
+            "email": "chenpi-hsia@example.com",
+            "phone": "0968956240",
+            "country": "Taiwan",
+            "districts": [
+                "D2386",
+                "D8010"
+            ],
+            "photo": "contact_photos/chenpihsia.jpg"
+        }
+    },
+    {
+        "model": "contacts.contact",
+        "pk": 5,
+        "fields": {
+            "first_name": "Vincent",
+            "last_name": "Sundin",
+            "email": "vincentsundin@example.org",
+            "phone": "08-15 94 05",
+            "country": "Sweden",
+            "districts": [
+                "D4084",
+                "D4890",
+                "D3002",
+                "D2762",
+                "D3538"
+            ],
+            "photo": "contact_photos/vincentsudin.jpg"
+        }
+    },
+    {
+        "model": "contacts.contact",
+        "pk": 6,
+        "fields": {
+            "first_name": "Malika",
+            "last_name": "Desmet",
+            "email": "malikadesmet@example.net",
+            "phone": "778.637.5297x63859",
+            "country": "Belgium",
+            "districts": [
+                "D2421",
+                "D1851",
+                "D6432",
+                "D2911"
+            ],
+            "photo": "contact_photos/malikadesmet.jpg"
+        }
+    },
+    {
+        "model": "contacts.contact",
+        "pk": 7,
+        "fields": {
+            "first_name": "Urszula",
+            "last_name": "Taranek",
+            "email": "urszulataranek@example.com",
+            "phone": "+48 539 006 010",
+            "country": "Poland",
+            "districts": [
+                "D2738",
+                "D9061",
+                "D5478"
+            ],
+            "photo": "contact_photos/urszulataranek.jpg"
+        }
+    },
+    {
+        "model": "contacts.contact",
+        "pk": 8,
+        "fields": {
+            "first_name": "Freja",
+            "last_name": "Jansson",
+            "email": "frejajansson@example.com",
+            "phone": "0234-70 73 12",
+            "country": "Sweden",
+            "districts": [
+                "D8595",
+                "D3269"
+            ],
+            "photo": "contact_photos/frejajansson.jpg"
+        }
+    },
+    {
+        "model": "contacts.contact",
+        "pk": 9,
+        "fields": {
+            "first_name": "Yu",
+            "last_name": "Tingchen",
+            "email": "yu-tingchen@example.net",
+            "phone": "(08) 29489940",
+            "country": "Taiwan",
+            "districts": [
+                "D5685",
+                "D9580"
+            ],
+            "photo": "contact_photos/yutingchen.jpg"
+        }
+    },
+    {
+        "model": "contacts.contact",
+        "pk": 10,
+        "fields": {
+            "first_name": "Elisabeth",
+            "last_name": "Marchal",
+            "email": "elisabethmarchal@example.com",
+            "phone": "+1-398-926-0535",
+            "country": "Belgium",
+            "districts": [
+                "D2485",
+                "D1947"
+            ],
+            "photo": "contact_photos/elisabethmarchal.jpg"
+        }
+    }
+]

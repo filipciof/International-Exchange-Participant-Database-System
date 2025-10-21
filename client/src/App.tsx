@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UserInfo from "./pages/UserInfo";
+import Contacts from "./pages/Contacts";
 
 const allowedGroups = ["admin", "correspondent", "club_officer", "kwm_officer"];
 
@@ -54,6 +55,14 @@ function App() {
               element={
                 <ProtectedRoute allowedGroups={allowedGroups}>
                   <Families />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="contacts"
+              element={
+                <ProtectedRoute allowedGroups={allowedGroups}>
+                  <Contacts />
                 </ProtectedRoute>
               }
             />

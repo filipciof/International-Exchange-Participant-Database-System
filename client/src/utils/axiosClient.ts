@@ -28,6 +28,7 @@ const refreshAccessToken = async () => {
     localStorage.setItem("accessToken", accessToken);
     return accessToken;
   } catch (error) {
+    localStorage.clear();
     throw new Error("Unable to refresh token");
   }
 };
@@ -49,7 +50,6 @@ axiosClient.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return axiosClient(originalRequest);
       } catch (err) {
-        localStorage.clear();
         return Promise.reject(err);
       }
     }

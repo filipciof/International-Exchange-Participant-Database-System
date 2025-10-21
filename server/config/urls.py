@@ -17,12 +17,15 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from config.settings import DEBUG
+from config.settings import DEBUG, MEDIA_URL, MEDIA_ROOT
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("", include("main.urls")),
     path("auth/", include("eauth.urls")),
+    path("contacts/", include("contacts.urls"))
 ]
 
 if DEBUG is True:
     urlpatterns.insert(0, path("admin/", admin.site.urls))
+    urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

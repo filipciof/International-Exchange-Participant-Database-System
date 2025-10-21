@@ -34,7 +34,7 @@ export default function Clubs() {
 
   const getRows = async () => {
     try {
-      const response = await axiosClient.get(`/clubs/`);
+      const response = await axiosClient.get("/clubs/");
       setRows(response.data);
       setLoading(false);
     } catch (err: any) {
