@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import axiosClient from "../utils/axiosClient";
 import ActionAreaCard from "../components/ActionAreaCard";
 import AddIcon from "@mui/icons-material/Add";
-import { Box, Button, CssBaseline } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
+import Loading from "../components/Loading";
 
 type Contact = {
   first_name: string;
@@ -25,6 +26,7 @@ export default function Contacts() {
       const response = await axiosClient.get("/contacts/");
       setContacts(response.data);
       setLoading(false);
+      console.log(response.data);
       return response.data;
     } catch (err: any) {
       setError(err.message);
@@ -72,29 +74,24 @@ export default function Contacts() {
     return `${contact.first_name} ${contact.last_name}`;
   };
 
-  const getCardDescription = (contact: Contact) => {
-    return (
-      contact.country +
-      "\n" +
-      contact.districts +
-      "\n" +
-      contact.email +
-      "\n" +
-      contact.phone
-    );
+  const getCardDescription = (contact: Contact): string[] => {
+    let districtStr = "";
+    for (let district of contact.districts) {
+      districtStr += `${district}, `;
+    }
+    districtStr = districtStr.slice(0, districtStr.length - 2);
+    return [contact.country, districtStr, contact.email, contact.phone];
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <Loading />;
+  if (error) return <Typography>Error: {error}</Typography>;
 
   return (
-    <Box>
-      <CssBaseline enableColorScheme />
-      <Box style={{textAlign: "left", paddingTop: "5vh", paddingLeft: "3.5vw"}}>
-        <Button variant="outlined" startIcon={<AddIcon />}>
-          New contact
-        </Button>
-      </Box>
+    <>
+      <Button variant="outlined" startIcon={<AddIcon />}>
+        New contact
+      </Button>
+
       <Box style={{ display: "flex", flexWrap: "wrap" }}>
         {contacts.map((contact, index) => (
           <ActionAreaCard
@@ -105,6 +102,6 @@ export default function Contacts() {
           />
         ))}
       </Box>
-    </Box>
+    </>
   );
 }

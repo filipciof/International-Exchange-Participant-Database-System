@@ -1,15 +1,28 @@
-import MiniDrawer from "./MiniDrawer";
-import { type MenuItem } from "./MiniDrawer";
-
+import {
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  ListItemButton,
+} from "@mui/material";
 import SchoolIcon from "@mui/icons-material/School";
 import HouseIcon from "@mui/icons-material/House";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PersonIcon from "@mui/icons-material/Person";
-import ContactPageIcon from '@mui/icons-material/ContactPage';
+import ContactPageIcon from "@mui/icons-material/ContactPage";
+import { useNavigate } from "react-router-dom";
 
 const allowedGroups = ["admin", "correspondent", "club_officer", "kwm_officer"];
 
-export default function MainDrawer() {
+interface MenuItem {
+  text: string;
+  icon: React.ReactNode;
+  path: string;
+}
+
+export default function SideBarList() {
+  const navigate = useNavigate();
+
   const getMenuItems = (): MenuItem[] => {
     const userGroupsWrapper = localStorage.getItem("userGroups");
     let userGroups: string[] = [];
@@ -32,5 +45,20 @@ export default function MainDrawer() {
 
     return [{ text: "Home", icon: <PersonIcon />, path: "/" }];
   };
-  return <MiniDrawer header={"IEPDS"} menuItems={getMenuItems()} />;
+
+  return (
+    <List>
+      {getMenuItems().map((item) => (
+        <ListItem key={item.text} disablePadding>
+          <ListItemButton
+            selected={location.pathname === item.path}
+            onClick={() => navigate(item.path)}
+          >
+            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.text} />
+          </ListItemButton>
+        </ListItem>
+      ))}
+    </List>
+  );
 }

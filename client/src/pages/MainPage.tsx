@@ -1,0 +1,106 @@
+import {
+  Box,
+  AppBar,
+  Button,
+  Toolbar,
+  IconButton,
+  Typography,
+  Drawer,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import { useState } from "react";
+import SideBarList from "../components/SideBarList";
+import { Outlet, useNavigate } from "react-router-dom";
+import axiosClient from "../utils/axiosClient";
+import { appBarHeight, drawerWidth } from "../utils/constants";
+import Loading from "../components/Loading";
+
+export default function MainPage() {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const toggleDrawer = (newOpen: boolean) => () => {
+    setOpen(newOpen);
+  };
+
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      await axiosClient.post("/auth/logout/");
+      localStorage.clear();
+      navigate("/sign-in");
+    } catch (err) {
+      setLoading(false);
+      console.error(err);
+      localStorage.clear();
+      navigate("/sign-in");
+    }
+  };
+
+  return (
+    <Box>
+      <Box>
+        <AppBar position="fixed">
+          <Toolbar>
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{ mr: 2, display: { sm: "block", md: "none" } }}
+              onClick={toggleDrawer(true)}
+            >
+              <MenuIcon />
+            </IconButton>
+
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              IEPDS
+            </Typography>
+
+            <Button color="inherit" onClick={handleLogout}>
+              Logout
+            </Button>
+          </Toolbar>
+        </AppBar>
+      </Box>
+
+      <Box
+        sx={{
+          position: "fixed",
+          borderRight: "1px solid",
+          borderColor: "divider",
+          width: drawerWidth,
+          height: `calc(100vh - ${appBarHeight}px)`,
+          display: { xs: "none", sm: "none", md: "flex" },
+        }}
+      >
+        <SideBarList />
+      </Box>
+
+      <Box
+        sx={{
+          mt: `${appBarHeight}px`,
+          ml: { xs: 0, sm: 0, md: `${drawerWidth}px` },
+          flexGrow: 1,
+          p: 3,
+        }}
+      >
+        {loading ? <Loading /> : <Outlet />}
+      </Box>
+
+      <Drawer
+        sx={{
+          "& .MuiDrawer-paper": {
+            boxSizing: "border-box",
+            width: drawerWidth,
+          },
+        }}
+        open={open}
+        onClose={toggleDrawer(false)}
+      >
+        <SideBarList />
+      </Drawer>
+    </Box>
+  );
+}

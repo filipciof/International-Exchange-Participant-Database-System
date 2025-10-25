@@ -1,7 +1,8 @@
-import Box from "@mui/material/Box";
 import { DataGrid, type GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import axiosClient from "../utils/axiosClient";
+import { Typography, Box } from "@mui/material";
+import Loading from "../components/Loading";
 
 interface Club {
   name: string;
@@ -47,8 +48,8 @@ export default function Clubs() {
     getRows();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <Loading />;
+  if (error) return <Typography>Error: {error}</Typography>;
 
   return (
     <Box sx={{ height: 400, width: "100%" }}>

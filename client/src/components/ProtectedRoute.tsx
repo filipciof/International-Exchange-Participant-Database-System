@@ -1,6 +1,6 @@
 import { type PropsWithChildren } from "react";
 import { Navigate } from "react-router-dom";
-import CssBaseline from "@mui/material/CssBaseline";
+import { Typography } from "@mui/material";
 
 type ProtectedRouteProps = PropsWithChildren & {
   allowedGroups?: string[];
@@ -30,12 +30,7 @@ export default function ProtectedRoute({
   const hasAccess = allowedGroups?.some((group) => userGroups?.includes(group));
 
   if (!hasAccess) {
-    return (
-      <div>
-        <CssBaseline enableColorScheme />
-        Access denied!
-      </div>
-    );
+    return <Typography>Access denied!</Typography>;
   }
 
   return children;

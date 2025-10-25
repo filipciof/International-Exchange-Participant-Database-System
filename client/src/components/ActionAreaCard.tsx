@@ -1,13 +1,17 @@
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
-import Typography from "@mui/material/Typography";
-import CardActionArea from "@mui/material/CardActionArea";
+import {
+  List,
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  CardActionArea,
+  Box,
+} from "@mui/material";
 
 type ActionAreaCardProps = {
   imageUrl: string;
   header: string;
-  description: string;
+  description: string[];
 };
 
 export default function ActionAreaCard({
@@ -16,31 +20,27 @@ export default function ActionAreaCard({
   description,
 }: ActionAreaCardProps) {
   return (
-    <div
-      style={{
-        transform: `scale(${0.7})`,
-        transition: "transform 0.3s ease",
-      }}
-    >
-      <Card sx={{ maxWidth: 345 }}>
+    <Box sx={{ zoom: {xs: 0.5, sm: 0.6, md: 0.7} }}>
+      <Card sx={{ maxWidth: "300px", mt: "10px", mr: "10px" }}>
         <CardActionArea>
           <CardMedia
             component="img"
-            // height="140"
             image={imageUrl}
             alt={header}
             sx={{ objectFit: "fill" }}
           />
           <CardContent>
-            <Typography gutterBottom variant="h4" component="div">
+            <Typography gutterBottom variant="h5" component="div">
               {header}
             </Typography>
-            <Typography variant="body1" sx={{ color: "text.secondary" }}>
-              {description}
-            </Typography>
+            <List>
+              {description.map((section) => (
+                <Typography variant="body1">{section}</Typography>
+              ))}
+            </List>
           </CardContent>
         </CardActionArea>
       </Card>
-    </div>
+    </Box>
   );
 }

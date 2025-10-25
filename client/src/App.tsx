@@ -5,8 +5,7 @@ import "@fontsource/roboto/700.css";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import "./App.css";
-import MainDrawer from "./components/MainDrawer";
+import MainPage from "./pages/MainPage";
 import Students from "./pages/Students";
 import Clubs from "./pages/Clubs";
 import Families from "./pages/Families";
@@ -29,7 +28,7 @@ function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <MainDrawer />
+                <MainPage />
               </ProtectedRoute>
             }
           >

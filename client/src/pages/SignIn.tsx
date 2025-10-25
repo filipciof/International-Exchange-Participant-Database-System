@@ -3,7 +3,6 @@ import { useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
-import CssBaseline from "@mui/material/CssBaseline";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
@@ -16,6 +15,7 @@ import { styled } from "@mui/material/styles";
 import ForgotPassword from "../components/ForgotPassword";
 import axiosClient from "../utils/axiosClient";
 import { Navigate, useNavigate } from "react-router-dom";
+import Loading from "../components/Loading";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -65,7 +65,7 @@ type LoginErrorMessageProps = {
 
 function LoginErrorMessage({ isError }: LoginErrorMessageProps) {
   if (isError) {
-    return <div style={{ color: "red" }}>Invalid credentials</div>;
+    return <Typography sx={{ color: "red" }}>Invalid credentials</Typography>;
   }
 
   return null;
@@ -156,20 +156,15 @@ export default function SignIn() {
     return isValid;
   };
 
-  if (loading) {
-    return (
-      <div>
-        <CssBaseline enableColorScheme />
-        Loading...
-      </div>
-    );
-  }
+  if (loading) return <Loading />;
 
   return (
     <>
-      <CssBaseline enableColorScheme />
       <SignInContainer direction="column" justifyContent="space-between">
-        <Card variant="outlined">
+        <Card
+          variant="outlined"
+          sx={{ width: { xs: "200px", sm: "300px", md: "500px" } }}
+        >
           <Typography
             component="h1"
             variant="h4"
