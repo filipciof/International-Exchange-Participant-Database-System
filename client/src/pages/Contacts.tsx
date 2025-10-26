@@ -4,8 +4,9 @@ import ActionAreaCard from "../components/ActionAreaCard";
 import AddIcon from "@mui/icons-material/Add";
 import { Box, Button, Typography } from "@mui/material";
 import Loading from "../components/Loading";
+import ContactForm from "../components/ContactForm";
 
-type Contact = {
+export type Contact = {
   first_name: string;
   last_name: string;
   email: string;
@@ -20,6 +21,19 @@ export default function Contacts() {
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+
+  const handleAddContact = (contact: Contact) => {
+    setContacts([...contacts, contact]);
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const getContacts = async () => {
     try {
@@ -54,7 +68,7 @@ export default function Contacts() {
 
   const fetchImages = async () => {
     const fetchedImages = await Promise.all(
-      contacts.map((contact) => getImage(contact))
+      contacts.map((contact) => getImage(contact)),
     );
     setImages(fetchedImages);
   };
@@ -88,9 +102,19 @@ export default function Contacts() {
 
   return (
     <>
-      <Button variant="outlined" startIcon={<AddIcon />}>
+      <Button
+        variant="outlined"
+        startIcon={<AddIcon />}
+        onClick={handleClickOpen}
+      >
         New contact
       </Button>
+
+      <ContactForm
+        open={open}
+        handleClose={handleClose}
+        handleAddContact={handleAddContact}
+      />
 
       <Box style={{ display: "flex", flexWrap: "wrap" }}>
         {contacts.map((contact, index) => (

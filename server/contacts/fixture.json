@@ -6,7 +6,7 @@
             "first_name": "Thierry",
             "last_name": "Gaillard",
             "email": "thierrygaillard@example.com",
-            "phone": "+1-953-825-7143x96733",
+            "phone": "+32 453 825 714",
             "country": "Belgium",
             "districts": [
                 "D8071",
@@ -23,7 +23,7 @@
             "first_name": "William",
             "last_name": "Haglund",
             "email": "williamhaglund@example.com",
-            "phone": "+46 (0)92 67 28 59",
+            "phone": "+46 09 267 28 59",
             "country": "Sweden",
             "districts": [
                 "D1813",
@@ -41,7 +41,7 @@
             "first_name": "Fryderyk",
             "last_name": "Czak",
             "email": "fryderykczak@example.net",
-            "phone": "534 025 144",
+            "phone": "+48 534 025 144",
             "country": "Poland",
             "districts": [
                 "D5755",
@@ -60,7 +60,7 @@
             "first_name": "Chenpi",
             "last_name": "Hsia",
             "email": "chenpi-hsia@example.com",
-            "phone": "0968956240",
+            "phone": "+886 996 895 624",
             "country": "Taiwan",
             "districts": [
                 "D2386",
@@ -76,7 +76,7 @@
             "first_name": "Vincent",
             "last_name": "Sundin",
             "email": "vincentsundin@example.org",
-            "phone": "08-15 94 05",
+            "phone": "+46 08 159 40 52",
             "country": "Sweden",
             "districts": [
                 "D4084",
@@ -95,7 +95,7 @@
             "first_name": "Malika",
             "last_name": "Desmet",
             "email": "malikadesmet@example.net",
-            "phone": "778.637.5297x63859",
+            "phone": "+32 478 637 529",
             "country": "Belgium",
             "districts": [
                 "D2421",
@@ -130,7 +130,7 @@
             "first_name": "Freja",
             "last_name": "Jansson",
             "email": "frejajansson@example.com",
-            "phone": "0234-70 73 12",
+            "phone": "+46 23 470 73 12",
             "country": "Sweden",
             "districts": [
                 "D8595",
@@ -146,7 +146,7 @@
             "first_name": "Yu",
             "last_name": "Tingchen",
             "email": "yu-tingchen@example.net",
-            "phone": "(08) 29489940",
+            "phone": "+886 929 489 940",
             "country": "Taiwan",
             "districts": [
                 "D5685",
@@ -162,7 +162,7 @@
             "first_name": "Elisabeth",
             "last_name": "Marchal",
             "email": "elisabethmarchal@example.com",
-            "phone": "+1-398-926-0535",
+            "phone": "+32 498 926 053",
             "country": "Belgium",
             "districts": [
                 "D2485",
