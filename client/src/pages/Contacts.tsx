@@ -93,7 +93,7 @@ export default function Contacts() {
   if (isLoading) return <Loading />;
   if (error)
     return (
-      <Typography sx={{ color: "red" }}>Error: {error.message}</Typography>
+      <Typography sx={{ color: "error.main" }}>Error: {error.message}</Typography>
     );
 
   return (

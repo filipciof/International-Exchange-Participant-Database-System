@@ -160,7 +160,7 @@ export default function ContactForm({
             <List>
               {handleValidationErrors(error.response?.data).map(
                 (message: string) => (
-                  <Typography sx={{ color: "red" }}>{message}</Typography>
+                  <Typography sx={{ color: "error.main" }}>{message}</Typography>
                 )
               )}
             </List>
@@ -171,7 +171,7 @@ export default function ContactForm({
             <></>
           )}
           {isSuccess ? (
-            <Typography sx={{ color: "green" }}>
+            <Typography sx={{ color: "success.main" }}>
               New contact added successfully!
             </Typography>
           ) : (

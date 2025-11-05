@@ -26,7 +26,7 @@ export default function AxiosDataGrid({
   });
 
   if (isLoading) return <Loading />;
-  if (error) return <Typography sx={{color: "red"}}>Error: {error.message}</Typography>;
+  if (error) return <Typography sx={{color: "error.main"}}>Error: {error.message}</Typography>;
 
   return (
     <Box sx={{ height: 400, width: "100%" }}>

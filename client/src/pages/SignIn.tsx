@@ -65,7 +65,7 @@ type LoginErrorMessageProps = {
 
 function LoginErrorMessage({ isError }: LoginErrorMessageProps) {
   if (isError) {
-    return <Typography sx={{ color: "red" }}>Invalid credentials</Typography>;
+    return <Typography sx={{ color: "error.main" }}>Invalid credentials</Typography>;
   }
 
   return null;
