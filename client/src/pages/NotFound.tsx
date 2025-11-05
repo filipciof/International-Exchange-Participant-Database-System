@@ -1,10 +1,5 @@
-import CssBaseline from "@mui/material/CssBaseline";
+import { Typography } from "@mui/material";
 
 export default function NotFound() {
-  return (
-    <div>
-      <CssBaseline enableColorScheme />
-      Page not found!
-    </div>
-  );
+  return <Typography>Page not found!</Typography>;
 }
