@@ -2,10 +2,19 @@ import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import Loading from "../components/Loading";
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
-import ActionAreaCard from "../components/ActionAreaCard";
+import {
+  Box,
+  Button,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import ViewModuleIcon from "@mui/icons-material/ViewModule";
+import ViewListIcon from "@mui/icons-material/ViewList";
 import ContactForm from "../components/ContactForm";
+import ContactCard from "../components/ContactCard";
+import ContactList from "../components/ContactList";
 import queryClient from "../utils/queryClient";
 
 export type Contact = {
@@ -31,6 +40,7 @@ export type ContactFormData = {
 
 export default function Contacts() {
   const [open, setOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"card" | "list">("card");
 
   const {
     data: contacts = [],
@@ -71,6 +81,15 @@ export default function Contacts() {
     setOpen(false);
   };
 
+  const handleViewChange = (
+    _event: React.MouseEvent<HTMLElement>,
+    newView: "card" | "list" | null
+  ) => {
+    if (newView !== null) {
+      setViewMode(newView);
+    }
+  };
+
   if (isLoading) return <Loading />;
   if (error)
     return (
@@ -79,13 +98,29 @@ export default function Contacts() {
 
   return (
     <>
-      <Button
-        variant="outlined"
-        startIcon={<AddIcon />}
-        onClick={handleClickOpen}
-      >
-        New contact
-      </Button>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Button
+          variant="outlined"
+          startIcon={<AddIcon />}
+          onClick={handleClickOpen}
+        >
+          New contact
+        </Button>
+
+        <ToggleButtonGroup
+          value={viewMode}
+          exclusive
+          onChange={handleViewChange}
+          aria-label="view mode"
+        >
+          <ToggleButton value="card" aria-label="card view">
+            <ViewModuleIcon />
+          </ToggleButton>
+          <ToggleButton value="list" aria-label="table view">
+            <ViewListIcon />
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
 
       <ContactForm
         open={open}
@@ -93,44 +128,20 @@ export default function Contacts() {
         handleAddContact={handleAddContact}
         isLoading={addContactMutation.isPending}
         isSuccess={addContactMutation.isSuccess}
-        error={addContactMutation.error} 
+        error={addContactMutation.error}
       />
-      <Box style={{ display: "flex", flexWrap: "wrap" }}>
-        {contacts.map((contact: Contact) => (
-          <ContactCard key={contact.id} contact={contact} />
-        ))}
+
+      <Box sx={{ display: viewMode === "card" ? "flex" : "none", flexWrap: "wrap" }}>
+        {
+          contacts.map((contact: Contact) => (
+            <ContactCard key={contact.id} contact={contact} />
+          ))
+        }
+      </Box>
+
+      <Box sx={{ display: viewMode === "list" ? "flex" : "none", flexWrap: "wrap" }}>
+        <ContactList contacts={contacts} />
       </Box>
     </>
-  );
-}
-
-function ContactCard({ contact }: { contact: Contact }) {
-  const { data: imageUrl, isLoading } = useQuery({
-    queryKey: ["contactImage", contact.photo],
-    queryFn: async () => {
-      const photoName = contact.photo.split("/")[3];
-      const response = await axiosClient.get(
-        `/contacts/photos/?photo_name=${photoName}`,
-        { responseType: "blob" }
-      );
-      return URL.createObjectURL(response.data);
-    },
-    enabled: !!contact.photo,
-    staleTime: Infinity,
-  });
-
-  if (isLoading) return <CircularProgress sx={{ color: "secondary.main" }} />;
-
-  return (
-    <ActionAreaCard
-      imageUrl={imageUrl || ""}
-      header={`${contact.first_name} ${contact.last_name}`}
-      description={[
-        contact.country,
-        contact.districts.join(", "),
-        contact.email,
-        contact.phone,
-      ]}
-    />
   );
 }
