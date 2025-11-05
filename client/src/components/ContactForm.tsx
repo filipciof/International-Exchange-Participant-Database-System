@@ -7,20 +7,21 @@ import {
   Stack,
   CircularProgress,
   Typography,
-  List,
   useMediaQuery,
+  List,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useState } from "react";
 import { SingleFileUpload, FileDropzoneInputBody } from "mui-file-upload";
-import axiosClient from "../utils/axiosClient";
-import { isAxiosError } from "axios";
-import { type Contact } from "../pages/Contacts";
+import { type ContactFormData } from "../pages/Contacts";
 
 type ContactFormProps = {
   open: boolean;
   handleClose: () => void;
-  handleAddContact: (contact: Contact) => void;
+  handleAddContact: (contact: ContactFormData) => void;
+  isLoading: boolean;
+  isSuccess: boolean;
+  error: any | null;
 };
 
 interface ValidationErrors {
@@ -31,6 +32,9 @@ export default function ContactForm({
   open,
   handleClose,
   handleAddContact,
+  isLoading,
+  isSuccess,
+  error,
 }: ContactFormProps) {
   const [formData, setFormData] = useState({
     first_name: "",
@@ -41,10 +45,6 @@ export default function ContactForm({
     phone: "",
   });
   const [photo, setPhoto] = useState<File | null>(null);
-  const [error, setError] = useState(false);
-  const [errorMessages, setErrorMessages] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -55,29 +55,8 @@ export default function ContactForm({
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    setLoading(true);
-    const requestBody = { ...formData, photo: photo };
-    try {
-      const response = await axiosClient.post("/contacts/", requestBody, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      handleAddContact(response.data);
-      setSuccess(true);
-      setError(false);
-      setErrorMessages([]);
-    } catch (err: unknown) {
-      if (isAxiosError(err)) {
-        setSuccess(false);
-        setError(true);
-        setErrorMessages(handleValidationErrors(err.response?.data));
-      } else {
-        console.error("An unexpected error occurred", err);
-      }
-    } finally {
-      setLoading(false);
-    }
+    const newContact = { ...formData, photo: photo };
+    handleAddContact(newContact);
   };
 
   const handleValidationErrors = (errors: ValidationErrors) => {
@@ -166,7 +145,7 @@ export default function ContactForm({
             body={<FileDropzoneInputBody title="Upload photo" />}
           />
           <Stack direction="row" spacing={2} justifyContent="space-between">
-            {loading ? (
+            {isLoading ? (
               <CircularProgress sx={{ color: "secondary.main" }} />
             ) : (
               <Button variant="contained" type="submit">
@@ -179,14 +158,19 @@ export default function ContactForm({
           </Stack>
           {error ? (
             <List>
-              {errorMessages.map((message) => (
-                <Typography sx={{ color: "red" }}>{message}</Typography>
-              ))}
+              {handleValidationErrors(error.response?.data).map(
+                (message: string) => (
+                  <Typography sx={{ color: "red" }}>{message}</Typography>
+                )
+              )}
             </List>
           ) : (
+            // <Typography sx={{ color: "red" }}>
+            //   Error: {error.message}
+            // </Typography>
             <></>
           )}
-          {success ? (
+          {isSuccess ? (
             <Typography sx={{ color: "green" }}>
               New contact added successfully!
             </Typography>
