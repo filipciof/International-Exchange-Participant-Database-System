@@ -6,6 +6,7 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_403_FORBIDDEN
+from rest_framework.pagination import PageNumberPagination
 
 allowed_groups = ["admin", "correspondent", "club_officer", "kwm_officer"]
 
@@ -57,6 +58,8 @@ class StudentView(APIView):
             )
 
         students = Student.objects.all()
-        serializer = StudentSerializer(students, many=True)
-
+        paginator = PageNumberPagination()
+        result_page = paginator.paginate_queryset(students, request, view=self)
+        serializer = StudentSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
         return Response(serializer.data)
