@@ -29,6 +29,7 @@ const refreshAccessToken = async () => {
     return accessToken;
   } catch (error) {
     localStorage.clear();
+    window.location.href = "/sign-in";
     throw new Error("Unable to refresh token");
   }
 };

@@ -1,10 +1,11 @@
 from django.urls import path
-from .views import not_found_view, ClubView, FamilyView, StudentView
+from .views import not_found_view, ClubView, FamilyView, StudentView, CountryView
 from config.settings import DEBUG
 
 not_found_url = path("", not_found_view, name="root-not-found")
 
 urlpatterns = [
+    path("countries/", CountryView.as_view()),
     path("clubs/", ClubView.as_view()),
     path("families/", FamilyView.as_view()),
     path("students/", StudentView.as_view()),

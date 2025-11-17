@@ -13,6 +13,8 @@ from .models import Contact
 from .serializers import ContactSerializer
 from uuid import uuid4
 from django.core.files.storage import default_storage
+from rest_framework.pagination import PageNumberPagination
+from django.db.models import Q
 
 get_allowed_groups = ["admin", "correspondent", "club_officer", "kwm_officer"]
 crud_allowed_groups = ["admin", "correspondent"]
@@ -56,10 +58,52 @@ class ContactView(APIView):
                 status=HTTP_403_FORBIDDEN,
             )
 
-        contacts = Contact.objects.all()
-        serializer = ContactSerializer(contacts, many=True)
+        contacts = Contact.objects.order_by("-id")
+        contacts = contacts.filter(is_active=True)
 
-        return Response(serializer.data)
+        country = request.query_params.get("country")
+        if country:
+            contacts = contacts.filter(id_country=country)
+
+        groups = request.query_params.getlist("group")
+        if groups:
+            group_query = Q()
+        
+            for group in groups:
+                if group == "lt":
+                    group_query |= Q(is_longterm=True)
+                elif group == "f2f":
+                    group_query |= Q(is_family_to_family=True)
+                elif group == "camp":
+                    group_query |= Q(is_camp=True)
+                elif group == "none":
+                    group_query |= Q(is_longterm=False, is_family_to_family=False, is_camp=False)
+        
+            contacts = contacts.filter(group_query)
+        
+        search = request.query_params.get("search")
+        if search:
+            search_query = Q()
+
+            search_fields = [
+                'first_name',
+                "middle_name",
+                'last_name',
+                'email',
+                'phone',
+                'notes',
+            ]
+            
+            for field in search_fields:
+                search_query |= Q(**{f"{field}__icontains": search})
+            
+            contacts = contacts.filter(search_query)
+
+        paginator = PageNumberPagination()
+        paginator.page_size = min(int(request.query_params.get("page_size", 25)), 100)
+        result_page = paginator.paginate_queryset(contacts, request, view=self)
+        serializer = ContactSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
         user_groups = request.user.groups.values_list("name", flat=True)

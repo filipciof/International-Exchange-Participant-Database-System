@@ -3,6 +3,7 @@ import axiosClient from "../utils/axiosClient";
 import { Typography, Box } from "@mui/material";
 import Loading from "./Loading";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 interface AxiosDataGridProps {
   columns: GridColDef[];
@@ -13,36 +14,45 @@ export default function AxiosDataGrid({
   columns,
   endpoint,
 }: AxiosDataGridProps) {
-  const {
-    data: rows,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: [endpoint],
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 25,
+  });
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: [endpoint, paginationModel],
     queryFn: async () => {
-      const response = await axiosClient.get(`/${endpoint}/`);
+      const response = await axiosClient.get(
+        `/${endpoint}/?page=${paginationModel.page + 1}&page_size=${
+          paginationModel.pageSize
+        }`
+      );
       return response.data;
     },
+    placeholderData: (prev) => prev,
   });
 
   if (isLoading) return <Loading />;
-  if (error) return <Typography sx={{color: "error.main"}}>Error: {error.message}</Typography>;
+  if (error)
+    return (
+      <Typography sx={{ color: "error.main" }}>
+        Error: {error.message}
+      </Typography>
+    );
 
   return (
-    <Box sx={{ height: 400, width: "100%" }}>
+    <Box sx={{ width: "100%" }}>
       <DataGrid
-        rows={rows}
+        rows={data.results}
         columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 5,
-            },
-          },
-        }}
-        pageSizeOptions={[5]}
         checkboxSelection
         disableRowSelectionOnClick
+        paginationMode="server"
+        rowCount={data.count}
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        pageSizeOptions={[10, 25, 50, 100]}
+        loading={isLoading}
       />
     </Box>
   );

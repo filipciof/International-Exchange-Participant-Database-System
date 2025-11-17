@@ -1,10 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import Loading from "../components/Loading";
 import {
+  Autocomplete,
   Box,
   Button,
+  FormControl,
+  MenuItem,
+  Pagination,
+  Select,
+  TextField,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
@@ -12,46 +18,81 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import ViewListIcon from "@mui/icons-material/ViewList";
+import SearchIcon from "@mui/icons-material/Search";
 import ContactForm from "../components/ContactForm";
 import ContactCard from "../components/ContactCard";
 import ContactList from "../components/ContactList";
 import queryClient from "../utils/queryClient";
-
-export type Contact = {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  country: string;
-  districts: string[];
-  photo: string;
-};
-
-export type ContactFormData = {
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  country: string;
-  districts: string;
-  photo: File | null;
-};
+import type { Contact, ContactFormData, Country } from "../utils/types";
 
 export default function Contacts() {
   const [open, setOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"card" | "list">("card");
+  const [paginationModel, setPaginationModel] = useState({
+    page: 1,
+    pageSize: 25,
+  });
+  const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+      setPaginationModel((prev) => ({ ...prev, page: 1 }));
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   const {
     data: contacts = [],
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["contacts"],
+    queryKey: [
+      "contacts",
+      paginationModel,
+      selectedGroups,
+      selectedCountry,
+      debouncedSearch,
+    ],
     queryFn: async () => {
-      const response = await axiosClient.get("/contacts/");
+      const params = new URLSearchParams({
+        page: paginationModel.page.toString(),
+        page_size: paginationModel.pageSize.toString(),
+      });
+
+      if (selectedCountry) {
+        params.append("country", selectedCountry.id.toString());
+      }
+
+      selectedGroups.forEach((group) => {
+        params.append("group", group);
+      });
+
+      if (debouncedSearch) {
+        params.append("search", debouncedSearch);
+      }
+
+      const response = await axiosClient.get(`/contacts/?${params.toString()}`);
+
+      console.log(response.data);
       return response.data;
     },
+    placeholderData: (prev) => prev,
+    enabled: searchInput === debouncedSearch,
+  });
+
+  const { data: countries = [] } = useQuery({
+    queryKey: ["countries"],
+    queryFn: async () => {
+      const response = await axiosClient.get("/countries/");
+      console.log(response.data);
+      return response.data;
+    },
+    staleTime: Infinity,
   });
 
   const addContactMutation = useMutation({
@@ -93,7 +134,9 @@ export default function Contacts() {
   if (isLoading) return <Loading />;
   if (error)
     return (
-      <Typography sx={{ color: "error.main" }}>Error: {error.message}</Typography>
+      <Typography sx={{ color: "error.main" }}>
+        Error: {error.message}
+      </Typography>
     );
 
   return (
@@ -130,17 +173,178 @@ export default function Contacts() {
         isSuccess={addContactMutation.isSuccess}
         error={addContactMutation.error}
       />
-
-      <Box sx={{ display: viewMode === "card" ? "flex" : "none", flexWrap: "wrap" }}>
-        {
-          contacts.map((contact: Contact) => (
-            <ContactCard key={contact.id} contact={contact} />
-          ))
-        }
+      <Box sx={{ my: 2 }}>
+        <TextField
+          fullWidth
+          size="small"
+          placeholder="Search contacts..."
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <SearchIcon sx={{ color: "text.secondary", mr: 1 }} />
+              ),
+            },
+          }}
+        />
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 3,
+          my: 2,
+        }}
+      >
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+          Filter by country:
+        </Typography>
+        <Autocomplete
+          value={selectedCountry}
+          onChange={(_event, newValue) => {
+            setSelectedCountry(newValue);
+            setPaginationModel({ ...paginationModel, page: 1 });
+          }}
+          options={countries}
+          getOptionLabel={(option) => option.name}
+          sx={{ minWidth: 200 }}
+          renderInput={(params) => (
+            <TextField {...params} placeholder="Select country" size="small" />
+          )}
+        />
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+          Filter by group:
+        </Typography>
+        <ToggleButtonGroup
+          value={selectedGroups}
+          onChange={(_event, newGroups) => setSelectedGroups(newGroups)}
+          aria-label="group filters"
+          sx={{
+            gap: 1,
+            "& .MuiToggleButton-root": {
+              borderRadius: "20px",
+              textTransform: "lowercase",
+              border: "1px solid",
+              borderColor: "divider",
+              "&.Mui-selected": {
+                borderColor: "secondary.main",
+              },
+            },
+          }}
+        >
+          <ToggleButton value="lt" aria-label="group 1">
+            <Typography>longterm</Typography>
+          </ToggleButton>
+          <ToggleButton value="f2f" aria-label="group 2">
+            <Typography>family-to-family</Typography>
+          </ToggleButton>
+          <ToggleButton value="camp" aria-label="group 3">
+            <Typography>camp</Typography>
+          </ToggleButton>
+          <ToggleButton value="none" aria-label="unassigned">
+            <Typography>unassigned</Typography>
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          // justifyContent: "center",
+          gap: 2,
+          my: 3,
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
+            Results per page:
+          </Typography>
+          <FormControl size="small">
+            <Select
+              value={paginationModel.pageSize}
+              onChange={(e) =>
+                setPaginationModel({
+                  page: paginationModel.page,
+                  pageSize: Number(e.target.value),
+                })
+              }
+              sx={{ minWidth: 70 }}
+            >
+              <MenuItem value={5}>5</MenuItem>
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={25}>25</MenuItem>
+              <MenuItem value={50}>50</MenuItem>
+              <MenuItem value={100}>100</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+        <Pagination
+          count={Math.ceil(contacts.count / paginationModel.pageSize)}
+          page={paginationModel.page}
+          onChange={(_, page) =>
+            setPaginationModel({
+              page: page,
+              pageSize: paginationModel.pageSize,
+            })
+          }
+          showFirstButton
+          showLastButton
+          color="secondary"
+          variant="outlined"
+          shape="rounded"
+        />
       </Box>
 
-      <Box sx={{ display: viewMode === "list" ? "flex" : "none", flexWrap: "wrap" }}>
-        <ContactList contacts={contacts} />
+      <Box
+        sx={{
+          display: viewMode === "card" ? "flex" : "none",
+          flexWrap: "wrap",
+        }}
+      >
+        {contacts.results.map((contact: Contact) => (
+          <ContactCard key={contact.id} contact={contact} />
+        ))}
+      </Box>
+
+      <Box
+        sx={{
+          display: viewMode === "list" ? "flex" : "none",
+          flexWrap: "wrap",
+        }}
+      >
+        <ContactList
+          contacts={contacts}
+          paginationModel={paginationModel}
+          setPaginationModel={setPaginationModel}
+          isLoading={isLoading}
+        />
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          // justifyContent: "center",
+          gap: 2,
+          my: 3,
+        }}
+      >
+        <Pagination
+          count={Math.ceil(contacts.count / paginationModel.pageSize)}
+          page={paginationModel.page}
+          onChange={(_, page) =>
+            setPaginationModel({
+              page: page,
+              pageSize: paginationModel.pageSize,
+            })
+          }
+          showFirstButton
+          showLastButton
+          color="secondary"
+          variant="outlined"
+          shape="rounded"
+        />
       </Box>
     </>
   );

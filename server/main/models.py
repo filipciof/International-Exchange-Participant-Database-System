@@ -183,6 +183,9 @@ class Staff(models.Model):
     email = models.EmailField(blank=True, default="")
     phone = PhoneNumberField(blank=True, default="")
 
+    photo = models.ImageField(upload_to="staff_photos/", blank=True, default="")
+    notes = models.TextField(blank=True, default="")
+
     class Meta:
         db_table = "staff"
 

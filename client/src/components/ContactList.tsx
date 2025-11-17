@@ -1,5 +1,5 @@
 import { type GridColDef, DataGrid } from "@mui/x-data-grid";
-import { type Contact } from "../pages/Contacts";
+import { type PaginatedData, type Contact } from "../utils/types";
 
 const columns: GridColDef<Contact>[] = [
   {
@@ -34,22 +34,47 @@ const columns: GridColDef<Contact>[] = [
   },
 ];
 
-export default function ContactList({ contacts }: { contacts: Contact[] }) {
+type ContactListProps = {
+  contacts: PaginatedData<Contact>;
+  paginationModel: {
+    page: number;
+    pageSize: number;
+  };
+  setPaginationModel: (newPaginationModel: {
+    page: number;
+    pageSize: number;
+  }) => void;
+  isLoading: boolean;
+};
+
+export default function ContactList({
+  contacts,
+  paginationModel,
+  setPaginationModel,
+  isLoading,
+}: ContactListProps) {
   return (
     <>
       <DataGrid
-        rows={contacts}
+        rows={contacts.results}
         columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 5,
-            },
-          },
-        }}
-        pageSizeOptions={[5]}
         checkboxSelection
         disableRowSelectionOnClick
+        paginationMode="server"
+        rowCount={contacts.count}
+        paginationModel={{
+          page: paginationModel.page - 1,
+          pageSize: paginationModel.pageSize,
+        }}
+        onPaginationModelChange={(model) => {
+          setPaginationModel({
+            page: model.page + 1,
+            pageSize: model.pageSize,
+          });
+        }}
+        pageSizeOptions={[10, 25, 50, 100]}
+        hideFooter
+        loading={isLoading}
       />
     </>
   );
