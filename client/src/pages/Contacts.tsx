@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import Loading from "../components/Loading";
@@ -18,12 +18,12 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import ViewListIcon from "@mui/icons-material/ViewList";
-import SearchIcon from "@mui/icons-material/Search";
 import ContactForm from "../components/ContactForm";
 import ContactCard from "../components/ContactCard";
 import ContactList from "../components/ContactList";
 import queryClient from "../utils/queryClient";
 import type { Contact, ContactFormData, Country } from "../utils/types";
+import SearchInput from "../components/SearchInput";
 
 export default function Contacts() {
   const [open, setOpen] = useState(false);
@@ -35,16 +35,6 @@ export default function Contacts() {
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [searchInput, setSearchInput] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchInput);
-      setPaginationModel((prev) => ({ ...prev, page: 1 }));
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchInput]);
 
   const {
     data: contacts = [],
@@ -56,7 +46,7 @@ export default function Contacts() {
       paginationModel,
       selectedGroups,
       selectedCountry,
-      debouncedSearch,
+      searchInput,
     ],
     queryFn: async () => {
       const params = new URLSearchParams({
@@ -72,8 +62,8 @@ export default function Contacts() {
         params.append("group", group);
       });
 
-      if (debouncedSearch) {
-        params.append("search", debouncedSearch);
+      if (searchInput) {
+        params.append("search", searchInput);
       }
 
       const response = await axiosClient.get(`/contacts/?${params.toString()}`);
@@ -82,7 +72,6 @@ export default function Contacts() {
       return response.data;
     },
     placeholderData: (prev) => prev,
-    enabled: searchInput === debouncedSearch,
   });
 
   const { data: countries = [] } = useQuery({
@@ -173,22 +162,13 @@ export default function Contacts() {
         isSuccess={addContactMutation.isSuccess}
         error={addContactMutation.error}
       />
-      <Box sx={{ my: 2 }}>
-        <TextField
-          fullWidth
-          size="small"
-          placeholder="Search contacts..."
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <SearchIcon sx={{ color: "text.secondary", mr: 1 }} />
-              ),
-            },
-          }}
-        />
-      </Box>
+      <SearchInput
+        value={searchInput}
+        onChange={(newSearchInput) => {
+          setPaginationModel({ ...paginationModel, page: 1 });
+          setSearchInput(newSearchInput);
+        }}
+      />
       <Box
         sx={{
           display: "flex",
@@ -203,8 +183,8 @@ export default function Contacts() {
         <Autocomplete
           value={selectedCountry}
           onChange={(_event, newValue) => {
-            setSelectedCountry(newValue);
             setPaginationModel({ ...paginationModel, page: 1 });
+            setSelectedCountry(newValue);
           }}
           options={countries}
           getOptionLabel={(option) => option.name}
@@ -218,7 +198,10 @@ export default function Contacts() {
         </Typography>
         <ToggleButtonGroup
           value={selectedGroups}
-          onChange={(_event, newGroups) => setSelectedGroups(newGroups)}
+          onChange={(_event, newGroups) => {
+            setPaginationModel({ ...paginationModel, page: 1 });
+            setSelectedGroups(newGroups);
+          }}
           aria-label="group filters"
           sx={{
             gap: 1,
@@ -265,7 +248,7 @@ export default function Contacts() {
               value={paginationModel.pageSize}
               onChange={(e) =>
                 setPaginationModel({
-                  page: paginationModel.page,
+                  page: 1,
                   pageSize: Number(e.target.value),
                 })
               }
@@ -284,8 +267,8 @@ export default function Contacts() {
           page={paginationModel.page}
           onChange={(_, page) =>
             setPaginationModel({
+              ...paginationModel,
               page: page,
-              pageSize: paginationModel.pageSize,
             })
           }
           showFirstButton
@@ -335,8 +318,8 @@ export default function Contacts() {
           page={paginationModel.page}
           onChange={(_, page) =>
             setPaginationModel({
+              ...paginationModel,
               page: page,
-              pageSize: paginationModel.pageSize,
             })
           }
           showFirstButton

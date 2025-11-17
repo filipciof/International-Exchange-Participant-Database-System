@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import { type Contact } from "../utils/types";
 import ActionAreaCard from "./ActionAreaCard";
-import { CircularProgress } from "@mui/material";
+import { Box, CircularProgress, Skeleton } from "@mui/material";
 
 export default function ContactCard({ contact }: { contact: Contact }) {
   const { data: imageUrl, isLoading } = useQuery({
@@ -19,7 +19,19 @@ export default function ContactCard({ contact }: { contact: Contact }) {
     staleTime: Infinity,
   });
 
-  if (isLoading) return <CircularProgress sx={{ color: "secondary.main" }} />;
+  // if (isLoading) return <CircularProgress sx={{ color: "secondary.main" }} />;
+  if (isLoading) {
+    return (
+      <Box sx={{ zoom: { xs: 0.5, sm: 0.6, md: 0.7 } }}>
+        <Skeleton
+          variant="rectangular"
+          width={300}
+          height={400}
+          sx={{ borderRadius: 1, mt: "10px", mr: "10px" }}
+        />
+      </Box>
+    );
+  }
 
   return (
     <ActionAreaCard
