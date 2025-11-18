@@ -8,9 +8,20 @@ const columns: GridColDef<Contact>[] = [
     width: 150,
   },
   {
+    field: "middle_name",
+    headerName: "Middle name",
+    width: 150,
+    hideable: true,
+  },
+  {
     field: "last_name",
     headerName: "Last name",
     width: 150,
+  },
+  {
+    field: "gender",
+    headerName: "Gender",
+    width: 100,
   },
   {
     field: "email",
@@ -30,6 +41,29 @@ const columns: GridColDef<Contact>[] = [
   {
     field: "districts",
     headerName: "Districts",
+    width: 150,
+  },
+  {
+    field: "is_longterm",
+    headerName: "LT",
+    type: "boolean",
+    width: 80,
+  },
+  {
+    field: "is_family_to_family",
+    headerName: "F2F",
+    type: "boolean",
+    width: 80,
+  },
+  {
+    field: "is_camp",
+    headerName: "CAMP",
+    type: "boolean",
+    width: 80,
+  },
+  {
+    field: "notes",
+    headerName: "Notes",
     width: 150,
   },
 ];

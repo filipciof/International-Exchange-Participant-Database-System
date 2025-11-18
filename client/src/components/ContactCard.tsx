@@ -36,13 +36,18 @@ export default function ContactCard({ contact }: { contact: Contact }) {
   return (
     <ActionAreaCard
       imageUrl={imageUrl || ""}
-      header={`${contact.first_name} ${contact.last_name}`}
+      header={`${contact.first_name} ${contact.middle_name} ${contact.last_name}`}
       description={[
         contact.country,
-        contact.districts.join(", "),
+        contact.districts.length ? contact.districts.join(", "): "-",
         contact.email,
         contact.phone,
+        contact.gender,
+        contact.notes,
       ]}
+      is_longterm={contact.is_longterm}
+      is_family_to_family={contact.is_family_to_family}
+      is_camp={contact.is_camp}
     />
   );
 }

@@ -1,10 +1,12 @@
 from rest_framework import serializers
 from .models import Contact, ContactDistrict
+from main.models import Gender
 
 
 class ContactSerializer(serializers.ModelSerializer):
     country = serializers.SerializerMethodField()
     districts = serializers.SerializerMethodField()
+    gender = serializers.SerializerMethodField()
 
     class Meta:
         model = Contact
@@ -31,3 +33,11 @@ class ContactSerializer(serializers.ModelSerializer):
     def get_districts(self, obj):
         districts = ContactDistrict.objects.filter(id_contact=obj)
         return [district.id_district.number for district in districts]
+    
+    def get_gender(self, obj):
+        genderMap = {
+            Gender.MALE: "male",
+            Gender.FEMALE: "female",
+            Gender.NONBINARY: "nonbinary",            
+        }
+        return genderMap.get(obj.gender, "unknown")

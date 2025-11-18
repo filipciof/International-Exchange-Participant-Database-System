@@ -14,12 +14,18 @@ export type Country = {
 export type Contact = {
   id: number;
   first_name: string;
+  middle_name: string;
   last_name: string;
+  gender: string;
   email: string;
   phone: string;
   country: string;
-  districts: string[];
+  districts: number[];
+  is_longterm: boolean;
+  is_family_to_family: boolean;
+  is_camp: boolean;
   photo: string;
+  notes: string;
 };
 
 export type ContactFormData = {
