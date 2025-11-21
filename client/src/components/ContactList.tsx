@@ -92,7 +92,6 @@ export default function ContactList({
       <DataGrid
         rows={contacts.results}
         columns={columns}
-        checkboxSelection
         disableRowSelectionOnClick
         paginationMode="server"
         rowCount={contacts.count}

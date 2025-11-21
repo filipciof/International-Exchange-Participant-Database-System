@@ -9,7 +9,7 @@ from rest_framework.status import (
 from config.settings import MEDIA_ROOT
 import os
 from django.http import HttpResponse
-from .models import Contact
+from .models import Contact, ContactDistrict
 from .serializers import ContactSerializer
 from uuid import uuid4
 from django.core.files.storage import default_storage
@@ -68,7 +68,7 @@ class ContactView(APIView):
         groups = request.query_params.getlist("group")
         if groups:
             group_query = Q()
-        
+
             for group in groups:
                 if group == "lt":
                     group_query |= Q(is_longterm=True)
@@ -77,26 +77,28 @@ class ContactView(APIView):
                 elif group == "camp":
                     group_query |= Q(is_camp=True)
                 elif group == "none":
-                    group_query |= Q(is_longterm=False, is_family_to_family=False, is_camp=False)
-        
+                    group_query |= Q(
+                        is_longterm=False, is_family_to_family=False, is_camp=False
+                    )
+
             contacts = contacts.filter(group_query)
-        
+
         search = request.query_params.get("search")
         if search:
             search_query = Q()
 
             search_fields = [
-                'first_name',
+                "first_name",
                 "middle_name",
-                'last_name',
-                'email',
-                'phone',
-                'notes',
+                "last_name",
+                "email",
+                "phone",
+                "notes",
             ]
-            
+
             for field in search_fields:
                 search_query |= Q(**{f"{field}__icontains": search})
-            
+
             contacts = contacts.filter(search_query)
 
         paginator = PageNumberPagination()
@@ -124,10 +126,14 @@ class ContactView(APIView):
             photo.name = unique_name
             data["photo"] = photo
 
-        serializer = ContactSerializer(data=request.data)
+        serializer = ContactSerializer(data=data)
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=HTTP_201_CREATED)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        contact = serializer.save()
+        id_districts = data.getlist("id_districts[]", [])
+        for id_district in id_districts:
+            ContactDistrict.objects.create(id_contact=contact, id_district_id=id_district)
+
+        return Response(serializer.data, status=HTTP_201_CREATED)

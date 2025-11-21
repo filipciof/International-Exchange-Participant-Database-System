@@ -161,6 +161,7 @@ export default function Contacts() {
         isLoading={addContactMutation.isPending}
         isSuccess={addContactMutation.isSuccess}
         error={addContactMutation.error}
+        countries={countries}
       />
       <SearchInput
         value={searchInput}

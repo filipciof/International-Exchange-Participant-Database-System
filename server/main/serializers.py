@@ -1,10 +1,15 @@
 from rest_framework import serializers
-from .models import Club, Family, Student, Country
+from .models import Club, Family, Student, Country, District
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
         fields = ["id", "name", "code"]
+
+class DistrictSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = District
+        fields = "__all__"
 
 
 class ClubSerializer(serializers.ModelSerializer):

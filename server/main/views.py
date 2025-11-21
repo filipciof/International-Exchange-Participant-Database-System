@@ -1,7 +1,13 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from .models import Club, Family, Student, Country
-from .serializers import ClubSerializer, FamilySerializer, StudentSerializer, CountrySerializer
+from .models import Club, Family, Student, Country, District
+from .serializers import (
+    ClubSerializer,
+    FamilySerializer,
+    StudentSerializer,
+    CountrySerializer,
+    DistrictSerializer,
+)
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -27,6 +33,26 @@ class CountryView(APIView):
 
         countries = Country.objects.order_by("id")
         serializer = CountrySerializer(countries, many=True)
+        return Response(serializer.data)
+
+
+class DistrictView(APIView):
+    def get(self, request, format=None):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        districts = []
+        country = request.query_params.get("country")
+        if country:
+            districts = District.objects.filter(id_country=country)
+        
+        serializer = DistrictSerializer(districts, many=True)
+
         return Response(serializer.data)
 
 

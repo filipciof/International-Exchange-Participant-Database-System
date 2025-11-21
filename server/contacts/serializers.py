@@ -1,12 +1,17 @@
 from rest_framework import serializers
 from .models import Contact, ContactDistrict
-from main.models import Gender
+from main.models import Country, Gender
 
 
 class ContactSerializer(serializers.ModelSerializer):
-    country = serializers.SerializerMethodField()
     districts = serializers.SerializerMethodField()
     gender = serializers.SerializerMethodField()
+
+    country = serializers.CharField(source="id_country.name", read_only=True)
+    id_country = serializers.PrimaryKeyRelatedField(
+        queryset=Country.objects.all(),
+        write_only=True
+    )
 
     class Meta:
         model = Contact
@@ -19,6 +24,7 @@ class ContactSerializer(serializers.ModelSerializer):
             "email",
             "phone",
             "country",
+            "id_country",
             "districts",
             "is_longterm",
             "is_family_to_family",
@@ -27,9 +33,6 @@ class ContactSerializer(serializers.ModelSerializer):
             "notes",
         ]
 
-    def get_country(self, obj):
-        return obj.id_country.name if obj.id_country else None
-    
     def get_districts(self, obj):
         districts = ContactDistrict.objects.filter(id_contact=obj)
         return [district.id_district.number for district in districts]

@@ -11,6 +11,12 @@ export type Country = {
   code: string;
 }
 
+export type District = {
+  id: number;
+  id_country: number;
+  number: number;
+}
+
 export type Contact = {
   id: number;
   first_name: string;
@@ -33,7 +39,7 @@ export type ContactFormData = {
   last_name: string;
   email: string;
   phone: string;
-  country: string;
-  districts: string;
+  id_country: number;
+  id_districts: number[];
   photo: File | null;
 };
