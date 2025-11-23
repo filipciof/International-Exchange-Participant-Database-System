@@ -7,9 +7,13 @@ import { Box, Skeleton } from "@mui/material";
 export default function ContactCard({
   contact,
   onCardClick,
+  onEdit,
+  onDelete,
 }: {
   contact: Contact;
   onCardClick: (contact: Contact) => void;
+  onEdit: (contact: Contact) => void;
+  onDelete: (contact: Contact) => void;
 }) {
   const { data: imageUrl, isLoading } = useQuery({
     queryKey: ["contactImage", contact.photo],
@@ -58,6 +62,8 @@ export default function ContactCard({
       ]}
       chips={chips}
       onClick={() => onCardClick(contact)}
+      onEdit={() => onEdit(contact)}
+      onDelete={() => onDelete(contact)}
     />
   );
 }

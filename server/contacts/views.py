@@ -4,6 +4,7 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
     HTTP_403_FORBIDDEN,
     HTTP_201_CREATED,
+    HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
 )
 from config.settings import MEDIA_ROOT
@@ -142,7 +143,9 @@ class ContactView(APIView):
         contact = serializer.save()
         id_districts = data.getlist("id_districts[]", [])
         for id_district in id_districts:
-            ContactDistrict.objects.create(id_contact=contact, id_district_id=id_district)
+            ContactDistrict.objects.create(
+                id_contact=contact, id_district_id=id_district
+            )
 
         return Response(serializer.data, status=HTTP_201_CREATED)
 
@@ -159,8 +162,7 @@ class ContactView(APIView):
             contact = Contact.objects.get(pk=pk, is_active=True)
         except Contact.DoesNotExist:
             return Response(
-                {"message": "Contact not found."}, 
-                status=HTTP_404_NOT_FOUND
+                {"message": "Contact not found."}, status=HTTP_404_NOT_FOUND
             )
 
         data = request.data.copy()
@@ -171,7 +173,7 @@ class ContactView(APIView):
                 old_photo_path = os.path.join(MEDIA_ROOT, str(contact.photo))
                 if os.path.exists(old_photo_path):
                     os.remove(old_photo_path)
-            
+
             ext = os.path.splitext(photo.name)[1].lower() or ".bin"
             target_name = f"{uuid4().hex}{ext}"
             unique_name = default_storage.get_available_name(target_name)
@@ -188,11 +190,16 @@ class ContactView(APIView):
         id_districts = data.getlist("id_districts[]", None)
         if id_districts is not None:
             ContactDistrict.objects.filter(id_contact=contact).delete()
-            
+
             for id_district in id_districts:
                 ContactDistrict.objects.create(
-                    id_contact=contact, 
-                    id_district_id=id_district
+                    id_contact=contact, id_district_id=id_district
                 )
 
         return Response(serializer.data)
+
+    def delete(self, request, pk=None):
+        updated = Contact.objects.filter(id=pk).update(is_active=False)
+        if updated == 0:
+            return Response({"error": "Contact not found"}, status=HTTP_404_NOT_FOUND)
+        return Response(status=HTTP_204_NO_CONTENT)

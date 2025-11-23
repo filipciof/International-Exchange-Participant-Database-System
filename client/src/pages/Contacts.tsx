@@ -25,9 +25,12 @@ import queryClient from "../utils/queryClient";
 import type { Contact, ContactFormData, Country } from "../utils/types";
 import SearchInput from "../components/SearchInput";
 import UpdateContactForm from "../components/UpdateContactForm";
+import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 
 export default function Contacts() {
-  const [open, setOpen] = useState<"none" | "add" | "update">("none");
+  const [open, setOpen] = useState<"none" | "add" | "update" | "delete">(
+    "none"
+  );
   const [viewMode, setViewMode] = useState<"card" | "list">("card");
   const [paginationModel, setPaginationModel] = useState({
     page: 1,
@@ -124,12 +127,30 @@ export default function Contacts() {
     }
   };
 
+  const deleteContactMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await axiosClient.delete(`/contacts/${id}/`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+    },
+  });
+
+  const handleDeleteContact = (contact: Contact) => {
+    if (selectedContact) {
+      deleteContactMutation.mutate(contact.id);
+    }
+  };
+
   const handleAddOpen = () => {
     setOpen("add");
   };
 
   const handleClose = () => {
     addContactMutation.reset();
+    updateContactMutation.reset();
+    deleteContactMutation.reset();
     setSelectedContact(null);
     setOpen("none");
   };
@@ -137,6 +158,11 @@ export default function Contacts() {
   const handleUpdateOpen = (contact: Contact) => {
     setSelectedContact(contact);
     setOpen("update");
+  };
+
+  const handleDeleteOpen = (contact: Contact) => {
+    setSelectedContact(contact);
+    setOpen("delete");
   };
 
   const handleViewChange = (
@@ -210,6 +236,18 @@ export default function Contacts() {
           error={updateContactMutation.error}
           countries={countries}
           contact={selectedContact}
+        />
+      ) : (
+        <></>
+      )}
+      {selectedContact ? (
+        <DeleteConfirmationDialog
+          open={open === "delete"}
+          handleClose={handleClose}
+          isLoading={deleteContactMutation.isPending}
+          isSuccess={deleteContactMutation.isSuccess}
+          error={deleteContactMutation.error}
+          onConfirm={() => handleDeleteContact(selectedContact)}
         />
       ) : (
         <></>
@@ -342,6 +380,8 @@ export default function Contacts() {
             key={contact.id}
             contact={contact}
             onCardClick={handleUpdateOpen}
+            onEdit={handleUpdateOpen}
+            onDelete={handleDeleteOpen}
           />
         ))}
       </Box>
