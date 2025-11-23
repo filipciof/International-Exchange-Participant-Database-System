@@ -18,15 +18,16 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import ViewListIcon from "@mui/icons-material/ViewList";
-import ContactForm from "../components/ContactForm";
+import AddContactForm from "../components/AddContactForm";
 import ContactCard from "../components/ContactCard";
 import ContactList from "../components/ContactList";
 import queryClient from "../utils/queryClient";
 import type { Contact, ContactFormData, Country } from "../utils/types";
 import SearchInput from "../components/SearchInput";
+import UpdateContactForm from "../components/UpdateContactForm";
 
 export default function Contacts() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<"none" | "add" | "update">("none");
   const [viewMode, setViewMode] = useState<"card" | "list">("card");
   const [paginationModel, setPaginationModel] = useState({
     page: 1,
@@ -35,6 +36,7 @@ export default function Contacts() {
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [searchInput, setSearchInput] = useState("");
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
 
   const {
     data: contacts = [],
@@ -102,13 +104,39 @@ export default function Contacts() {
     addContactMutation.mutate(contact);
   };
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const updateContactMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: ContactFormData }) => {
+      const response = await axiosClient.patch(`/contacts/${id}/`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+    },
+  });
+
+  const handleUpdateContact = (data: ContactFormData) => {
+    if (selectedContact) {
+      updateContactMutation.mutate({ id: selectedContact.id, data });
+    }
+  };
+
+  const handleAddOpen = () => {
+    setOpen("add");
   };
 
   const handleClose = () => {
     addContactMutation.reset();
-    setOpen(false);
+    setSelectedContact(null);
+    setOpen("none");
+  };
+
+  const handleUpdateOpen = (contact: Contact) => {
+    setSelectedContact(contact);
+    setOpen("update");
   };
 
   const handleViewChange = (
@@ -134,7 +162,7 @@ export default function Contacts() {
         <Button
           variant="outlined"
           startIcon={<AddIcon />}
-          onClick={handleClickOpen}
+          onClick={handleAddOpen}
         >
           New contact
         </Button>
@@ -154,7 +182,7 @@ export default function Contacts() {
         </ToggleButtonGroup>
       </Box>
 
-      <ContactForm
+      {/* <ContactForm
         open={open}
         handleClose={handleClose}
         handleAddContact={handleAddContact}
@@ -162,7 +190,30 @@ export default function Contacts() {
         isSuccess={addContactMutation.isSuccess}
         error={addContactMutation.error}
         countries={countries}
+      /> */}
+      <AddContactForm
+        open={open === "add"}
+        handleClose={handleClose}
+        handleAddContact={handleAddContact}
+        isLoading={addContactMutation.isPending}
+        isSuccess={addContactMutation.isSuccess}
+        error={addContactMutation.error}
+        countries={countries}
       />
+      {selectedContact ? (
+        <UpdateContactForm
+          open={open === "update"}
+          handleClose={handleClose}
+          handleUpdateContact={handleUpdateContact}
+          isLoading={updateContactMutation.isPending}
+          isSuccess={updateContactMutation.isSuccess}
+          error={updateContactMutation.error}
+          countries={countries}
+          contact={selectedContact}
+        />
+      ) : (
+        <></>
+      )}
       <SearchInput
         value={searchInput}
         onChange={(newSearchInput) => {
@@ -287,7 +338,11 @@ export default function Contacts() {
         }}
       >
         {contacts.results.map((contact: Contact) => (
-          <ContactCard key={contact.id} contact={contact} />
+          <ContactCard
+            key={contact.id}
+            contact={contact}
+            onCardClick={handleUpdateOpen}
+          />
         ))}
       </Box>
 

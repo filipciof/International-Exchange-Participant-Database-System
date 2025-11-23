@@ -1,25 +1,26 @@
 import { type GridColDef, DataGrid } from "@mui/x-data-grid";
 import { type PaginatedData, type Contact } from "../utils/types";
+import { Box } from "@mui/material";
 
 const columns: GridColDef<Contact>[] = [
   {
     field: "first_name",
     headerName: "First name",
-    width: 150,
+    width: 100,
   },
   {
     field: "middle_name",
     headerName: "Middle name",
-    width: 150,
+    width: 100,
     hideable: true,
   },
   {
     field: "last_name",
     headerName: "Last name",
-    width: 150,
+    width: 100,
   },
   {
-    field: "gender",
+    field: "gender_name",
     headerName: "Gender",
     width: 100,
   },
@@ -41,7 +42,7 @@ const columns: GridColDef<Contact>[] = [
   {
     field: "districts",
     headerName: "Districts",
-    width: 150,
+    width: 120,
   },
   {
     field: "is_longterm",
@@ -64,7 +65,7 @@ const columns: GridColDef<Contact>[] = [
   {
     field: "notes",
     headerName: "Notes",
-    width: 150,
+    width: 100,
   },
 ];
 
@@ -88,7 +89,7 @@ export default function ContactList({
   isLoading,
 }: ContactListProps) {
   return (
-    <>
+    <Box sx={{ height: "100%", width: "100%"}}>
       <DataGrid
         rows={contacts.results}
         columns={columns}
@@ -108,7 +109,14 @@ export default function ContactList({
         pageSizeOptions={[10, 25, 50, 100]}
         hideFooter
         loading={isLoading}
+        initialState={{
+          columns: {
+            columnVisibilityModel: {
+              notes: false,
+            },
+          },
+        }}
       />
-    </>
+    </Box>
   );
 }

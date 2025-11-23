@@ -22,6 +22,14 @@ crud_allowed_groups = ["admin", "correspondent"]
 
 class ContactPhotoView(APIView):
     def get(self, request, format=None):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(get_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
         photo_name = request.query_params.get("photo_name", None)
 
         if not photo_name:
@@ -137,3 +145,54 @@ class ContactView(APIView):
             ContactDistrict.objects.create(id_contact=contact, id_district_id=id_district)
 
         return Response(serializer.data, status=HTTP_201_CREATED)
+
+    def patch(self, request, pk=None):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        try:
+            contact = Contact.objects.get(pk=pk, is_active=True)
+        except Contact.DoesNotExist:
+            return Response(
+                {"message": "Contact not found."}, 
+                status=HTTP_404_NOT_FOUND
+            )
+
+        data = request.data.copy()
+
+        photo = request.FILES.get("photo")
+        if photo:
+            if contact.photo:
+                old_photo_path = os.path.join(MEDIA_ROOT, str(contact.photo))
+                if os.path.exists(old_photo_path):
+                    os.remove(old_photo_path)
+            
+            ext = os.path.splitext(photo.name)[1].lower() or ".bin"
+            target_name = f"{uuid4().hex}{ext}"
+            unique_name = default_storage.get_available_name(target_name)
+            photo.name = unique_name
+            data["photo"] = photo
+
+        serializer = ContactSerializer(contact, data=data, partial=True)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        contact = serializer.save()
+
+        id_districts = data.getlist("id_districts[]", None)
+        if id_districts is not None:
+            ContactDistrict.objects.filter(id_contact=contact).delete()
+            
+            for id_district in id_districts:
+                ContactDistrict.objects.create(
+                    id_contact=contact, 
+                    id_district_id=id_district
+                )
+
+        return Response(serializer.data)

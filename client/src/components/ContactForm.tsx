@@ -11,39 +11,34 @@ import {
   FormControlLabel,
   Checkbox,
   Autocomplete,
+  MenuItem,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { SingleFileUpload, FileDropzoneInputBody } from "mui-file-upload";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import type { ContactFormData, Country, District } from "../utils/types";
+import type {
+  ContactFormData,
+  ContactFormInputs,
+  Country,
+  District,
+} from "../utils/types";
+import { contactSchema, Gender } from "../utils/types";
 import axiosClient from "../utils/axiosClient";
-
-const contactSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  id_country: z.number().min(1, "Country is required"),
-  id_districts: z.array(z.number()).min(1, "At least one district is required"),
-  email: z.email().or(z.literal("")),
-  phone: z.string(),
-  is_longterm: z.boolean(),
-  is_family_to_family: z.boolean(),
-  is_camp: z.boolean(),
-});
-
-type ContactFormInputs = z.infer<typeof contactSchema>;
 
 type ContactFormProps = {
   open: boolean;
+  title: string;
   handleClose: () => void;
-  handleAddContact: (contact: ContactFormData) => void;
+  handleSubmit: (contact: ContactFormData) => void;
   isLoading: boolean;
   isSuccess: boolean;
   error: any | null;
   countries: Country[];
+  initialData?: ContactFormInputs;
+  submitButtonText?: string;
 };
 
 interface ValidationErrors {
@@ -52,12 +47,15 @@ interface ValidationErrors {
 
 export default function ContactForm({
   open,
+  title,
   handleClose,
-  handleAddContact,
+  handleSubmit: onFormSubmit,
   isLoading,
   isSuccess,
   error,
   countries,
+  initialData,
+  submitButtonText = "Submit",
 }: ContactFormProps) {
   const [photo, setPhoto] = useState<File | null>(null);
   const theme = useTheme();
@@ -71,16 +69,19 @@ export default function ContactForm({
     watch,
   } = useForm<ContactFormInputs>({
     resolver: zodResolver(contactSchema),
-    defaultValues: {
+    defaultValues: initialData || {
       first_name: "",
+      middle_name: "",
       last_name: "",
       id_country: 0,
       id_districts: [],
+      gender: undefined,
       email: "",
       phone: "",
       is_longterm: false,
       is_family_to_family: false,
       is_camp: false,
+      notes: "",
     },
   });
 
@@ -92,16 +93,35 @@ export default function ContactForm({
       const response = await axiosClient.get(
         `/districts/?country=${selectedCountry}`
       );
-      console.log(response.data);
       return response.data;
     },
     enabled: selectedCountry > 0,
   });
 
+  useEffect(() => {
+    if (initialData) {
+      reset(initialData);
+    }
+  }, [initialData, reset]);
+
   const onSubmit = (data: ContactFormInputs) => {
-    const newContact = { ...data, photo: photo };
-    console.log(data);
-    handleAddContact(newContact);
+    const contactData = {
+      first_name: data.first_name,
+      middle_name: data.middle_name || "",
+      last_name: data.last_name,
+      gender: data.gender,
+      id_country: data.id_country,
+      id_districts: data.id_districts || [],
+      email: data.email,
+      phone: data.phone,
+      is_longterm: data.is_longterm,
+      is_family_to_family: data.is_family_to_family,
+      is_camp: data.is_camp,
+      notes: data.notes || "",
+      photo: photo,
+    };
+    console.log(contactData);
+    onFormSubmit(contactData);
   };
 
   const handleValidationErrors = (errors: ValidationErrors) => {
@@ -127,7 +147,7 @@ export default function ContactForm({
 
   return (
     <Dialog open={open} onClose={onClose} fullScreen={fullScreen}>
-      <DialogTitle>New Contact</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2} sx={{ p: 2 }}>
           <Stack direction="row" spacing={2}>
@@ -146,20 +166,56 @@ export default function ContactForm({
               )}
             />
             <Controller
-              name="last_name"
+              name="middle_name"
               control={control}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Last Name"
+                  value={field.value || ""}
+                  label="Middle Name"
                   variant="outlined"
                   fullWidth
-                  error={!!errors.last_name}
-                  helperText={errors.last_name?.message}
+                  error={!!errors.middle_name}
+                  helperText={errors.middle_name?.message}
                 />
               )}
             />
           </Stack>
+          <Controller
+            name="last_name"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Last Name"
+                variant="outlined"
+                fullWidth
+                error={!!errors.last_name}
+                helperText={errors.last_name?.message}
+              />
+            )}
+          />
+          <Controller
+            name="gender"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                select
+                label="Gender"
+                variant="outlined"
+                fullWidth
+                error={!!errors.gender}
+                helperText={errors.gender?.message}
+              >
+                {Gender.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          />
           <Stack direction="row" spacing={2}>
             <Controller
               name="id_country"
@@ -191,7 +247,7 @@ export default function ContactForm({
                 <Autocomplete
                   multiple
                   value={districts.filter((d: District) =>
-                    field.value.includes(d.id)
+                    field.value?.includes(d.id)
                   )}
                   onChange={(_event, newValue) => {
                     field.onChange(newValue.map((v) => v.id));
@@ -307,7 +363,23 @@ export default function ContactForm({
               />
             </Stack>
           </FormGroup>
-
+          <Controller
+            name="notes"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                value={field.value || ""}
+                label="Notes"
+                variant="outlined"
+                fullWidth
+                multiline
+                rows={4}
+                error={!!errors.notes}
+                helperText={errors.notes?.message}
+              />
+            )}
+          />
           <SingleFileUpload
             uploadService={handlePhotoUpload}
             body={<FileDropzoneInputBody title="Upload photo" />}
@@ -317,7 +389,7 @@ export default function ContactForm({
               <CircularProgress sx={{ color: "secondary.main" }} />
             ) : (
               <Button variant="contained" type="submit">
-                Add
+                {submitButtonText}
               </Button>
             )}
             <Button variant="outlined" onClick={onClose}>
@@ -337,7 +409,7 @@ export default function ContactForm({
           )}
           {isSuccess && (
             <Typography sx={{ color: "success.main" }}>
-              New contact added successfully!
+              Operation completed successfully!
             </Typography>
           )}
         </Stack>

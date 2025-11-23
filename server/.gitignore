@@ -4,3 +4,5 @@ __pycache__/
 db.sqlite3
 prod.txt
 test_media_faces/
+media/contact_photos/*.jpg
+!media/contact_photos/__nodelete__*.jpg

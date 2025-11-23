@@ -2,9 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import { type Contact } from "../utils/types";
 import ActionAreaCard from "./ActionAreaCard";
-import { Box, CircularProgress, Skeleton } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 
-export default function ContactCard({ contact }: { contact: Contact }) {
+export default function ContactCard({
+  contact,
+  onCardClick,
+}: {
+  contact: Contact;
+  onCardClick: (contact: Contact) => void;
+}) {
   const { data: imageUrl, isLoading } = useQuery({
     queryKey: ["contactImage", contact.photo],
     queryFn: async () => {
@@ -20,6 +26,7 @@ export default function ContactCard({ contact }: { contact: Contact }) {
   });
 
   // if (isLoading) return <CircularProgress sx={{ color: "secondary.main" }} />;
+
   if (isLoading) {
     return (
       <Box sx={{ zoom: { xs: 0.5, sm: 0.6, md: 0.7 } }}>
@@ -33,21 +40,24 @@ export default function ContactCard({ contact }: { contact: Contact }) {
     );
   }
 
+  const chips = [];
+  if (contact.is_longterm) chips.push("LT");
+  if (contact.is_family_to_family) chips.push("F2F");
+  if (contact.is_camp) chips.push("CAMP");
+
   return (
     <ActionAreaCard
-      imageUrl={imageUrl || ""}
+      imageUrl={imageUrl || "/blank-profile-1024x1024.png"}
       header={`${contact.first_name} ${contact.middle_name} ${contact.last_name}`}
       description={[
         contact.country,
-        contact.districts.length ? contact.districts.join(", "): "-",
+        contact.districts.length ? contact.districts.join(", ") : "-",
         contact.email,
         contact.phone,
-        contact.gender,
-        contact.notes,
+        contact.gender_name,
       ]}
-      is_longterm={contact.is_longterm}
-      is_family_to_family={contact.is_family_to_family}
-      is_camp={contact.is_camp}
+      chips={chips}
+      onClick={() => onCardClick(contact)}
     />
   );
 }
