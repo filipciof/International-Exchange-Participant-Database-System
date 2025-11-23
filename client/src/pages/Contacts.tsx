@@ -26,11 +26,12 @@ import type { Contact, ContactFormData, Country } from "../utils/types";
 import SearchInput from "../components/SearchInput";
 import UpdateContactForm from "../components/UpdateContactForm";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
+import ContactDetailDialog from "../components/ContactDetailDialog";
 
 export default function Contacts() {
-  const [open, setOpen] = useState<"none" | "add" | "update" | "delete">(
-    "none"
-  );
+  const [open, setOpen] = useState<
+    "none" | "add" | "update" | "delete" | "detail"
+  >("none");
   const [viewMode, setViewMode] = useState<"card" | "list">("card");
   const [paginationModel, setPaginationModel] = useState({
     page: 1,
@@ -143,16 +144,16 @@ export default function Contacts() {
     }
   };
 
-  const handleAddOpen = () => {
-    setOpen("add");
-  };
-
   const handleClose = () => {
     addContactMutation.reset();
     updateContactMutation.reset();
     deleteContactMutation.reset();
     setSelectedContact(null);
     setOpen("none");
+  };
+
+  const handleAddOpen = () => {
+    setOpen("add");
   };
 
   const handleUpdateOpen = (contact: Contact) => {
@@ -164,6 +165,11 @@ export default function Contacts() {
     setSelectedContact(contact);
     setOpen("delete");
   };
+
+  const handleDetailOpen = (contact: Contact) => {
+    setSelectedContact(contact);
+    setOpen("detail");
+  }
 
   const handleViewChange = (
     _event: React.MouseEvent<HTMLElement>,
@@ -252,6 +258,13 @@ export default function Contacts() {
       ) : (
         <></>
       )}
+      {selectedContact ? (
+        <ContactDetailDialog
+          open={open === "detail"}
+          handleClose={handleClose}
+          contact={selectedContact}
+        />
+      ) : (<></>)}
       <SearchInput
         value={searchInput}
         onChange={(newSearchInput) => {
@@ -379,7 +392,7 @@ export default function Contacts() {
           <ContactCard
             key={contact.id}
             contact={contact}
-            onCardClick={handleUpdateOpen}
+            onCardClick={handleDetailOpen}
             onEdit={handleUpdateOpen}
             onDelete={handleDeleteOpen}
           />
