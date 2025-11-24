@@ -214,15 +214,6 @@ export default function Contacts() {
         </ToggleButtonGroup>
       </Box>
 
-      {/* <ContactForm
-        open={open}
-        handleClose={handleClose}
-        handleAddContact={handleAddContact}
-        isLoading={addContactMutation.isPending}
-        isSuccess={addContactMutation.isSuccess}
-        error={addContactMutation.error}
-        countries={countries}
-      /> */}
       <AddContactForm
         open={open === "add"}
         handleClose={handleClose}
@@ -410,6 +401,9 @@ export default function Contacts() {
           paginationModel={paginationModel}
           setPaginationModel={setPaginationModel}
           isLoading={isLoading}
+          onEdit={handleUpdateOpen}
+          onDelete={handleDeleteOpen}
+          onRowClick={handleDetailOpen}
         />
       </Box>
 
