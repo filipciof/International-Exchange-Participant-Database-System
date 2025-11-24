@@ -105,13 +105,11 @@ export default function SignIn() {
       email: data.get("email"),
       password: data.get("password"),
     };
-    console.log(requestBody);
 
     setLoading(true);
 
     try {
       const response = await axiosClient.post("/auth/token/", requestBody);
-      console.log(response.data);
 
       const accessToken: string = response.data["access"];
       const userGroups: string = JSON.stringify(

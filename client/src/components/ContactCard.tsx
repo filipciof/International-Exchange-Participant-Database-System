@@ -3,6 +3,7 @@ import axiosClient from "../utils/axiosClient";
 import { type Contact } from "../utils/types";
 import ActionAreaCard from "./ActionAreaCard";
 import { Box, Skeleton } from "@mui/material";
+import type { ChipProps } from "@mui/material";
 
 export default function ContactCard({
   contact,
@@ -44,10 +45,10 @@ export default function ContactCard({
     );
   }
 
-  const chips = [];
-  if (contact.is_longterm) chips.push("LT");
-  if (contact.is_family_to_family) chips.push("F2F");
-  if (contact.is_camp) chips.push("CAMP");
+  const chips: ChipProps[] = [];
+  if (contact.is_longterm) chips.push({ label: "LT", color: "primary" });
+  if (contact.is_family_to_family) chips.push({label: "F2F", color: "secondary"});
+  if (contact.is_camp) chips.push({label: "CAMP", color: "success"});
 
   return (
     <ActionAreaCard

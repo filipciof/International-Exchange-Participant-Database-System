@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import Loading from "../components/Loading";
@@ -18,20 +18,20 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import ViewListIcon from "@mui/icons-material/ViewList";
-import AddContactForm from "../components/AddContactForm";
+import AddContactView from "../components/AddContactView";
+import UpdateContactView from "../components/UpdateContactView";
+import ContactDetailView from "../components/ContactDetailView";
 import ContactCard from "../components/ContactCard";
 import ContactList from "../components/ContactList";
 import queryClient from "../utils/queryClient";
 import type { Contact, ContactFormData, Country } from "../utils/types";
 import SearchInput from "../components/SearchInput";
-import UpdateContactForm from "../components/UpdateContactForm";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
-import ContactDetailDialog from "../components/ContactDetailDialog";
+
+type ViewType = "list" | "add" | "update" | "delete" | "detail";
 
 export default function Contacts() {
-  const [open, setOpen] = useState<
-    "none" | "add" | "update" | "delete" | "detail"
-  >("none");
+  const [currentView, setCurrentView] = useState<ViewType>("list");
   const [viewMode, setViewMode] = useState<"card" | "list">("card");
   const [paginationModel, setPaginationModel] = useState({
     page: 1,
@@ -41,6 +41,28 @@ export default function Contacts() {
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [searchInput, setSearchInput] = useState("");
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const scrollPositionRef = useRef<number>(0);
+
+  // Restore scroll position when returning to list view
+  useEffect(() => {
+    if (currentView === "list") {
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPositionRef.current);
+      });
+    } else {
+      // Scroll to top when switching to other views
+      window.scrollTo(0, 0);
+    }
+  }, [currentView]);
+
+  // Save scroll position before leaving list view
+  const handleViewChange = (newView: ViewType) => {
+    if (currentView === "list") {
+      scrollPositionRef.current = window.scrollY;
+    }
+    setCurrentView(newView);
+  };
 
   const {
     data: contacts = [],
@@ -74,7 +96,6 @@ export default function Contacts() {
 
       const response = await axiosClient.get(`/contacts/?${params.toString()}`);
 
-      console.log(response.data);
       return response.data;
     },
     placeholderData: (prev) => prev,
@@ -84,7 +105,6 @@ export default function Contacts() {
     queryKey: ["countries"],
     queryFn: async () => {
       const response = await axiosClient.get("/countries/");
-      console.log(response.data);
       return response.data;
     },
     staleTime: Infinity,
@@ -149,29 +169,29 @@ export default function Contacts() {
     updateContactMutation.reset();
     deleteContactMutation.reset();
     setSelectedContact(null);
-    setOpen("none");
+    handleViewChange("list");
   };
 
   const handleAddOpen = () => {
-    setOpen("add");
+    handleViewChange("add");
   };
 
   const handleUpdateOpen = (contact: Contact) => {
     setSelectedContact(contact);
-    setOpen("update");
+    handleViewChange("update");
   };
 
   const handleDeleteOpen = (contact: Contact) => {
     setSelectedContact(contact);
-    setOpen("delete");
+    handleViewChange("delete");
   };
 
   const handleDetailOpen = (contact: Contact) => {
     setSelectedContact(contact);
-    setOpen("detail");
-  }
+    handleViewChange("detail");
+  };
 
-  const handleViewChange = (
+  const handleViewModeChange = (
     _event: React.MouseEvent<HTMLElement>,
     newView: "card" | "list" | null
   ) => {
@@ -180,14 +200,49 @@ export default function Contacts() {
     }
   };
 
-  if (isLoading) return <Loading />;
-  if (error)
+  if (isLoading && currentView === "list") return <Loading />;
+  if (error && currentView === "list")
     return (
       <Typography sx={{ color: "error.main" }}>
         Error: {error.message}
       </Typography>
     );
 
+  // Render full-page views
+  if (currentView === "add") {
+    return (
+      <AddContactView
+        handleClose={handleClose}
+        handleAddContact={handleAddContact}
+        isLoading={addContactMutation.isPending}
+        isSuccess={addContactMutation.isSuccess}
+        error={addContactMutation.error}
+        countries={countries}
+      />
+    );
+  }
+
+  if (currentView === "update" && selectedContact) {
+    return (
+      <UpdateContactView
+        handleClose={handleClose}
+        handleUpdateContact={handleUpdateContact}
+        isLoading={updateContactMutation.isPending}
+        isSuccess={updateContactMutation.isSuccess}
+        error={updateContactMutation.error}
+        countries={countries}
+        contact={selectedContact}
+      />
+    );
+  }
+
+  if (currentView === "detail" && selectedContact) {
+    return (
+      <ContactDetailView contact={selectedContact} handleClose={handleClose} />
+    );
+  }
+
+  // Render contacts list view
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
@@ -202,7 +257,7 @@ export default function Contacts() {
         <ToggleButtonGroup
           value={viewMode}
           exclusive
-          onChange={handleViewChange}
+          onChange={handleViewModeChange}
           aria-label="view mode"
         >
           <ToggleButton value="card" aria-label="card view">
@@ -214,48 +269,18 @@ export default function Contacts() {
         </ToggleButtonGroup>
       </Box>
 
-      <AddContactForm
-        open={open === "add"}
-        handleClose={handleClose}
-        handleAddContact={handleAddContact}
-        isLoading={addContactMutation.isPending}
-        isSuccess={addContactMutation.isSuccess}
-        error={addContactMutation.error}
-        countries={countries}
-      />
-      {selectedContact ? (
-        <UpdateContactForm
-          open={open === "update"}
-          handleClose={handleClose}
-          handleUpdateContact={handleUpdateContact}
-          isLoading={updateContactMutation.isPending}
-          isSuccess={updateContactMutation.isSuccess}
-          error={updateContactMutation.error}
-          countries={countries}
-          contact={selectedContact}
-        />
-      ) : (
-        <></>
-      )}
-      {selectedContact ? (
+      {/* Delete dialog still uses dialog since it's a confirmation */}
+      {selectedContact && (
         <DeleteConfirmationDialog
-          open={open === "delete"}
+          open={currentView === "delete"}
           handleClose={handleClose}
           isLoading={deleteContactMutation.isPending}
           isSuccess={deleteContactMutation.isSuccess}
           error={deleteContactMutation.error}
           onConfirm={() => handleDeleteContact(selectedContact)}
         />
-      ) : (
-        <></>
       )}
-      {selectedContact ? (
-        <ContactDetailDialog
-          open={open === "detail"}
-          handleClose={handleClose}
-          contact={selectedContact}
-        />
-      ) : (<></>)}
+
       <SearchInput
         value={searchInput}
         onChange={(newSearchInput) => {
@@ -266,69 +291,101 @@ export default function Contacts() {
       <Box
         sx={{
           display: "flex",
-          alignItems: "center",
-          gap: 3,
+          flexDirection: { xs: "column", md: "row" },
+          alignItems: { xs: "stretch", md: "center" },
+          gap: { xs: 2, md: 3 },
           my: 2,
         }}
       >
-        <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          Filter by country:
-        </Typography>
-        <Autocomplete
-          value={selectedCountry}
-          onChange={(_event, newValue) => {
-            setPaginationModel({ ...paginationModel, page: 1 });
-            setSelectedCountry(newValue);
-          }}
-          options={countries}
-          getOptionLabel={(option) => option.name}
-          sx={{ minWidth: 200 }}
-          renderInput={(params) => (
-            <TextField {...params} placeholder="Select country" size="small" />
-          )}
-        />
-        <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          Filter by group:
-        </Typography>
-        <ToggleButtonGroup
-          value={selectedGroups}
-          onChange={(_event, newGroups) => {
-            setPaginationModel({ ...paginationModel, page: 1 });
-            setSelectedGroups(newGroups);
-          }}
-          aria-label="group filters"
+        <Box
           sx={{
-            gap: 1,
-            "& .MuiToggleButton-root": {
-              borderRadius: "20px",
-              textTransform: "lowercase",
-              border: "1px solid",
-              borderColor: "divider",
-              "&.Mui-selected": {
-                borderColor: "secondary.main",
-              },
-            },
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            flexWrap: "wrap",
           }}
         >
-          <ToggleButton value="lt" aria-label="group 1">
-            <Typography>longterm</Typography>
-          </ToggleButton>
-          <ToggleButton value="f2f" aria-label="group 2">
-            <Typography>family-to-family</Typography>
-          </ToggleButton>
-          <ToggleButton value="camp" aria-label="group 3">
-            <Typography>camp</Typography>
-          </ToggleButton>
-          <ToggleButton value="none" aria-label="unassigned">
-            <Typography>unassigned</Typography>
-          </ToggleButton>
-        </ToggleButtonGroup>
+          <Typography
+            variant="body2"
+            sx={{ color: "text.secondary", minWidth: "fit-content" }}
+          >
+            Filter by country:
+          </Typography>
+          <Autocomplete
+            value={selectedCountry}
+            onChange={(_event, newValue) => {
+              setPaginationModel({ ...paginationModel, page: 1 });
+              setSelectedCountry(newValue);
+            }}
+            options={countries}
+            getOptionLabel={(option) => option.name}
+            sx={{ minWidth: { xs: "100%", sm: 200 }, flex: 1 }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="Select country"
+                size="small"
+              />
+            )}
+          />
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "stretch", sm: "center" },
+            gap: 2,
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{ color: "text.secondary", minWidth: "fit-content" }}
+          >
+            Filter by group:
+          </Typography>
+          <ToggleButtonGroup
+            value={selectedGroups}
+            onChange={(_event, newGroups) => {
+              setPaginationModel({ ...paginationModel, page: 1 });
+              setSelectedGroups(newGroups);
+            }}
+            aria-label="group filters"
+            sx={{
+              gap: 1,
+              flexWrap: "wrap",
+              "& .MuiToggleButton-root": {
+                borderRadius: "20px",
+                textTransform: "lowercase",
+                border: "1px solid",
+                borderColor: "divider",
+                fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                padding: { xs: "4px 8px", sm: "6px 12px" },
+                "&.Mui-selected": {
+                  borderColor: "secondary.main",
+                },
+              },
+            }}
+          >
+            <ToggleButton value="lt" aria-label="group 1">
+              longterm
+            </ToggleButton>
+            <ToggleButton value="f2f" aria-label="group 2">
+              family-to-family
+            </ToggleButton>
+            <ToggleButton value="camp" aria-label="group 3">
+              camp
+            </ToggleButton>
+            <ToggleButton value="none" aria-label="unassigned">
+              unassigned
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
       </Box>
       <Box
         sx={{
           display: "flex",
-          alignItems: "center",
-          // justifyContent: "center",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "stretch", sm: "center" },
           gap: 2,
           my: 3,
         }}
@@ -370,48 +427,19 @@ export default function Contacts() {
           color="secondary"
           variant="outlined"
           shape="rounded"
+          siblingCount={0}
+          sx={{
+            "& .MuiPagination-ul": {
+              flexWrap: "nowrap",
+            },
+          }}
         />
       </Box>
-
-      <Box
-        sx={{
-          display: viewMode === "card" ? "flex" : "none",
-          flexWrap: "wrap",
-        }}
-      >
-        {contacts.results.map((contact: Contact) => (
-          <ContactCard
-            key={contact.id}
-            contact={contact}
-            onCardClick={handleDetailOpen}
-            onEdit={handleUpdateOpen}
-            onDelete={handleDeleteOpen}
-          />
-        ))}
-      </Box>
-
-      <Box
-        sx={{
-          display: viewMode === "list" ? "flex" : "none",
-          flexWrap: "wrap",
-        }}
-      >
-        <ContactList
-          contacts={contacts}
-          paginationModel={paginationModel}
-          setPaginationModel={setPaginationModel}
-          isLoading={isLoading}
-          onEdit={handleUpdateOpen}
-          onDelete={handleDeleteOpen}
-          onRowClick={handleDetailOpen}
-        />
-      </Box>
-
-      <Box
+      {/* <Box
         sx={{
           display: "flex",
           alignItems: "center",
-          // justifyContent: "center",
+          justifyContent: { xs: "center", sm: "flex-start" },
           gap: 2,
           my: 3,
         }}
@@ -430,6 +458,76 @@ export default function Contacts() {
           color="secondary"
           variant="outlined"
           shape="rounded"
+          siblingCount={0}
+          sx={{
+            "& .MuiPagination-ul": {
+              flexWrap: "nowrap",
+            },
+          }}
+        />
+      </Box> */}
+      {viewMode === "card" && (
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+          }}
+        >
+          {contacts.results.map((contact: Contact) => (
+            <ContactCard
+              key={contact.id}
+              contact={contact}
+              onCardClick={handleDetailOpen}
+              onEdit={handleUpdateOpen}
+              onDelete={handleDeleteOpen}
+            />
+          ))}
+        </Box>
+      )}
+
+      {viewMode === "list" && (
+        <Box>
+          <ContactList
+            contacts={contacts}
+            paginationModel={paginationModel}
+            setPaginationModel={setPaginationModel}
+            isLoading={isLoading}
+            onEdit={handleUpdateOpen}
+            onDelete={handleDeleteOpen}
+            onRowClick={handleDetailOpen}
+          />
+        </Box>
+      )}
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: { xs: "center", sm: "flex-start" },
+          gap: 2,
+          my: 3,
+        }}
+      >
+        <Pagination
+          count={Math.ceil(contacts.count / paginationModel.pageSize)}
+          page={paginationModel.page}
+          onChange={(_, page) =>
+            setPaginationModel({
+              ...paginationModel,
+              page: page,
+            })
+          }
+          showFirstButton
+          showLastButton
+          color="secondary"
+          variant="outlined"
+          shape="rounded"
+          siblingCount={0}
+          sx={{
+            "& .MuiPagination-ul": {
+              flexWrap: "nowrap",
+            },
+          }}
         />
       </Box>
     </>

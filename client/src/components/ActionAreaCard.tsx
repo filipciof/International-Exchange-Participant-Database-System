@@ -14,12 +14,13 @@ import {
   MenuItem,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import type { ChipProps } from "@mui/material";
 
 type ActionAreaCardProps = {
   imageUrl: string;
   header: string;
   description: string[];
-  chips?: string[];
+  chips?: ChipProps[];
   onClick?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -62,7 +63,7 @@ export default function ActionAreaCard({
   };
 
   return (
-    <Box sx={{ zoom: { xs: 0.5, sm: 0.6, md: 0.7 } }}>
+    <Box sx={{ zoom: { xs: 0.56, sm: 0.6, md: 0.7 } }}>
       <Card
         sx={{ maxWidth: "300px", mt: "10px", mr: "10px", position: "relative" }}
       >
@@ -120,8 +121,8 @@ export default function ActionAreaCard({
                 flexDirection="row"
                 gap={1}
               >
-                {chips.map((label, index) => (
-                  <Chip key={index} label={label} color="secondary" />
+                {chips.map((chip, index) => (
+                  <Chip key={index} label={chip.label} color={chip.color} />
                 ))}
               </Box>
             )}
