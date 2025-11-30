@@ -26,11 +26,11 @@ import type {
   ContactFormInputs,
   Country,
   District,
-} from "../utils/types";
-import { contactSchema, Gender } from "../utils/types";
-import axiosClient from "../utils/axiosClient";
+} from "../../utils/types";
+import { contactSchema, Gender } from "../../utils/types";
+import axiosClient from "../../utils/axiosClient";
 
-type ContactFormViewProps = {
+type ContactFormProps = {
   title: string;
   handleClose: () => void;
   handleSubmit: (contact: ContactFormData) => void;
@@ -46,7 +46,7 @@ interface ValidationErrors {
   [key: string]: string[];
 }
 
-export default function ContactFormView({
+export default function ContactForm({
   title,
   handleClose,
   handleSubmit: onFormSubmit,
@@ -56,7 +56,7 @@ export default function ContactFormView({
   countries,
   initialData,
   submitButtonText = "Submit",
-}: ContactFormViewProps) {
+}: ContactFormProps) {
   const [photo, setPhoto] = useState<File | null>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));

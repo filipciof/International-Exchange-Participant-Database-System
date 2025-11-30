@@ -11,19 +11,19 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
-import type { Contact } from "../utils/types";
+import type { Contact } from "../../utils/types";
 import { useQuery } from "@tanstack/react-query";
-import axiosClient from "../utils/axiosClient";
+import axiosClient from "../../utils/axiosClient";
 
-type ContactDetailViewProps = {
+type ContactDetailProps = {
   contact: Contact;
   handleClose: () => void;
 };
 
-export default function ContactDetailView({
+export default function ContactDetail({
   contact,
   handleClose,
-}: ContactDetailViewProps) {
+}: ContactDetailProps) {
   const { data: imageUrl, isLoading } = useQuery({
     queryKey: ["contactImage", contact.photo],
     queryFn: async () => {

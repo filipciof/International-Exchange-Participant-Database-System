@@ -7,6 +7,11 @@ export type PaginatedData<T> = {
   results: T[];
 };
 
+export type PaginationModel = {
+  page: number;
+  pageSize: number;
+}
+
 export type Country = {
   id: number;
   name: string;

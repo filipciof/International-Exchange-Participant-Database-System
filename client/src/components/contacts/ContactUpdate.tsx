@@ -1,8 +1,8 @@
-import ContactFormView from "./ContactFormView";
-import type { ContactFormData, Country } from "../utils/types";
-import type { ContactFormInputs } from "../utils/types";
+import ContactForm from "./ContactForm";
+import type { ContactFormData, Country } from "../../utils/types";
+import type { ContactFormInputs } from "../../utils/types";
 
-type UpdateContactViewProps = {
+type UpdateContactProps = {
   handleClose: () => void;
   handleUpdateContact: (contact: ContactFormData) => void;
   isLoading: boolean;
@@ -12,7 +12,7 @@ type UpdateContactViewProps = {
   contact: ContactFormInputs;
 };
 
-export default function UpdateContactView({
+export default function UpdateContact({
   handleClose,
   handleUpdateContact,
   isLoading,
@@ -20,9 +20,9 @@ export default function UpdateContactView({
   error,
   countries,
   contact,
-}: UpdateContactViewProps) {
+}: UpdateContactProps) {
   return (
-    <ContactFormView
+    <ContactForm
       title="Update Contact"
       handleClose={handleClose}
       handleSubmit={handleUpdateContact}

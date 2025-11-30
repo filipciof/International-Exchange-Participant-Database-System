@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import axiosClient from "../utils/axiosClient";
-import { type Contact } from "../utils/types";
-import ActionAreaCard from "./ActionAreaCard";
+import axiosClient from "../../utils/axiosClient";
+import { type Contact } from "../../utils/types";
+import ActionAreaCard from "../ActionAreaCard";
 import { Box, Skeleton } from "@mui/material";
 import type { ChipProps } from "@mui/material";
 

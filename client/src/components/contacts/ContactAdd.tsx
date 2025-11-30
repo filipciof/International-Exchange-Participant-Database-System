@@ -1,7 +1,7 @@
-import ContactFormView from "./ContactFormView";
-import type { ContactFormData, Country } from "../utils/types";
+import ContactForm from "./ContactForm";
+import type { ContactFormData, Country } from "../../utils/types";
 
-type AddContactViewProps = {
+type ContactAddProps = {
   handleClose: () => void;
   handleAddContact: (contact: ContactFormData) => void;
   isLoading: boolean;
@@ -10,16 +10,16 @@ type AddContactViewProps = {
   countries: Country[];
 };
 
-export default function AddContactView({
+export default function ContactAdd({
   handleClose,
   handleAddContact,
   isLoading,
   isSuccess,
   error,
   countries,
-}: AddContactViewProps) {
+}: ContactAddProps) {
   return (
-    <ContactFormView
+    <ContactForm
       title="New Contact"
       handleClose={handleClose}
       handleSubmit={handleAddContact}

@@ -1,19 +1,13 @@
 import { type GridColDef, DataGrid } from "@mui/x-data-grid";
-import { type PaginatedData, type Contact } from "../utils/types";
+import type { PaginatedData, Contact, PaginationModel} from "../../utils/types";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 type ContactListProps = {
   contacts: PaginatedData<Contact>;
-  paginationModel: {
-    page: number;
-    pageSize: number;
-  };
-  setPaginationModel: (newPaginationModel: {
-    page: number;
-    pageSize: number;
-  }) => void;
+  paginationModel: PaginationModel;
+  setPaginationModel: (newPaginationModel: PaginationModel) => void;
   isLoading: boolean;
   onEdit?: (contact: Contact) => void;
   onDelete?: (contact: Contact) => void;
