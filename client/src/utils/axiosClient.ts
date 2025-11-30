@@ -39,6 +39,10 @@ axiosClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    if (originalRequest.url.includes("auth/")) {
+      return Promise.reject(error);
+    }
+
     if (
       error.response &&
       error.response.status === 401 &&
