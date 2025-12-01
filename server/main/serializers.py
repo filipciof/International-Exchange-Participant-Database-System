@@ -1,10 +1,21 @@
 from rest_framework import serializers
-from .models import Club, Family, Student, Country, District
+from .models import (
+    Club,
+    Family,
+    Student,
+    Country,
+    District,
+    Gender,
+    LanguageProficiency,
+    Exchange,
+)
+
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
         fields = ["id", "name", "code"]
+
 
 class DistrictSerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,54 +54,89 @@ class FamilySerializer(serializers.ModelSerializer):
 
 
 class StudentSerializer(serializers.ModelSerializer):
-    country_of_birth = serializers.SerializerMethodField()
-    country_of_departure = serializers.SerializerMethodField()
-    country_of_passport = serializers.SerializerMethodField()
-
     class Meta:
         model = Student
-        fields = [
-            "id",
-            "first_name",
-            "middle_name",
-            "last_name",
-            "nick_name",
-            "gender",
-            "date_of_birth",
-            "country_of_birth",
-            "city_of_birth",
-            "city_of_residence",
-            "address",
-            "height",
-            "shirt_size",
-            "dietary_restrictions",
-            "first_language",
-            "second_language",
-            "second_language_proficiency",
-            "third_language",
-            "third_language_proficiency",
-            "country_of_departure",
-            "country_of_passport",
-            "passport_number",
-            "passport_expiration_date",
-            "first_parent_full_name",
-            "first_parent_email",
-            "second_parent_full_name",
-            "second_parent_email",
-            "polish_phone_number",
-            "insurance_company",
-            "insurance_type",
-            "insurance_serial_number",
-            "insurance_amount",
-            "photo",
-            "notes",
-        ]
+        fields = "__all__"
 
-    def get_country_of_birth(self, obj):
-        return obj.id_country_of_birth.name if obj.id_country_of_birth else None
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
 
-    def get_country_of_departure(self, obj):
-        return obj.id_country_of_departure.name if obj.id_country_of_departure else None
+        representation["country_of_birth"] = (
+            instance.id_country_of_birth.name if instance.id_country_of_birth else ""
+        )
+        representation["country_of_departure"] = (
+            instance.id_country_of_departure.name
+            if instance.id_country_of_departure
+            else ""
+        )
+        representation["country_of_passport"] = (
+            instance.id_country_of_passport.name
+            if instance.id_country_of_passport
+            else ""
+        )
 
-    def get_country_of_passport(self, obj):
-        return obj.id_country_of_passport.name if obj.id_country_of_passport else None
+        gender_map = {
+            Gender.MALE: "male",
+            Gender.FEMALE: "female",
+            Gender.NONBINARY: "nonbinary",
+        }
+        representation["gender_name"] = gender_map.get(instance.gender, "unknown")
+
+        lang_prof_map = {
+            LanguageProficiency.BEGINNER: "beginner",
+            LanguageProficiency.CONVERSATIONAL: "conversational",
+            LanguageProficiency.ADVANCED: "advanced",
+            LanguageProficiency.FLUENT: "fluent",
+        }
+        representation["second_language_proficiency_name"] = lang_prof_map.get(
+            instance.second_language_proficiency, None
+        )
+        representation["third_language_proficiency_name"] = lang_prof_map.get(
+            instance.third_language_proficiency, None
+        )
+
+        return representation
+
+
+class ExchangeSerializer(serializers.ModelSerializer):
+    receiving_club = ClubSerializer(source='id_receiving_club', read_only=True)
+    sending_club = ClubSerializer(source='id_sending_club', read_only=True)
+    
+    class Meta:
+        model = Exchange
+        fields = "__all__"
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        
+        representation["counsellor"] = (
+            " ".join(filter(None, [
+                instance.id_counsellor.first_name,
+                instance.id_counsellor.middle_name,
+                instance.id_counsellor.last_name
+            ]))
+            if instance.id_counsellor
+            else ""
+        )
+        
+        representation["kwm_officer"] = (
+            " ".join(filter(None, [
+                instance.id_kwm_officer.first_name,
+                instance.id_kwm_officer.middle_name,
+                instance.id_kwm_officer.last_name
+            ]))
+            if instance.id_kwm_officer
+            else ""
+        )
+        
+        representation["type"] = (
+            instance.id_type.subtype
+            if instance.id_type and instance.id_type.subtype
+            else (
+                "longterm"
+                if instance.id_type and instance.id_type.name == "lt"
+                else "shortterm" if instance.id_type and instance.id_type.name == "st" else ""
+            )
+        )
+        
+        return representation

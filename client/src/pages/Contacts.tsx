@@ -15,13 +15,16 @@ import UpdateContact from "../components/contacts/ContactUpdate";
 import ContactDetail from "../components/contacts/ContactDetail";
 import ContactCard from "../components/contacts/ContactCard";
 import ContactList from "../components/contacts/ContactList";
-import type { Contact, ContactFormData, Country } from "../utils/types";
+import type {
+  Contact,
+  ContactFormData,
+  Country,
+  ViewType,
+} from "../utils/types";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 import { useContacts } from "../hooks/useContacts";
 import MyPagination from "../components/MyPagination";
 import ContactFilter from "../components/contacts/ContactFilter";
-
-type ViewType = "list" | "add" | "update" | "delete" | "detail";
 
 export default function Contacts() {
   const [currentView, setCurrentView] = useState<ViewType>("list");

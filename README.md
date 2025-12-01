@@ -24,3 +24,9 @@ Dropping all tables in postgresql:
 
   DROP SCHEMA public CASCADE;
   CREATE SCHEMA public;
+
+Dumping the whole database:
+  pg_dump -U admin -h localhost -d iepds > ~/repos/IEPDS/server/pg_iepds.sql
+
+Loading the dump (drop all schema before doing this):
+  psql -U admin -h localhost -d iepds < ~/repos/IEPDS/server/pg_iepds.sql

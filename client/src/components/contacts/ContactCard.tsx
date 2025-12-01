@@ -17,7 +17,7 @@ export default function ContactCard({
   onDelete: (contact: Contact) => void;
 }) {
   const { data: imageUrl, isLoading } = useQuery({
-    queryKey: ["contactImage", contact.photo],
+    queryKey: ["contactPhoto", contact.photo],
     queryFn: async () => {
       const photoName = contact.photo.split("/")[3];
       const response = await axiosClient.get(

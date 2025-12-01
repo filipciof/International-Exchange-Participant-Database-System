@@ -10,7 +10,7 @@ export type PaginatedData<T> = {
 export type PaginationModel = {
   page: number;
   pageSize: number;
-}
+};
 
 export type Country = {
   id: number;
@@ -80,21 +80,73 @@ export const contactSchema = z.object({
 
 export type ContactFormInputs = z.infer<typeof contactSchema>;
 
-// export const transformContactToFormInputs = (
-//   contact: Contact
-// ): ContactFormInputs => {
-//   return contactSchema.parse({
-//     first_name: contact.first_name,
-//     middle_name: contact.middle_name || "",
-//     last_name: contact.last_name,
-//     gender: contact.gender || -1,
-//     id_country: contact.id_country,
-//     id_districts: contact.id_districts || [],
-//     email: contact.email,
-//     phone: contact.phone,
-//     is_longterm: contact.is_longterm,
-//     is_family_to_family: contact.is_family_to_family,
-//     is_camp: contact.is_camp,
-//     notes: contact.notes || "",
-//   });
-// };
+export type ViewType = "list" | "add" | "update" | "delete" | "detail";
+
+export type Student = {
+  id: number;
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+  nick_name: string;
+  gender: number;
+  gender_name: string;
+  date_of_birth: Date;
+  id_country_of_birth: number;
+  country_of_birth: string;
+  city_of_birth: string;
+  city_of_residence: string;
+  address: string;
+  height: number;
+  shirt_size: string;
+  dietary_restrictions: string;
+  first_language: string;
+  second_language: string;
+  second_language_proficiency: number;
+  second_language_proficiency_name: string;
+  third_language: string;
+  third_language_proficiency: number;
+  third_langugae_proficiency_name: string;
+  id_country_of_departure: number;
+  country_of_departure: string;
+  id_country_of_passport: number;
+  country_of_passport: string;
+  passport_number: string;
+  passport_expiration_date: Date;
+  first_parent_full_name: string;
+  first_parent_email: string;
+  second_parent_full_name: string;
+  second_parent_email: string;
+  polish_phone_number: string;
+  insurance_company: string;
+  insurance_type: string;
+  insurance_serial_number: string;
+  insurance_amount: number;
+  photo: string;
+  notes: string;
+};
+
+type Club = {
+  name: string;
+  country: string;
+  district: number;
+  city: string;
+};
+
+export type Exchange = {
+  id: number;
+  id_student: number;
+  id_receiving_club: number | null;
+  receiving_club: Club | null;
+  id_sending_club: number | null;
+  sending_club: Club | null;
+  id_counsellor: number | null;
+  counsellor: string;
+  id_kwm_officer: number | null;
+  kwm_officer: string;
+  id_type: number | null;
+  type: string;
+  start_date: Date | null;
+  end_date: Date | null;
+  year: number;
+  is_inbound: boolean;
+};

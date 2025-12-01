@@ -17,7 +17,7 @@ export function useContacts({
   searchInput,
 }: UseContactsParams) {
   const {
-    data: contacts = { results: [], count: 0 },
+    data: contacts,
     isLoading,
     error,
   } = useQuery({

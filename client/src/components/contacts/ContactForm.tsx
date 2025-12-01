@@ -150,7 +150,7 @@ export default function ContactForm({
       sx={{
         height: "100%",
         width: "100%",
-        overflow: "auto",
+        overflow: "hidden",
         backgroundColor: "background.default",
       }}
     >
