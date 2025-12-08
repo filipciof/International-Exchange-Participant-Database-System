@@ -155,11 +155,13 @@ class Student(models.Model):
     insurance_company = models.CharField(max_length=50, blank=True, default="")
     insurance_type = models.CharField(max_length=50, blank=True, default="")
     insurance_serial_number = models.CharField(max_length=20, blank=True, default="")
-    insurance_amount = models.PositiveIntegerField(null=True)
+    insurance_amount = models.DecimalField(max_digits=12, decimal_places=2, null=True)
 
     # Extras
     photo = models.ImageField(upload_to="student_photos/", blank=True, default="")
     notes = models.TextField(blank=True, default="")
+
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = "student"

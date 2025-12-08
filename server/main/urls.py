@@ -19,6 +19,7 @@ urlpatterns = [
     path("clubs/", ClubView.as_view()),
     path("families/", FamilyView.as_view()),
     path("students/", StudentView.as_view()),
+    path("students/<int:pk>/", StudentView.as_view()),
     path("students/photos/", StudentPhotoView.as_view()),
     path("exchanges/", ExchangeView.as_view()),
 ]

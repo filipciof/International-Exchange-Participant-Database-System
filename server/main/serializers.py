@@ -57,6 +57,9 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = "__all__"
+        extra_kwargs = {
+            'is_active': {'required': False, 'default': True}
+        }
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

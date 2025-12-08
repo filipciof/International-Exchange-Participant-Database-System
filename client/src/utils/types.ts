@@ -30,6 +30,15 @@ export const Gender = [
   { value: 2, label: "nonbinary" },
 ];
 
+export const LanguageProficiency = [
+  { value: 0, label: "beginner" },
+  { value: 1, label: "conversational" },
+  { value: 2, label: "advanced" },
+  { value: 3, label: "fluent" },
+];
+
+export const ShirtSize = ["XS", "S", "M", "L", "XL", "XXL"];
+
 export type Contact = {
   id: number;
   first_name: string;
@@ -68,8 +77,8 @@ export const contactSchema = z.object({
   middle_name: z.string().optional(),
   last_name: z.string().min(1, "Last name is required"),
   id_country: z.number().min(1, "Country is required"),
-  id_districts: z.array(z.number()).optional(),
-  gender: z.number().optional(),
+  id_districts: z.array(z.number()).nullable().optional(),
+  gender: z.number().nullable().optional(),
   email: z.email().or(z.literal("")),
   phone: z.string(),
   is_longterm: z.boolean(),
@@ -79,6 +88,47 @@ export const contactSchema = z.object({
 });
 
 export type ContactFormInputs = z.infer<typeof contactSchema>;
+
+export const studentSchema = z.object({
+  first_name: z.string().min(1, "First name is required"),
+  middle_name: z.string().optional(),
+  last_name: z.string().min(1, "Last name is required"),
+  nick_name: z.string().optional(),
+  gender: z.number().nullable().optional(),
+  date_of_birth: z.string().nullable().optional(),
+  id_country_of_birth: z.number().nullable().optional(),
+  city_of_birth: z.string().optional(),
+  city_of_residence: z.string().optional(),
+  address: z.string().optional(),
+  height: z.string().nullable().optional(),
+  shirt_size: z.string().optional(),
+  dietary_restrictions: z.string().optional(),
+  first_language: z.string().optional(),
+  second_language: z.string().optional(),
+  second_language_proficiency: z.number().nullable().optional(),
+  third_language: z.string().optional(),
+  third_language_proficiency: z.number().nullable().optional(),
+  id_country_of_departure: z.number().nullable().optional(),
+  id_country_of_passport: z.number().nullable().optional(),
+  passport_number: z.string().optional(),
+  passport_expiration_date: z.string().nullable().optional(),
+  first_parent_full_name: z.string().optional(),
+  first_parent_email: z.email().or(z.literal("")),
+  second_parent_full_name: z.string().optional(),
+  second_parent_email: z.email().or(z.literal("")),
+  polish_phone_number: z.string().optional(),
+  insurance_company: z.string().optional(),
+  insurance_type: z.string().optional(),
+  insurance_serial_number: z.string().optional(),
+  insurance_amount: z.string().nullable().optional(),
+  notes: z.string().optional(),
+});
+
+export type StudentFormInputs = z.infer<typeof studentSchema>;
+
+export type StudentFormData = StudentFormInputs & {
+  photo: File | null;
+};
 
 export type ViewType = "list" | "add" | "update" | "delete" | "detail";
 
@@ -90,13 +140,13 @@ export type Student = {
   nick_name: string;
   gender: number;
   gender_name: string;
-  date_of_birth: Date;
+  date_of_birth: string;
   id_country_of_birth: number;
   country_of_birth: string;
   city_of_birth: string;
   city_of_residence: string;
   address: string;
-  height: number;
+  height: string;
   shirt_size: string;
   dietary_restrictions: string;
   first_language: string;
@@ -111,7 +161,7 @@ export type Student = {
   id_country_of_passport: number;
   country_of_passport: string;
   passport_number: string;
-  passport_expiration_date: Date;
+  passport_expiration_date: string;
   first_parent_full_name: string;
   first_parent_email: string;
   second_parent_full_name: string;
@@ -120,7 +170,7 @@ export type Student = {
   insurance_company: string;
   insurance_type: string;
   insurance_serial_number: string;
-  insurance_amount: number;
+  insurance_amount: string;
   photo: string;
   notes: string;
 };
@@ -150,3 +200,7 @@ export type Exchange = {
   year: number;
   is_inbound: boolean;
 };
+
+export interface ValidationErrors {
+  [key: string]: string[];
+}

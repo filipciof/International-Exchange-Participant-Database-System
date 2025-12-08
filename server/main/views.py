@@ -12,10 +12,18 @@ from .serializers import (
 from django.http import Http404, HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.status import HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_204_NO_CONTENT,
+)
 from rest_framework.pagination import PageNumberPagination
 from config.settings import MEDIA_ROOT
 import os
+from uuid import uuid4
+from django.core.files.storage import default_storage
 
 get_allowed_groups = ["admin", "correspondent", "club_officer", "kwm_officer"]
 crud_allowed_groups = ["admin", "correspondent"]
@@ -52,11 +60,11 @@ class DistrictView(APIView):
 
         districts = []
         country = request.query_params.get("country")
+
         if country:
             districts = District.objects.filter(id_country=country)
 
         serializer = DistrictSerializer(districts, many=True)
-
         return Response(serializer.data)
 
 
@@ -107,11 +115,84 @@ class StudentView(APIView):
             )
 
         students = Student.objects.order_by("-id")
+        students = students.filter(is_active=True)
         paginator = PageNumberPagination()
         paginator.page_size = min(int(request.query_params.get("page_size", 25)), 100)
         result_page = paginator.paginate_queryset(students, request, view=self)
         serializer = StudentSerializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
+
+    def post(self, request):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        data = request.data.copy()
+        photo = request.FILES.get("photo")
+
+        if photo:
+            ext = os.path.splitext(photo.name)[1].lower() or ".bin"
+            target_name = f"{uuid4().hex}{ext}"
+            unique_name = default_storage.get_available_name(target_name)
+            photo.name = unique_name
+            data["photo"] = photo
+
+        serializer = StudentSerializer(data=data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data, status=HTTP_201_CREATED)
+    
+    def delete(self, request, pk=None):
+        updated = Student.objects.filter(id=pk).update(is_active=False)
+        if updated == 0:
+            return Response({"error": "Student not found"}, status=HTTP_404_NOT_FOUND)
+        return Response(status=HTTP_204_NO_CONTENT)
+    
+    def patch(self, request, pk=None):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        try:
+            student = Student.objects.get(pk=pk, is_active=True)
+        except Student.DoesNotExist:
+            return Response(
+                {"message": "Student not found."}, status=HTTP_404_NOT_FOUND
+            )
+
+        data = request.data.copy()
+
+        photo = request.FILES.get("photo")
+        if photo:
+            if student.photo:
+                old_photo_path = os.path.join(MEDIA_ROOT, str(student.photo))
+                if os.path.exists(old_photo_path):
+                    os.remove(old_photo_path)
+
+            ext = os.path.splitext(photo.name)[1].lower() or ".bin"
+            target_name = f"{uuid4().hex}{ext}"
+            unique_name = default_storage.get_available_name(target_name)
+            photo.name = unique_name
+            data["photo"] = photo
+
+        serializer = StudentSerializer(student, data=data, partial=True)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        student = serializer.save()
+        return Response(serializer.data)
 
 
 class StudentPhotoView(APIView):
@@ -159,9 +240,8 @@ class ExchangeView(APIView):
                 {"message": "You are not authorized to do this."},
                 status=HTTP_403_FORBIDDEN,
             )
-        
-        exchanges = Exchange.objects.order_by("-id")
 
+        exchanges = Exchange.objects.order_by("-id")
         id_student = request.query_params.get("id_student")
 
         if id_student:

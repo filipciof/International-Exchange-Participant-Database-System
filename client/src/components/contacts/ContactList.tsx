@@ -152,6 +152,7 @@ export default function ContactList({
             columnVisibilityModel: {
               middle_name: false,
               notes: false,
+              gender_name: false,
             },
           },
         }}

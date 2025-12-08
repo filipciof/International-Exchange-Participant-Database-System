@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
-import axiosClient from "../utils/axiosClient";
 import StudentList from "../components/students/StudentList";
 import Loading from "../components/Loading";
-import { Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import MyPagination from "../components/MyPagination";
-import type { Student, ViewType } from "../utils/types";
+import type { Student, StudentFormData, ViewType } from "../utils/types";
 import StudentDetail from "../components/students/StudentDetail";
+import AddStudent from "../components/students/StudentAdd";
+import UpdateStudent from "../components/students/StudentUpdate";
+import AddIcon from "@mui/icons-material/Add";
+import { useStudents } from "../hooks/useStudents";
+import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 
 export default function Students() {
   const [currentView, setCurrentView] = useState<ViewType>("list");
@@ -27,30 +30,27 @@ export default function Students() {
     }
   }, [currentView]);
 
+  const {
+    students,
+    countries,
+    isLoading,
+    error,
+    addStudentMutation,
+    updateStudentMutation,
+    deleteStudentMutation,
+  } = useStudents({
+    paginationModel,
+    // selectedGroups,
+    // selectedCountry,
+    // searchInput,
+  });
+
   const handleViewChange = (newView: ViewType) => {
     if (currentView === "list") {
       scrollPositionRef.current = window.scrollY;
     }
     setCurrentView(newView);
   };
-
-  const {
-    data: students,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["students", paginationModel],
-    queryFn: async () => {
-      const params = new URLSearchParams({
-        page: paginationModel.page.toString(),
-        page_size: paginationModel.pageSize.toString(),
-      });
-
-      const response = await axiosClient.get(`/students/?${params.toString()}`);
-      console.log(response.data);
-      return response.data;
-    },
-  });
 
   if (isLoading) return <Loading />;
   if (error)
@@ -62,6 +62,9 @@ export default function Students() {
 
   const handleClose = () => {
     setSelectedStudent(null);
+    addStudentMutation.reset();
+    deleteStudentMutation.reset();
+    updateStudentMutation.reset();
     handleViewChange("list");
   };
 
@@ -69,15 +72,93 @@ export default function Students() {
     setSelectedStudent(student);
     handleViewChange("detail");
   };
-  
-  if (currentView === "detail" && selectedStudent) {
-      return (
-        <StudentDetail student={selectedStudent} handleClose={handleClose} />
-      );
+
+  const handleAddOpen = () => {
+    handleViewChange("add");
+  };
+
+  const handleAddStudent = (student: StudentFormData) => {
+    addStudentMutation.mutate(student);
+  };
+
+  const handleDeleteOpen = (student: Student) => {
+    setSelectedStudent(student);
+    handleViewChange("delete");
+  };
+
+  const handleDeleteStudent = (student: Student) => {
+    if (selectedStudent) {
+      deleteStudentMutation.mutate(student.id);
     }
+  };
+
+  const handleUpdateOpen = (student: Student) => {
+    setSelectedStudent(student);
+    handleViewChange("update");
+  }
+
+  const handleUpdateStudent = (data: StudentFormData) => {
+    if (selectedStudent) {
+      updateStudentMutation.mutate({ id: selectedStudent.id, data });
+    }
+  };
+
+  if (currentView === "detail" && selectedStudent) {
+    return (
+      <StudentDetail student={selectedStudent} handleClose={handleClose} />
+    );
+  }
+
+  if (currentView === "add") {
+    return (
+      <AddStudent
+        handleClose={handleClose}
+        handleAddStudent={handleAddStudent}
+        isLoading={addStudentMutation.isPending}
+        isSuccess={addStudentMutation.isSuccess}
+        error={addStudentMutation.error}
+        countries={countries}
+      />
+    );
+  }
+
+  if (currentView === "update" && selectedStudent) {
+    return (
+      <UpdateStudent
+        handleClose={handleClose}
+        handleUpdateStudent={handleUpdateStudent}
+        isLoading={updateStudentMutation.isPending}
+        isSuccess={updateStudentMutation.isSuccess}
+        error={updateStudentMutation.error}
+        countries={countries}
+        student={selectedStudent}
+      />
+    );
+  }
 
   return (
     <>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Button
+          variant="outlined"
+          startIcon={<AddIcon />}
+          onClick={handleAddOpen}
+        >
+          New student
+        </Button>
+      </Box>
+
+      {selectedStudent && (
+        <DeleteConfirmationDialog
+          open={currentView === "delete"}
+          handleClose={handleClose}
+          isLoading={deleteStudentMutation.isPending}
+          isSuccess={deleteStudentMutation.isSuccess}
+          error={deleteStudentMutation.error}
+          onConfirm={() => handleDeleteStudent(selectedStudent)}
+        />
+      )}
+
       <MyPagination
         paginationModel={paginationModel}
         setPaginationModel={setPaginationModel}
@@ -90,8 +171,8 @@ export default function Students() {
         paginationModel={paginationModel}
         setPaginationModel={setPaginationModel}
         isLoading={isLoading}
-        onEdit={() => {}}
-        onDelete={() => {}}
+        onEdit={handleUpdateOpen}
+        onDelete={handleDeleteOpen}
         onRowClick={handleDetailOpen}
       />
 

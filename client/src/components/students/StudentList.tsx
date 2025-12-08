@@ -156,6 +156,7 @@ export default function StudentList({
               nick_name: false,
               country_of_birth: false,
               city_of_birth: false,
+              second_language: false,
             },
           },
         }}
