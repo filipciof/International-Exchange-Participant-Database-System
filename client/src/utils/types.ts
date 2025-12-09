@@ -204,3 +204,8 @@ export type Exchange = {
 export interface ValidationErrors {
   [key: string]: string[];
 }
+
+export type SearchableField = {
+  value: string;
+  label: string;
+};

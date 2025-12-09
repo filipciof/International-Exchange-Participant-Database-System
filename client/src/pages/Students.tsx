@@ -3,13 +3,19 @@ import StudentList from "../components/students/StudentList";
 import Loading from "../components/Loading";
 import { Box, Button, Typography } from "@mui/material";
 import MyPagination from "../components/MyPagination";
-import type { Student, StudentFormData, ViewType } from "../utils/types";
+import type {
+  Student,
+  StudentFormData,
+  ViewType,
+  Country,
+} from "../utils/types";
 import StudentDetail from "../components/students/StudentDetail";
 import AddStudent from "../components/students/StudentAdd";
 import UpdateStudent from "../components/students/StudentUpdate";
 import AddIcon from "@mui/icons-material/Add";
 import { useStudents } from "../hooks/useStudents";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
+import StudentFilter from "../components/students/StudentFilter";
 
 export default function Students() {
   const [currentView, setCurrentView] = useState<ViewType>("list");
@@ -18,6 +24,16 @@ export default function Students() {
     page: 1,
     pageSize: 25,
   });
+  const [selectedCountryOfDeparture, setSelectedCountryOfDeparture] =
+    useState<Country | null>(null);
+  const [selectedCountryOfBirth, setSelectedCountryOfBirth] =
+    useState<Country | null>(null);
+  const [selectedCountryOfPassport, setSelectedCountryOfPassport] =
+    useState<Country | null>(null);
+  const [selectedShirtSizes, setSelectedShirtSizes] = useState<string[]>([]);
+  const [selectedGenders, setSelectedGenders] = useState<number[]>([]);
+  const [searchFields, setSearchFields] = useState<string[]>([]);
+  const [searchInput, setSearchInput] = useState("");
   const scrollPositionRef = useRef<number>(0);
 
   useEffect(() => {
@@ -40,9 +56,13 @@ export default function Students() {
     deleteStudentMutation,
   } = useStudents({
     paginationModel,
-    // selectedGroups,
-    // selectedCountry,
-    // searchInput,
+    selectedCountryOfDeparture,
+    selectedCountryOfBirth,
+    selectedCountryOfPassport,
+    selectedGenders,
+    selectedShirtSizes,
+    searchFields,
+    searchInput,
   });
 
   const handleViewChange = (newView: ViewType) => {
@@ -95,7 +115,7 @@ export default function Students() {
   const handleUpdateOpen = (student: Student) => {
     setSelectedStudent(student);
     handleViewChange("update");
-  }
+  };
 
   const handleUpdateStudent = (data: StudentFormData) => {
     if (selectedStudent) {
@@ -158,6 +178,26 @@ export default function Students() {
           onConfirm={() => handleDeleteStudent(selectedStudent)}
         />
       )}
+
+      <StudentFilter
+        searchInput={searchInput}
+        setSearchInput={setSearchInput}
+        searchFields={searchFields}
+        setSearchFields={setSearchFields}
+        paginationModel={paginationModel}
+        setPaginationModel={setPaginationModel}
+        selectedCountryOfDeparture={selectedCountryOfDeparture}
+        setSelectedCountryOfDeparture={setSelectedCountryOfDeparture}
+        selectedCountryOfBirth={selectedCountryOfBirth}
+        setSelectedCountryOfBirth={setSelectedCountryOfBirth}
+        selectedCountryOfPassport={selectedCountryOfPassport}
+        setSelectedCountryOfPassport={setSelectedCountryOfPassport}
+        selectedShirtSizes={selectedShirtSizes}
+        setSelectedShirtSizes={setSelectedShirtSizes}
+        selectedGenders={selectedGenders}
+        setSelectedGenders={setSelectedGenders}
+        countries={countries}
+      />
 
       <MyPagination
         paginationModel={paginationModel}

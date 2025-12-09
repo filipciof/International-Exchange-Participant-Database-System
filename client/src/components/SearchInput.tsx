@@ -5,9 +5,10 @@ import SearchIcon from "@mui/icons-material/Search";
 interface SearchInputProps {
   value: string;
   onChange: (value: string) => void;
+  placeholder: string;
 }
 
-const SearchInput = memo(({ value, onChange }: SearchInputProps) => {
+const SearchInput = memo(({ value, onChange, placeholder }: SearchInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
 
@@ -36,7 +37,7 @@ const SearchInput = memo(({ value, onChange }: SearchInputProps) => {
       <TextField
         fullWidth
         size="small"
-        placeholder="Search contacts..."
+        placeholder={placeholder}
         inputRef={inputRef}
         defaultValue={value}
         onChange={handleChange}

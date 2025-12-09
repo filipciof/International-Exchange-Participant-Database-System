@@ -4,17 +4,25 @@ import queryClient from "../utils/queryClient";
 import type { Country, StudentFormData, PaginationModel } from "../utils/types";
 
 interface UseStudentsParams {
-  paginationModel: PaginationModel,
-//   selectedGroups: string[];
-//   selectedCountry: Country | null;
-//   searchInput: string;
+  paginationModel: PaginationModel;
+  selectedCountryOfDeparture: Country | null;
+  selectedCountryOfBirth: Country | null;
+  selectedCountryOfPassport: Country | null;
+  selectedGenders: number[];
+  selectedShirtSizes: string[];
+  searchFields: string[];
+  searchInput: string;
 }
 
 export function useStudents({
   paginationModel,
-//   selectedGroups,
-//   selectedCountry,
-//   searchInput,
+  selectedCountryOfDeparture,
+  selectedCountryOfBirth,
+  selectedCountryOfPassport,
+  selectedGenders,
+  selectedShirtSizes,
+  searchFields,
+  searchInput,
 }: UseStudentsParams) {
   const {
     data: students,
@@ -24,9 +32,13 @@ export function useStudents({
     queryKey: [
       "students",
       paginationModel,
-    //   selectedGroups,
-    //   selectedCountry,
-    //   searchInput,
+      selectedCountryOfDeparture,
+      selectedCountryOfBirth,
+      selectedCountryOfPassport,
+      selectedGenders,
+      selectedShirtSizes,
+      searchFields,
+      searchInput,
     ],
     queryFn: async () => {
       const params = new URLSearchParams({
@@ -34,17 +46,39 @@ export function useStudents({
         page_size: paginationModel.pageSize.toString(),
       });
 
-    //   if (selectedCountry) {
-    //     params.append("country", selectedCountry.id.toString());
-    //   }
+      if (searchInput) {
+        params.append("search", searchInput);
+      }
 
-    //   selectedGroups.forEach((group) => {
-    //     params.append("group", group);
-    //   });
+      searchFields.forEach((searchField) => {
+        params.append("search_field", searchField);
+      });
 
-    //   if (searchInput) {
-    //     params.append("search", searchInput);
-    //   }
+      selectedGenders.forEach((gender) => {
+        params.append("gender", gender.toString());
+      });
+
+      selectedShirtSizes.forEach((shirtSize) => {
+        params.append("shirt_size", shirtSize);
+      });
+
+      if (selectedCountryOfBirth) {
+        params.append("country_of_birth", selectedCountryOfBirth.id.toString());
+      }
+
+      if (selectedCountryOfDeparture) {
+        params.append(
+          "country_of_departure",
+          selectedCountryOfDeparture.id.toString(),
+        );
+      }
+
+      if (selectedCountryOfPassport) {
+        params.append(
+          "country_of_passport",
+          selectedCountryOfPassport.id.toString(),
+        );
+      }
 
       const response = await axiosClient.get(`/students/?${params.toString()}`);
       return response.data;

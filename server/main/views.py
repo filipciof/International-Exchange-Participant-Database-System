@@ -24,6 +24,7 @@ from config.settings import MEDIA_ROOT
 import os
 from uuid import uuid4
 from django.core.files.storage import default_storage
+from django.db.models import Q
 
 get_allowed_groups = ["admin", "correspondent", "club_officer", "kwm_officer"]
 crud_allowed_groups = ["admin", "correspondent"]
@@ -116,6 +117,76 @@ class StudentView(APIView):
 
         students = Student.objects.order_by("-id")
         students = students.filter(is_active=True)
+        search = request.query_params.get("search")
+
+        if search:
+            search_query = Q()
+            search_fields_param = request.query_params.getlist("search_field")
+
+            if search_fields_param:
+                search_fields = search_fields_param
+            else:
+                search_fields = [
+                    "first_name",
+                    "middle_name",
+                    "last_name",
+                    "nick_name",
+                    "city_of_birth",
+                    "city_of_residence",
+                    "address",
+                    "dietary_restrictions",
+                    "first_language",
+                    "second_language",
+                    "third_language",
+                    "passport_number",
+                    "first_parent_full_name",
+                    "first_parent_email",
+                    "second_parent_full_name",
+                    "second_parent_email",
+                    "polish_phone_number",
+                    "insurance_company",
+                    "insurance_type",
+                    "insurance_serial_number",
+                    "notes",
+                ]
+
+            for field in search_fields:
+                search_query |= Q(**{f"{field}__icontains": search})
+
+            students = students.filter(search_query)
+
+        genders = request.query_params.getlist("gender")
+        if genders:
+            gender_query = Q()
+            for gender in genders:
+                try:
+                    gender_value = int(gender)
+                    gender_query |= Q(gender=gender_value)
+                except (ValueError, TypeError):
+                    pass
+            if gender_query:
+                students = students.filter(gender_query)
+
+        shirt_sizes = request.query_params.getlist("shirt_size")
+        if shirt_sizes:
+            shirt_size_query = Q()
+            for size in shirt_sizes:
+                shirt_size_query |= Q(shirt_size=size)
+            students = students.filter(shirt_size_query)
+
+        country_of_birth = request.query_params.get("country_of_birth")
+        country_of_departure = request.query_params.get("country_of_departure")
+        country_of_passport = request.query_params.get("country_of_passport")
+
+        if country_of_birth:
+            students = students.filter(id_country_of_birth=country_of_birth)
+
+        if country_of_departure:
+            students = students.filter(id_country_of_departure=country_of_departure)
+
+        if country_of_passport:
+            students = students.filter(id_country_of_passport=country_of_passport)
+
         paginator = PageNumberPagination()
         paginator.page_size = min(int(request.query_params.get("page_size", 25)), 100)
         result_page = paginator.paginate_queryset(students, request, view=self)
@@ -148,13 +219,13 @@ class StudentView(APIView):
 
         serializer.save()
         return Response(serializer.data, status=HTTP_201_CREATED)
-    
+
     def delete(self, request, pk=None):
         updated = Student.objects.filter(id=pk).update(is_active=False)
         if updated == 0:
             return Response({"error": "Student not found"}, status=HTTP_404_NOT_FOUND)
         return Response(status=HTTP_204_NO_CONTENT)
-    
+
     def patch(self, request, pk=None):
         user_groups = request.user.groups.values_list("name", flat=True)
 

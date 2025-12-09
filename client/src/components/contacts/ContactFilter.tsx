@@ -40,6 +40,7 @@ export default function ContactFilter({
           setPaginationModel({ ...paginationModel, page: 1 });
           setSearchInput(newSearchInput);
         }}
+        placeholder="Search contacts..."
       />
       <Box
         sx={{
