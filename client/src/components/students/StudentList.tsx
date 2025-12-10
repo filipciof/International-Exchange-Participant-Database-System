@@ -1,5 +1,9 @@
 import { type GridColDef, DataGrid } from "@mui/x-data-grid";
-import type { PaginatedData, PaginationModel, Student} from "../../utils/types";
+import type {
+  PaginatedData,
+  PaginationModel,
+  Student,
+} from "../../utils/types";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -9,9 +13,9 @@ type StudentListProps = {
   paginationModel: PaginationModel;
   setPaginationModel: (newPaginationModel: PaginationModel) => void;
   isLoading: boolean;
-  onEdit?: (student: Student) => void;
-  onDelete?: (student: Student) => void;
-  onRowClick?: (student: Student) => void;
+  onEdit?: (id: number) => void;
+  onDelete?: (id: number) => void;
+  onRowClick?: (id: number) => void;
 };
 
 export default function StudentList({
@@ -105,7 +109,7 @@ export default function StudentList({
           <Tooltip title="Edit">
             <IconButton
               size="small"
-              onClick={() => onEdit?.(params.row)}
+              onClick={() => onEdit?.(params.row.id)}
               color="primary"
             >
               <EditIcon fontSize="small" />
@@ -114,7 +118,7 @@ export default function StudentList({
           <Tooltip title="Delete">
             <IconButton
               size="small"
-              onClick={() => onDelete?.(params.row)}
+              onClick={() => onDelete?.(params.row.id)}
               color="error"
             >
               <DeleteIcon fontSize="small" />
@@ -144,7 +148,7 @@ export default function StudentList({
           });
         }}
         onRowClick={(params) => {
-          onRowClick?.(params.row);
+          onRowClick?.(params.row.id);
         }}
         pageSizeOptions={[10, 25, 50, 100]}
         hideFooter

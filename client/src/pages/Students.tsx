@@ -4,7 +4,6 @@ import Loading from "../components/Loading";
 import { Box, Button, Typography } from "@mui/material";
 import MyPagination from "../components/MyPagination";
 import type {
-  Student,
   StudentFormData,
   ViewType,
   Country,
@@ -19,7 +18,7 @@ import StudentFilter from "../components/students/StudentFilter";
 
 export default function Students() {
   const [currentView, setCurrentView] = useState<ViewType>("list");
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [paginationModel, setPaginationModel] = useState({
     page: 1,
     pageSize: 25,
@@ -81,15 +80,15 @@ export default function Students() {
     );
 
   const handleClose = () => {
-    setSelectedStudent(null);
+    setSelectedId(null);
     addStudentMutation.reset();
     deleteStudentMutation.reset();
     updateStudentMutation.reset();
     handleViewChange("list");
   };
 
-  const handleDetailOpen = (student: Student) => {
-    setSelectedStudent(student);
+  const handleDetailOpen = (id: number) => {
+    setSelectedId(id);
     handleViewChange("detail");
   };
 
@@ -101,31 +100,31 @@ export default function Students() {
     addStudentMutation.mutate(student);
   };
 
-  const handleDeleteOpen = (student: Student) => {
-    setSelectedStudent(student);
+  const handleDeleteOpen = (id: number) => {
+    setSelectedId(id);
     handleViewChange("delete");
   };
 
-  const handleDeleteStudent = (student: Student) => {
-    if (selectedStudent) {
-      deleteStudentMutation.mutate(student.id);
+  const handleDeleteStudent = () => {
+    if (selectedId) {
+      deleteStudentMutation.mutate(selectedId);
     }
   };
 
-  const handleUpdateOpen = (student: Student) => {
-    setSelectedStudent(student);
+  const handleUpdateOpen = (id: number) => {
+    setSelectedId(id);
     handleViewChange("update");
   };
 
   const handleUpdateStudent = (data: StudentFormData) => {
-    if (selectedStudent) {
-      updateStudentMutation.mutate({ id: selectedStudent.id, data });
+    if (selectedId) {
+      updateStudentMutation.mutate({ id: selectedId, data });
     }
   };
 
-  if (currentView === "detail" && selectedStudent) {
+  if (currentView === "detail" && selectedId) {
     return (
-      <StudentDetail student={selectedStudent} handleClose={handleClose} />
+      <StudentDetail id={selectedId} handleClose={handleClose} />
     );
   }
 
@@ -142,7 +141,7 @@ export default function Students() {
     );
   }
 
-  if (currentView === "update" && selectedStudent) {
+  if (currentView === "update" && selectedId) {
     return (
       <UpdateStudent
         handleClose={handleClose}
@@ -151,7 +150,7 @@ export default function Students() {
         isSuccess={updateStudentMutation.isSuccess}
         error={updateStudentMutation.error}
         countries={countries}
-        student={selectedStudent}
+        id={selectedId}
       />
     );
   }
@@ -168,14 +167,14 @@ export default function Students() {
         </Button>
       </Box>
 
-      {selectedStudent && (
+      {selectedId && (
         <DeleteConfirmationDialog
           open={currentView === "delete"}
           handleClose={handleClose}
           isLoading={deleteStudentMutation.isPending}
           isSuccess={deleteStudentMutation.isSuccess}
           error={deleteStudentMutation.error}
-          onConfirm={() => handleDeleteStudent(selectedStudent)}
+          onConfirm={() => handleDeleteStudent()}
         />
       )}
 

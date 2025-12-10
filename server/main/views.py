@@ -117,6 +117,13 @@ class StudentView(APIView):
 
         students = Student.objects.order_by("-id")
         students = students.filter(is_active=True)
+        id = request.query_params.get("id")
+
+        if id:
+            student = students.get(id=id)
+            serializer = StudentSerializer(student)
+            return Response(serializer.data)
+
         search = request.query_params.get("search")
 
         if search:

@@ -1,6 +1,6 @@
 import { Box, Typography, IconButton, Stack } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
-import type { Student, Country } from "../../utils/types";
+import type { Country } from "../../utils/types";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import EditableHeader from "./EditableHeader";
@@ -11,18 +11,23 @@ import EditableParentInfo from "./EditableParentInfo";
 import EditableInsurance from "./EditableInsurance";
 import EditableExchanges from "./EditableExchanges";
 import EditableNotes from "./EditableNotes";
+import Loading from "../Loading";
 
 type StudentDetailProps = {
-  student: Student;
+  id: number;
   handleClose: () => void;
 };
 
-export default function StudentDetail({
-  student,
-  handleClose,
-}: StudentDetailProps) {
-  const { data: imageUrl, isLoading } = useQuery({
-    queryKey: ["studentPhoto", student.photo],
+export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
+  const { data: student, isLoading: isStudentLoading } = useQuery({
+    queryKey: ["students", id],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/students/?id=${id}`);
+      return response.data;
+    },
+  });
+  const { data: imageUrl, isLoading: isImageLoading } = useQuery({
+    queryKey: ["studentPhoto", student?.photo],
     queryFn: async () => {
       const photoName = student.photo.split("/")[3];
       const response = await axiosClient.get(
@@ -31,7 +36,7 @@ export default function StudentDetail({
       );
       return URL.createObjectURL(response.data);
     },
-    enabled: !!student.photo,
+    enabled: Boolean(student?.photo),
     staleTime: Infinity,
   });
 
@@ -43,6 +48,10 @@ export default function StudentDetail({
     },
     staleTime: Infinity,
   });
+
+  if (isStudentLoading) {
+    return <Loading />;
+  }
 
   return (
     <Box sx={{}}>
@@ -60,7 +69,7 @@ export default function StudentDetail({
       <EditableHeader
         student={student}
         imageUrl={imageUrl}
-        isLoading={isLoading}
+        isLoading={isImageLoading}
       />
 
       {/* Personal Information */}
