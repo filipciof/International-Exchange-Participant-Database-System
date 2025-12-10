@@ -195,8 +195,8 @@ export type Exchange = {
   kwm_officer: string;
   id_type: number | null;
   type: string;
-  start_date: Date | null;
-  end_date: Date | null;
+  start_date: string;
+  end_date: string;
   year: number;
   is_inbound: boolean;
 };
