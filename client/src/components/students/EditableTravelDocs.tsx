@@ -13,6 +13,8 @@ import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import queryClient from "../../utils/queryClient";
 import Section from "./Section";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 type EditableTravelDocsProps = {
   student: Student;
@@ -60,7 +62,10 @@ export default function EditableTravelDocs({
 
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await axiosClient.patch(`/students/${student.id}/`, data);
+      const response = await axiosClient.patch(
+        `/students/${student.id}/`,
+        data,
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -178,19 +183,22 @@ export default function EditableTravelDocs({
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              fullWidth
-              size="small"
+            <DatePicker
               label="Passport Expiration Date"
-              type="date"
-              value={formData.passport_expiration_date}
-              onChange={(e) =>
+              format="YYYY-MM-DD"
+              value={
+                formData.passport_expiration_date
+                  ? dayjs(formData.passport_expiration_date)
+                  : null
+              }
+              onChange={(date) => {
                 setFormData({
                   ...formData,
-                  passport_expiration_date: e.target.value,
-                })
-              }
-              slotProps={{ inputLabel: { shrink: true } }}
+                  passport_expiration_date: date
+                    ? date.format("YYYY-MM-DD")
+                    : "",
+                });
+              }}
             />
           </Grid>
         </Grid>

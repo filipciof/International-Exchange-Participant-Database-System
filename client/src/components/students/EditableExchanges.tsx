@@ -26,6 +26,8 @@ import type { Exchange } from "../../utils/types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import Section from "./Section";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 type EditableExchangesProps = {
   studentId: number;
@@ -384,28 +386,29 @@ export default function EditableExchanges({
               }
               label="Inbound Exchange"
             />
-            <TextField
-              fullWidth
-              size="small"
+            <DatePicker
               label="Start Date"
-              type="date"
-              value={formData.start_date}
-              onChange={(e) =>
-                setFormData({ ...formData, start_date: e.target.value })
-              }
-              slotProps={{ inputLabel: { shrink: true } }}
+              format="YYYY-MM-DD"
+              value={formData.start_date ? dayjs(formData.start_date) : null}
+              onChange={(date) => {
+                setFormData({
+                  ...formData,
+                  start_date: date ? date.format("YYYY-MM-DD") : "",
+                });
+              }}
             />
-            <TextField
-              fullWidth
-              size="small"
+            <DatePicker
               label="End Date"
-              type="date"
-              value={formData.end_date}
-              onChange={(e) =>
-                setFormData({ ...formData, end_date: e.target.value })
-              }
-              slotProps={{ inputLabel: { shrink: true } }}
+              format="YYYY-MM-DD"
+              value={formData.end_date ? dayjs(formData.end_date) : null}
+              onChange={(date) => {
+                setFormData({
+                  ...formData,
+                  end_date: date ? date.format("YYYY-MM-DD") : "",
+                });
+              }}
             />
+
             <TextField
               fullWidth
               size="small"

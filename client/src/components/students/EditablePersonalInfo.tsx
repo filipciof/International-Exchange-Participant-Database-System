@@ -13,6 +13,8 @@ import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import queryClient from "../../utils/queryClient";
 import Section from "./Section";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 
 type EditablePersonalInfoProps = {
   student: Student;
@@ -62,7 +64,10 @@ export default function EditablePersonalInfo({
 
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await axiosClient.patch(`/students/${student.id}/`, data);
+      const response = await axiosClient.patch(
+        `/students/${student.id}/`,
+        data,
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -72,6 +77,7 @@ export default function EditablePersonalInfo({
   });
 
   const handleSave = () => {
+    console.log(formData);
     updateMutation.mutate(formData);
   };
 
@@ -135,15 +141,18 @@ export default function EditablePersonalInfo({
       ) : (
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              fullWidth
-              size="small"
+            <DatePicker
               label="Date of Birth"
-              value={formData.date_of_birth}
-              onChange={(e) =>
-                setFormData({ ...formData, date_of_birth: e.target.value })
+              format="YYYY-MM-DD"
+              value={
+                formData.date_of_birth ? dayjs(formData.date_of_birth) : null
               }
-              slotProps={{ inputLabel: { shrink: true } }}
+              onChange={(date) => {
+                setFormData({
+                  ...formData,
+                  date_of_birth: date ? date.format("YYYY-MM-DD") : "",
+                });
+              }}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
