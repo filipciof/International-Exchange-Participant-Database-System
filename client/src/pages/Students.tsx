@@ -3,11 +3,7 @@ import StudentList from "../components/students/StudentList";
 import Loading from "../components/Loading";
 import { Box, Button, Typography } from "@mui/material";
 import MyPagination from "../components/MyPagination";
-import type {
-  StudentFormData,
-  ViewType,
-  Country,
-} from "../utils/types";
+import type { StudentFormData, ViewType, Country } from "../utils/types";
 import StudentDetail from "../components/students/StudentDetail";
 import AddStudent from "../components/students/StudentAdd";
 import UpdateStudent from "../components/students/StudentUpdate";
@@ -15,10 +11,21 @@ import AddIcon from "@mui/icons-material/Add";
 import { useStudents } from "../hooks/useStudents";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 import StudentFilter from "../components/students/StudentFilter";
+import { useQueryState } from "nuqs";
+import { parseAsStringLiteral, parseAsInteger } from "nuqs";
 
 export default function Students() {
-  const [currentView, setCurrentView] = useState<ViewType>("list");
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [currentView, setCurrentView] = useQueryState(
+    "view",
+    parseAsStringLiteral([
+      "list",
+      "add",
+      "update",
+      "delete",
+      "detail",
+    ]).withDefault("list"),
+  );
+  const [selectedId, setSelectedId] = useQueryState("id", parseAsInteger);
   const [paginationModel, setPaginationModel] = useState({
     page: 1,
     pageSize: 25,
@@ -123,9 +130,7 @@ export default function Students() {
   };
 
   if (currentView === "detail" && selectedId) {
-    return (
-      <StudentDetail id={selectedId} handleClose={handleClose} />
-    );
+    return <StudentDetail id={selectedId} handleClose={handleClose} />;
   }
 
   if (currentView === "add") {
