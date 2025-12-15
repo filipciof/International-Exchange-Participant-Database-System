@@ -8,10 +8,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-
-interface ValidationErrors {
-  [key: string]: string[];
-}
+import { handleValidationErrors } from "../utils/handleValidationErrors";
 
 type DeleteConfirmationDialogProps = {
   open: boolean;
@@ -36,14 +33,6 @@ export default function DeleteConfirmationDialog({
   error = null,
   successMessage = "Item deleted successfully!",
 }: DeleteConfirmationDialogProps) {
-  const handleValidationErrors = (errors: ValidationErrors) => {
-    let errorMessages: string[] = [];
-    Object.values(errors).forEach((messagesArray) => {
-      errorMessages = [...errorMessages, ...messagesArray];
-    });
-    return errorMessages;
-  };
-
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>{title}</DialogTitle>
@@ -73,7 +62,7 @@ export default function DeleteConfirmationDialog({
                   <Typography key={index} sx={{ color: "error.main" }}>
                     {message}
                   </Typography>
-                )
+                ),
               )}
             </Stack>
           )}

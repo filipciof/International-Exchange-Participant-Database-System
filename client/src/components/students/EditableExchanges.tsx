@@ -49,6 +49,24 @@ const InfoItem = ({ label, value }: InfoItemProps) => {
   );
 };
 
+// Helper function to get current academic year in YYYY/YY format
+const getCurrentAcademicYear = (): string => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth(); // 0-11
+
+  // Academic year typically starts in September (month 8)
+  // If we're in Jan-Aug, the academic year is (previous year)/(current year last 2 digits)
+  // If we're in Sep-Dec, the academic year is (current year)/(next year last 2 digits)
+  if (currentMonth < 8) {
+    const prevYear = currentYear - 1;
+    return `${prevYear}/${String(currentYear).slice(-2)}`;
+  } else {
+    const nextYear = currentYear + 1;
+    return `${currentYear}/${String(nextYear).slice(-2)}`;
+  }
+};
+
 export default function EditableExchanges({
   studentId,
 }: EditableExchangesProps) {
@@ -56,9 +74,10 @@ export default function EditableExchanges({
     null | "update" | "add" | "delete"
   >(null);
   const [editingExchange, setEditingExchange] = useState<Exchange | null>(null);
+  const [deletingExchange, setDeletingExchange] = useState<Exchange | null>(null);
   const [formData, setFormData] = useState<ExchangeFormData>({
     id_student: studentId,
-    year: new Date().getFullYear(),
+    year: "",
     is_inbound: false,
     id_type: null,
     start_date: "",
@@ -132,7 +151,7 @@ export default function EditableExchanges({
     setEditingExchange(null);
     setFormData({
       id_student: studentId,
-      year: new Date().getFullYear(),
+      year: getCurrentAcademicYear(),
       is_inbound: false,
       id_type: null,
       start_date: "",
@@ -162,16 +181,13 @@ export default function EditableExchanges({
     setDialogOpen("update");
   };
 
-  // const handleOpenDeleteDialog = () => {
-  //   setDialogOpen("delete");
-  // };
-
   const handleCloseDialog = () => {
     createMutation.reset();
     updateMutation.reset();
     deleteMutation.reset();
     setDialogOpen(null);
     setEditingExchange(null);
+    setDeletingExchange(null);
   };
 
   const handleSave = () => {
@@ -181,12 +197,6 @@ export default function EditableExchanges({
       createMutation.mutate(formData);
     }
   };
-
-  // const handleDelete = (id: number) => {
-  //   if (window.confirm("Are you sure you want to delete this exchange?")) {
-  //     deleteMutation.mutate(id);
-  //   }
-  // };
 
   const actions = (
     <IconButton size="small" onClick={handleOpenAddDialog}>
@@ -279,20 +289,14 @@ export default function EditableExchanges({
                       </IconButton>
                       <IconButton
                         size="small"
-                        onClick={() => setDialogOpen("delete")}
+                        onClick={() => {
+                          setDeletingExchange(exchange);
+                          setDialogOpen("delete");
+                        }}
                         color="error"
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
-
-                      <DeleteConfirmationDialog
-                        open={dialogOpen === "delete"}
-                        handleClose={handleCloseDialog}
-                        isLoading={deleteMutation.isPending}
-                        isSuccess={deleteMutation.isSuccess}
-                        error={deleteMutation.error}
-                        onConfirm={() => deleteMutation.mutate(exchange.id)}
-                      />
                     </Box>
                   </Box>
 
@@ -333,7 +337,18 @@ export default function EditableExchanges({
         formData={formData}
         setFormData={setFormData}
         handleSave={handleSave}
-        isMutationPending={createMutation.isPending || updateMutation.isPending}
+        isLoading={createMutation.isPending || updateMutation.isPending}
+        isSuccess={createMutation.isSuccess || updateMutation.isSuccess}
+        error={createMutation.error || updateMutation.error}
+      />
+
+      <DeleteConfirmationDialog
+        open={dialogOpen === "delete"}
+        handleClose={handleCloseDialog}
+        isLoading={deleteMutation.isPending}
+        isSuccess={deleteMutation.isSuccess}
+        error={deleteMutation.error}
+        onConfirm={() => deletingExchange && deleteMutation.mutate(deletingExchange.id)}
       />
     </Section>
   );

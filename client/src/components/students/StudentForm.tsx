@@ -18,7 +18,6 @@ import type {
   StudentFormData,
   StudentFormInputs,
   Country,
-  ValidationErrors,
 } from "../../utils/types";
 import {
   studentSchema,
@@ -26,6 +25,7 @@ import {
   LanguageProficiency,
   ShirtSize,
 } from "../../utils/types";
+import { handleValidationErrors } from "../../utils/handleValidationErrors";
 
 type StudentFormProps = {
   title?: string;
@@ -156,14 +156,6 @@ export default function StudentForm({
     return new Promise((resolve) => {
       resolve("");
     });
-  };
-
-  const handleValidationErrors = (errors: ValidationErrors) => {
-    let errorMessages: string[] = [];
-    Object.values(errors).forEach((messagesArray) => {
-      errorMessages = [...errorMessages, ...messagesArray];
-    });
-    return errorMessages;
   };
 
   const onClose = () => {

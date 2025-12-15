@@ -59,17 +59,8 @@ export type Contact = {
   notes: string;
 };
 
-export type ContactFormData = {
-  first_name: string;
-  middle_name: string;
-  last_name: string;
-  gender: number | undefined;
-  email: string;
-  phone: string;
-  id_country: number;
-  id_districts: number[];
+export type ContactFormData = ContactFormInputs & {
   photo: File | null;
-  notes: string;
 };
 
 export const contactSchema = z.object({
@@ -197,13 +188,13 @@ export type Exchange = {
   type: string;
   start_date: string;
   end_date: string;
-  year: number;
+  year: string;
   is_inbound: boolean;
 };
 
 export type ExchangeFormData = {
   id_student: number;
-  year: number | null;
+  year: string;
   is_inbound: boolean;
   id_type: number | null;
   start_date: string;
@@ -224,10 +215,6 @@ export type Staff = {
   first_name: string;
   middle_name: string;
   last_name: string;
-}
-
-export interface ValidationErrors {
-  [key: string]: string[];
 }
 
 export type SearchableField = {

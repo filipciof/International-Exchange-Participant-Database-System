@@ -29,6 +29,7 @@ import type {
 } from "../../utils/types";
 import { contactSchema, Gender } from "../../utils/types";
 import axiosClient from "../../utils/axiosClient";
+import { handleValidationErrors } from "../../utils/handleValidationErrors";
 
 type ContactFormProps = {
   title: string;
@@ -41,10 +42,6 @@ type ContactFormProps = {
   initialData?: ContactFormInputs;
   submitButtonText?: string;
 };
-
-interface ValidationErrors {
-  [key: string]: string[];
-}
 
 export default function ContactForm({
   title,
@@ -91,7 +88,7 @@ export default function ContactForm({
     queryKey: ["districts", selectedCountry],
     queryFn: async () => {
       const response = await axiosClient.get(
-        `/districts/?country=${selectedCountry}`
+        `/districts/?country=${selectedCountry}`,
       );
       return response.data;
     },
@@ -122,14 +119,6 @@ export default function ContactForm({
     };
     console.log(contactData);
     onFormSubmit(contactData);
-  };
-
-  const handleValidationErrors = (errors: ValidationErrors) => {
-    let errorMessages: string[] = [];
-    Object.values(errors).forEach((messagesArray) => {
-      errorMessages = [...errorMessages, ...messagesArray];
-    });
-    return errorMessages;
   };
 
   const handlePhotoUpload = (newPhoto: File) => {
@@ -264,7 +253,7 @@ export default function ContactForm({
                   <Autocomplete
                     multiple
                     value={districts.filter((d: District) =>
-                      field.value?.includes(d.id)
+                      field.value?.includes(d.id),
                     )}
                     onChange={(_event, newValue) => {
                       field.onChange(newValue.map((v) => v.id));
@@ -425,7 +414,7 @@ export default function ContactForm({
                     <Typography key={index} sx={{ color: "error.main" }}>
                       {message}
                     </Typography>
-                  )
+                  ),
                 )}
               </Stack>
             )}

@@ -9,6 +9,7 @@ import {
   FormControlLabel,
   Stack,
   TextField,
+  Typography,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
@@ -21,6 +22,7 @@ import type {
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import StaffAutocomplete from "../StaffAutocomplete";
+import { handleValidationErrors } from "../../utils/handleValidationErrors";
 
 type AddEditExchangeDialogProps = {
   dialogOpen: boolean;
@@ -29,7 +31,9 @@ type AddEditExchangeDialogProps = {
   formData: ExchangeFormData;
   setFormData: (formData: ExchangeFormData) => void;
   handleSave: () => void;
-  isMutationPending: boolean;
+  isLoading?: boolean;
+  isSuccess?: boolean;
+  error?: any;
 };
 
 export default function AddEditExchangeDialog({
@@ -39,7 +43,9 @@ export default function AddEditExchangeDialog({
   formData,
   setFormData,
   handleSave,
-  isMutationPending,
+  isLoading = false,
+  isSuccess = false,
+  error = null,
 }: AddEditExchangeDialogProps) {
   const { data: exchangeTypes } = useQuery({
     queryKey: ["exchangeTypes"],
@@ -88,14 +94,15 @@ export default function AddEditExchangeDialog({
             fullWidth
             size="small"
             label="Year"
-            type="number"
+            placeholder="YYYY/YY"
             value={formData.year || ""}
             onChange={(e) =>
               setFormData({
                 ...formData,
-                year: parseInt(e.target.value) || null,
+                year: e.target.value,
               })
             }
+            helperText="Format: YYYY/YY (e.g., 2024/25)"
           />
           <FormControlLabel
             control={
@@ -146,37 +153,47 @@ export default function AddEditExchangeDialog({
             }}
             label="KWM Officer"
           />
-
-          {/* <TextField
-            fullWidth
-            size="small"
-            label="Counsellor"
-            value={formData.counsellor}
-            onChange={(e) =>
-              setFormData({ ...formData, counsellor: e.target.value })
-            }
-          />
-          <TextField
-            fullWidth
-            size="small"
-            label="KWM Officer"
-            value={formData.kwm_officer}
-            onChange={(e) =>
-              setFormData({ ...formData, kwm_officer: e.target.value })
-            }
-          /> */}
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseDialog}>Cancel</Button>
-        <Button
-          onClick={handleSave}
-          variant="contained"
-          // disabled={createMutation.isPending || updateMutation.isPending}
-          disabled={isMutationPending}
-        >
-          {editingExchange ? "Update" : "Add"}
-        </Button>
+        <Stack spacing={2} sx={{ p: 2, width: "100%" }}>
+          <Stack direction="row" spacing={2} justifyContent="space-between">
+            <Button onClick={handleCloseDialog} disabled={isLoading}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSave}
+              variant="contained"
+              disabled={isLoading || isSuccess}
+            >
+              {isLoading
+                ? editingExchange
+                  ? "Updating..."
+                  : "Adding..."
+                : editingExchange
+                  ? "Update"
+                  : "Add"}
+            </Button>
+          </Stack>
+          {error && (
+            <Stack spacing={1}>
+              {handleValidationErrors(error.response?.data).map(
+                (message: string, index: number) => (
+                  <Typography key={index} sx={{ color: "error.main" }}>
+                    {message}
+                  </Typography>
+                ),
+              )}
+            </Stack>
+          )}
+          {isSuccess && (
+            <Typography sx={{ color: "success.main" }}>
+              {editingExchange
+                ? "Exchange updated successfully!"
+                : "Exchange added successfully!"}
+            </Typography>
+          )}
+        </Stack>
       </DialogActions>
     </Dialog>
   );

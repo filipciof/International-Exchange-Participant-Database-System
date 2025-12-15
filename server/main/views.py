@@ -388,6 +388,31 @@ class ExchangeView(APIView):
             return Response({"error": "Exchange not found"}, status=HTTP_404_NOT_FOUND)
         return Response(status=HTTP_204_NO_CONTENT)
 
+    def patch(self, request, pk=None):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        try:
+            exchange = Exchange.objects.get(pk=pk, is_active=True)
+        except Exchange.DoesNotExist:
+            return Response(
+                {"message": "Student not found."}, status=HTTP_404_NOT_FOUND
+            )
+
+        data = request.data.copy()
+        serializer = ExchangeSerializer(exchange, data=data, partial=True)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        exchange = serializer.save()
+        return Response(serializer.data)
+
 
 class StaffView(APIView):
     def get(self, request, format=None):
@@ -421,7 +446,7 @@ class StaffView(APIView):
                 search_query |= Q(**{f"{field}__icontains": search})
 
             staff = staff.filter(search_query)
-        
+
         page = request.query_params.get("page")
 
         if page:

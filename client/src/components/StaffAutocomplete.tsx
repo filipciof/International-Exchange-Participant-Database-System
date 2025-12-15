@@ -1,17 +1,12 @@
 import * as React from "react";
-import {
-  Autocomplete,
-  TextField,
-  CircularProgress,
-  Box,
-} from "@mui/material";
+import { Autocomplete, TextField, CircularProgress, Box } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import type { Staff } from "../utils/types";
 
 type StaffAutocompleteProps = {
   initialStaffId: number | null;
-  handleStaffChange: (staff: Staff | null) => void;
+  handleStaffChange: (staff: Staff) => void;
   label: string;
 };
 
@@ -51,7 +46,7 @@ export default function StaffAutocomplete({
       setOptions((prev) =>
         prev.some((o) => o.id === initialStaff.id)
           ? prev
-          : [initialStaff, ...prev]
+          : [initialStaff, ...prev],
       );
     }
   }, [initialStaff, value]);
@@ -79,7 +74,7 @@ export default function StaffAutocomplete({
     if (!data) return;
 
     setOptions((prev) =>
-      page === 1 ? data.results : [...prev, ...data.results]
+      page === 1 ? data.results : [...prev, ...data.results],
     );
     setHasMore(Boolean(data.next));
   }, [data, page]);
@@ -103,51 +98,50 @@ export default function StaffAutocomplete({
    * ------------------------------------------------- */
   const ListboxComponent = React.useMemo(
     () =>
-      React.forwardRef<
-        HTMLUListElement,
-        React.HTMLAttributes<HTMLElement>
-      >(function Listbox(props, ref) {
-        const { children, ...other } = props;
+      React.forwardRef<HTMLUListElement, React.HTMLAttributes<HTMLElement>>(
+        function Listbox(props, ref) {
+          const { children, ...other } = props;
 
-        return (
-          <ul
-            ref={(node) => {
-              listboxRef.current = node;
-              if (typeof ref === "function") ref(node);
-              else if (ref) ref.current = node;
-            }}
-            {...other}
-            style={{
-              maxHeight: 300,
-              overflow: "auto",
-              padding: 0,
-              margin: 0,
-            }}
-            onScroll={(e) => {
-              const node = e.currentTarget;
+          return (
+            <ul
+              ref={(node) => {
+                listboxRef.current = node;
+                if (typeof ref === "function") ref(node);
+                else if (ref) ref.current = node;
+              }}
+              {...other}
+              style={{
+                maxHeight: 300,
+                overflow: "auto",
+                padding: 0,
+                margin: 0,
+              }}
+              onScroll={(e) => {
+                const node = e.currentTarget;
 
-              scrollTopRef.current = node.scrollTop;
+                scrollTopRef.current = node.scrollTop;
 
-              if (
-                node.scrollTop + node.clientHeight >=
-                node.scrollHeight - 1
-              ) {
-                if (hasMore && !isFetching) {
-                  setPage((p) => p + 1);
+                if (
+                  node.scrollTop + node.clientHeight >=
+                  node.scrollHeight - 1
+                ) {
+                  if (hasMore && !isFetching) {
+                    setPage((p) => p + 1);
+                  }
                 }
-              }
-            }}
-          >
-            {children}
-            {hasMore && (
-              <Box sx={{ display: "flex", justifyContent: "center", p: 1 }}>
-                <CircularProgress size={20} />
-              </Box>
-            )}
-          </ul>
-        );
-      }),
-    [hasMore, isFetching]
+              }}
+            >
+              {children}
+              {hasMore && (
+                <Box sx={{ display: "flex", justifyContent: "center", p: 1 }}>
+                  <CircularProgress size={20} />
+                </Box>
+              )}
+            </ul>
+          );
+        },
+      ),
+    [hasMore, isFetching],
   );
 
   /* -------------------------------------------------
@@ -165,7 +159,9 @@ export default function StaffAutocomplete({
       slots={{ listbox: ListboxComponent }}
       onChange={(_, newValue) => {
         setValue(newValue);
-        handleStaffChange(newValue);
+        if (newValue) {
+          handleStaffChange(newValue);
+        }
       }}
       onInputChange={(_, newInput, reason) => {
         setInputValue(newInput);
@@ -181,9 +177,7 @@ export default function StaffAutocomplete({
             ...params.InputProps,
             endAdornment: (
               <>
-                {isFetching && page === 1 && (
-                  <CircularProgress size={20} />
-                )}
+                {isFetching && page === 1 && <CircularProgress size={20} />}
                 {params.InputProps.endAdornment}
               </>
             ),
