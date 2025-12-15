@@ -7,14 +7,6 @@ import {
   Paper,
   Stack,
   Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Checkbox,
-  FormControlLabel,
-  Button,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -22,12 +14,12 @@ import {
   Delete as DeleteIcon,
   SwapHoriz as ExchangeIcon,
 } from "@mui/icons-material";
-import type { Exchange } from "../../utils/types";
+import type { Exchange, ExchangeFormData } from "../../utils/types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import Section from "./Section";
-import { DatePicker } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
+import AddEditExchangeDialog from "./AddEditExchangeDialog";
+import DeleteConfirmationDialog from "../DeleteConfirmationDialog";
 
 type EditableExchangesProps = {
   studentId: number;
@@ -57,39 +49,22 @@ const InfoItem = ({ label, value }: InfoItemProps) => {
   );
 };
 
-type ExchangeFormData = {
-  id_student: number;
-  year: number | null;
-  is_inbound: boolean;
-  id_type: number | null;
-  type: string;
-  start_date: string;
-  end_date: string;
-  id_counsellor: number | null;
-  counsellor: string;
-  id_kwm_officer: number | null;
-  kwm_officer: string;
-  id_sending_club: number | null;
-  id_receiving_club: number | null;
-};
-
 export default function EditableExchanges({
   studentId,
 }: EditableExchangesProps) {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState<
+    null | "update" | "add" | "delete"
+  >(null);
   const [editingExchange, setEditingExchange] = useState<Exchange | null>(null);
   const [formData, setFormData] = useState<ExchangeFormData>({
     id_student: studentId,
     year: new Date().getFullYear(),
     is_inbound: false,
     id_type: null,
-    type: "",
     start_date: "",
     end_date: "",
     id_counsellor: null,
-    counsellor: "",
     id_kwm_officer: null,
-    kwm_officer: "",
     id_sending_club: null,
     id_receiving_club: null,
   });
@@ -160,17 +135,14 @@ export default function EditableExchanges({
       year: new Date().getFullYear(),
       is_inbound: false,
       id_type: null,
-      type: "",
       start_date: "",
       end_date: "",
       id_counsellor: null,
-      counsellor: "",
       id_kwm_officer: null,
-      kwm_officer: "",
       id_sending_club: null,
       id_receiving_club: null,
     });
-    setDialogOpen(true);
+    setDialogOpen("add");
   };
 
   const handleOpenEditDialog = (exchange: Exchange) => {
@@ -180,21 +152,25 @@ export default function EditableExchanges({
       year: exchange.year,
       is_inbound: exchange.is_inbound,
       id_type: exchange.id_type,
-      type: exchange.type || "",
       start_date: exchange.start_date || "",
       end_date: exchange.end_date || "",
       id_counsellor: exchange.id_counsellor,
-      counsellor: exchange.counsellor || "",
       id_kwm_officer: exchange.id_kwm_officer,
-      kwm_officer: exchange.kwm_officer || "",
       id_sending_club: exchange.id_sending_club,
       id_receiving_club: exchange.id_receiving_club,
     });
-    setDialogOpen(true);
+    setDialogOpen("update");
   };
 
+  // const handleOpenDeleteDialog = () => {
+  //   setDialogOpen("delete");
+  // };
+
   const handleCloseDialog = () => {
-    setDialogOpen(false);
+    createMutation.reset();
+    updateMutation.reset();
+    deleteMutation.reset();
+    setDialogOpen(null);
     setEditingExchange(null);
   };
 
@@ -206,11 +182,11 @@ export default function EditableExchanges({
     }
   };
 
-  const handleDelete = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this exchange?")) {
-      deleteMutation.mutate(id);
-    }
-  };
+  // const handleDelete = (id: number) => {
+  //   if (window.confirm("Are you sure you want to delete this exchange?")) {
+  //     deleteMutation.mutate(id);
+  //   }
+  // };
 
   const actions = (
     <IconButton size="small" onClick={handleOpenAddDialog}>
@@ -303,11 +279,20 @@ export default function EditableExchanges({
                       </IconButton>
                       <IconButton
                         size="small"
-                        onClick={() => handleDelete(exchange.id)}
+                        onClick={() => setDialogOpen("delete")}
                         color="error"
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
+
+                      <DeleteConfirmationDialog
+                        open={dialogOpen === "delete"}
+                        handleClose={handleCloseDialog}
+                        isLoading={deleteMutation.isPending}
+                        isSuccess={deleteMutation.isSuccess}
+                        error={deleteMutation.error}
+                        onConfirm={() => deleteMutation.mutate(exchange.id)}
+                      />
                     </Box>
                   </Box>
 
@@ -341,105 +326,15 @@ export default function EditableExchanges({
         </>
       )}
 
-      {/* Add/Edit Dialog */}
-      <Dialog
-        open={dialogOpen}
-        onClose={handleCloseDialog}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>
-          {editingExchange ? "Edit Exchange" : "Add New Exchange"}
-        </DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField
-              fullWidth
-              size="small"
-              label="Type"
-              value={formData.type}
-              onChange={(e) =>
-                setFormData({ ...formData, type: e.target.value })
-              }
-            />
-            <TextField
-              fullWidth
-              size="small"
-              label="Year"
-              type="number"
-              value={formData.year || ""}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  year: parseInt(e.target.value) || null,
-                })
-              }
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formData.is_inbound}
-                  onChange={(e) =>
-                    setFormData({ ...formData, is_inbound: e.target.checked })
-                  }
-                />
-              }
-              label="Inbound Exchange"
-            />
-            <DatePicker
-              label="Start Date"
-              format="YYYY-MM-DD"
-              value={formData.start_date ? dayjs(formData.start_date) : null}
-              onChange={(date) => {
-                setFormData({
-                  ...formData,
-                  start_date: date ? date.format("YYYY-MM-DD") : "",
-                });
-              }}
-            />
-            <DatePicker
-              label="End Date"
-              format="YYYY-MM-DD"
-              value={formData.end_date ? dayjs(formData.end_date) : null}
-              onChange={(date) => {
-                setFormData({
-                  ...formData,
-                  end_date: date ? date.format("YYYY-MM-DD") : "",
-                });
-              }}
-            />
-
-            <TextField
-              fullWidth
-              size="small"
-              label="Counsellor"
-              value={formData.counsellor}
-              onChange={(e) =>
-                setFormData({ ...formData, counsellor: e.target.value })
-              }
-            />
-            <TextField
-              fullWidth
-              size="small"
-              label="KWM Officer"
-              value={formData.kwm_officer}
-              onChange={(e) =>
-                setFormData({ ...formData, kwm_officer: e.target.value })
-              }
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button
-            onClick={handleSave}
-            variant="contained"
-            disabled={createMutation.isPending || updateMutation.isPending}
-          >
-            {editingExchange ? "Update" : "Add"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <AddEditExchangeDialog
+        dialogOpen={dialogOpen === "add" || dialogOpen === "update"}
+        handleCloseDialog={handleCloseDialog}
+        editingExchange={editingExchange}
+        formData={formData}
+        setFormData={setFormData}
+        handleSave={handleSave}
+        isMutationPending={createMutation.isPending || updateMutation.isPending}
+      />
     </Section>
   );
 }

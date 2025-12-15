@@ -30,3 +30,15 @@ Dumping the whole database:
 
 Loading the dump (drop all schema before doing this):
   psql -U admin -h localhost -d iepds < ~/repos/IEPDS/server/pg_iepds.sql
+  
+TODO:
+* Adding, updating and deleting student's exchanges.
+  * Use InfiniteAutocomplete for counsellor and kwm_officer.
+* Filtering student by exchange information (current exchange inbound students shown by default).
+* Filtering student by dates of birth and passport expiration.
+* URL parameters for pagination and filters.
+* Downloading student table as a csv and pdf file.
+* Adding and uploading and deleting documents to student.
+* URL parameters for Contacts.
+* Using zod and react hook form for editable elements in the StudentDetail.
+* Filtering students by height.

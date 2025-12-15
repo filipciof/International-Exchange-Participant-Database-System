@@ -7,7 +7,9 @@ from .views import (
     CountryView,
     DistrictView,
     StudentPhotoView,
+    ExchangeTypeView,
     ExchangeView,
+    StaffView,
 )
 from config.settings import DEBUG
 
@@ -22,6 +24,9 @@ urlpatterns = [
     path("students/<int:pk>/", StudentView.as_view()),
     path("students/photos/", StudentPhotoView.as_view()),
     path("exchanges/", ExchangeView.as_view()),
+    path("exchanges/<int:pk>/", ExchangeView.as_view()),
+    path("exchangeTypes/", view=ExchangeTypeView.as_view()),
+    path("staff/", view=StaffView.as_view()),
 ]
 
 if DEBUG is False:

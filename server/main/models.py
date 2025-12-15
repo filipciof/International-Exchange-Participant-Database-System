@@ -249,6 +249,8 @@ class Exchange(models.Model):
     )
     is_inbound = models.BooleanField(default=True)
 
+    is_active = models.BooleanField(default=True)
+
     class Meta:
         db_table = "exchange"
 

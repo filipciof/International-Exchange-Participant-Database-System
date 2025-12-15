@@ -12,6 +12,7 @@ import {
   Grid,
 } from "@mui/material";
 import { Edit as EditIcon, Save, Close } from "@mui/icons-material";
+import { SingleFileUpload, FileDropzoneInputBody } from "mui-file-upload";
 import type { Student } from "../../utils/types";
 import { Gender, ShirtSize } from "../../utils/types";
 import { useMutation } from "@tanstack/react-query";
@@ -30,6 +31,7 @@ export default function EditableHeader({
   isLoading,
 }: EditableHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [photo, setPhoto] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     first_name: student.first_name || "",
     middle_name: student.middle_name || "",
@@ -41,18 +43,42 @@ export default function EditableHeader({
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      const response = await axiosClient.patch(`/students/${student.id}/`, data);
+    mutationFn: async (data: typeof formData & { photo?: File | null }) => {
+      const formDataToSend = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (key === "photo" && value instanceof File) {
+          formDataToSend.append(key, value);
+        } else if (key !== "photo" && value !== null && value !== undefined) {
+          formDataToSend.append(key, String(value));
+        }
+      });
+      const response = await axiosClient.patch(
+        `/students/${student.id}/`,
+        formDataToSend,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["students"] });
       setIsEditing(false);
+      setPhoto(null);
     },
   });
 
+  const handlePhotoUpload = (newPhoto: File) => {
+    setPhoto(newPhoto);
+    return new Promise((resolve) => {
+      resolve("");
+    });
+  };
+
   const handleSave = () => {
-    updateMutation.mutate(formData);
+    updateMutation.mutate({ ...formData, photo });
   };
 
   const handleCancel = () => {
@@ -65,6 +91,7 @@ export default function EditableHeader({
       height: student.height || "",
       shirt_size: student.shirt_size || "",
     });
+    setPhoto(null);
     setIsEditing(false);
   };
 
@@ -212,6 +239,11 @@ export default function EditableHeader({
                     }
                     sx={{
                       "& .MuiInputBase-root": { bgcolor: "white" },
+                      "& .MuiInputLabel-root": {
+                        bgcolor: "white",
+                        px: 0.5,
+                        borderRadius: 0.5,
+                      },
                     }}
                   />
                 </Grid>
@@ -226,6 +258,11 @@ export default function EditableHeader({
                     }
                     sx={{
                       "& .MuiInputBase-root": { bgcolor: "white" },
+                      "& .MuiInputLabel-root": {
+                        bgcolor: "white",
+                        px: 0.5,
+                        borderRadius: 0.5,
+                      },
                     }}
                   />
                 </Grid>
@@ -240,6 +277,11 @@ export default function EditableHeader({
                     }
                     sx={{
                       "& .MuiInputBase-root": { bgcolor: "white" },
+                      "& .MuiInputLabel-root": {
+                        bgcolor: "white",
+                        px: 0.5,
+                        borderRadius: 0.5,
+                      },
                     }}
                   />
                 </Grid>
@@ -254,6 +296,11 @@ export default function EditableHeader({
                     }
                     sx={{
                       "& .MuiInputBase-root": { bgcolor: "white" },
+                      "& .MuiInputLabel-root": {
+                        bgcolor: "white",
+                        px: 0.5,
+                        borderRadius: 0.5,
+                      },
                     }}
                   />
                 </Grid>
@@ -272,6 +319,11 @@ export default function EditableHeader({
                     }
                     sx={{
                       "& .MuiInputBase-root": { bgcolor: "white" },
+                      "& .MuiInputLabel-root": {
+                        bgcolor: "white",
+                        px: 0.5,
+                        borderRadius: 0.5,
+                      },
                     }}
                   >
                     {Gender.map((gender) => (
@@ -293,6 +345,11 @@ export default function EditableHeader({
                     }
                     sx={{
                       "& .MuiInputBase-root": { bgcolor: "white" },
+                      "& .MuiInputLabel-root": {
+                        bgcolor: "white",
+                        px: 0.5,
+                        borderRadius: 0.5,
+                      },
                     }}
                     slotProps={{
                       htmlInput: {
@@ -313,6 +370,11 @@ export default function EditableHeader({
                     }
                     sx={{
                       "& .MuiInputBase-root": { bgcolor: "white" },
+                      "& .MuiInputLabel-root": {
+                        bgcolor: "white",
+                        px: 0.5,
+                        borderRadius: 0.5,
+                      },
                     }}
                   >
                     <MenuItem value="">
@@ -324,6 +386,14 @@ export default function EditableHeader({
                       </MenuItem>
                     ))}
                   </TextField>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Box sx={{ bgcolor: "white", borderRadius: 1, p: 2 }}>
+                    <SingleFileUpload
+                      uploadService={handlePhotoUpload}
+                      body={<FileDropzoneInputBody title="Upload photo" />}
+                    />
+                  </Box>
                 </Grid>
               </Grid>
             </Box>

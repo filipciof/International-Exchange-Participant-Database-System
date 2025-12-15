@@ -1,13 +1,22 @@
-from django.shortcuts import render
-from rest_framework import viewsets
-from .models import Club, Family, Student, Country, District, Exchange
+from .models import (
+    Club,
+    Family,
+    Student,
+    Country,
+    District,
+    Exchange,
+    ExchangeType,
+    Staff,
+)
 from .serializers import (
     ClubSerializer,
     FamilySerializer,
     StudentSerializer,
     CountrySerializer,
     DistrictSerializer,
+    ExchangeTypeSerializer,
     ExchangeSerializer,
+    StaffSerializer,
 )
 from django.http import Http404, HttpResponse
 from rest_framework.views import APIView
@@ -309,6 +318,21 @@ class StudentPhotoView(APIView):
         return HttpResponse(photo_data, content_type="image/jpeg")
 
 
+class ExchangeTypeView(APIView):
+    def get(self, request, format=None):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(get_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        exchange_types = ExchangeType.objects.order_by("id")
+        serializer = ExchangeTypeSerializer(exchange_types, many=True)
+        return Response(serializer.data)
+
+
 class ExchangeView(APIView):
     def get(self, request, format=None):
         user_groups = request.user.groups.values_list("name", flat=True)
@@ -320,15 +344,94 @@ class ExchangeView(APIView):
             )
 
         exchanges = Exchange.objects.order_by("-id")
+        exchanges = exchanges.filter(is_active=True)
         id_student = request.query_params.get("id_student")
 
         if id_student:
             exchanges = exchanges.filter(id_student=id_student)
 
-        # paginator = PageNumberPagination()
-        # paginator.page_size = min(int(request.query_params.get("page_size", 25)), 100)
-        # result_page = paginator.paginate_queryset(exchanges, request, view=self)
-        # serializer = ExchangeSerializer(result_page, many=True)
-        # return paginator.get_paginated_response(serializer.data)
+        page = request.query_params.get("page")
+
+        if page:
+            paginator = PageNumberPagination()
+            paginator.page_size = min(
+                int(request.query_params.get("page_size", 25)), 100
+            )
+            result_page = paginator.paginate_queryset(exchanges, request, view=self)
+            serializer = ExchangeSerializer(result_page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
         serializer = ExchangeSerializer(exchanges, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        data = request.data.copy()
+        serializer = ExchangeSerializer(data=data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data, status=HTTP_201_CREATED)
+
+    def delete(self, request, pk=None):
+        updated = Exchange.objects.filter(id=pk).update(is_active=False)
+        if updated == 0:
+            return Response({"error": "Exchange not found"}, status=HTTP_404_NOT_FOUND)
+        return Response(status=HTTP_204_NO_CONTENT)
+
+
+class StaffView(APIView):
+    def get(self, request, format=None):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(get_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        staff = Staff.objects.order_by("-id")
+        search = request.query_params.get("search")
+
+        id = request.query_params.get("id")
+
+        if id:
+            staff = staff.get(id=id)
+            serializer = StaffSerializer(staff)
+            return Response(serializer.data)
+
+        if search:
+            search_query = Q()
+            search_fields = [
+                "first_name",
+                "middle_name",
+                "last_name",
+            ]
+
+            for field in search_fields:
+                search_query |= Q(**{f"{field}__icontains": search})
+
+            staff = staff.filter(search_query)
+        
+        page = request.query_params.get("page")
+
+        if page:
+            paginator = PageNumberPagination()
+            paginator.page_size = min(
+                int(request.query_params.get("page_size", 25)), 100
+            )
+            result_page = paginator.paginate_queryset(staff, request, view=self)
+            serializer = StaffSerializer(result_page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
+        serializer = StaffSerializer(staff, many=True)
         return Response(serializer.data)

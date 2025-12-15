@@ -201,6 +201,31 @@ export type Exchange = {
   is_inbound: boolean;
 };
 
+export type ExchangeFormData = {
+  id_student: number;
+  year: number | null;
+  is_inbound: boolean;
+  id_type: number | null;
+  start_date: string;
+  end_date: string;
+  id_counsellor: number | null;
+  id_kwm_officer: number | null;
+  id_sending_club: number | null;
+  id_receiving_club: number | null;
+};
+
+export type ExchangeType = {
+  id: number;
+  name: string;
+};
+
+export type Staff = {
+  id: number;
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+}
+
 export interface ValidationErrors {
   [key: string]: string[];
 }
