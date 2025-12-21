@@ -5,6 +5,7 @@ import {
   CardContent,
   Collapse,
   IconButton,
+  MenuItem,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
@@ -19,6 +20,15 @@ import type {
   SearchableField,
 } from "../../utils/types";
 import { Gender, ShirtSize } from "../../utils/types";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+
+// Generate year options (from 2010 to current year + 2)
+const currentYear = new Date().getFullYear();
+const YEAR_OPTIONS = Array.from(
+  { length: currentYear - 2010 + 3 },
+  (_, i) => 2010 + i,
+);
 
 const SEARCHABLE_FIELDS: SearchableField[] = [
   { value: "first_name", label: "First Name" },
@@ -62,6 +72,18 @@ type StudentFilterProps = {
   setSelectedCountryOfPassport: (country: Country | null) => void;
   selectedShirtSizes: string[];
   setSelectedShirtSizes: (sizes: string[]) => void;
+  selectedStartYear: number | null;
+  setSelectedStartYear: (year: number | null) => void;
+  isInbound: boolean | null;
+  setIsInbound: (isInbound: boolean | null) => void;
+  dateOfBirthBefore: string;
+  setDateOfBirthBefore: (date: string) => void;
+  dateOfBirthAfter: string;
+  setDateOfBirthAfter: (date: string) => void;
+  passportExpirationDateBefore: string;
+  setPassportExpirationDateBefore: (date: string) => void;
+  passportExpirationDateAfter: string;
+  setPassportExpirationDateAfter: (date: string) => void;
   countries: Country[];
 };
 
@@ -82,6 +104,18 @@ export default function StudentFilter({
   setSelectedCountryOfPassport,
   selectedShirtSizes,
   setSelectedShirtSizes,
+  selectedStartYear,
+  setSelectedStartYear,
+  isInbound,
+  setIsInbound,
+  dateOfBirthBefore,
+  setDateOfBirthBefore,
+  dateOfBirthAfter,
+  setDateOfBirthAfter,
+  passportExpirationDateBefore,
+  setPassportExpirationDateBefore,
+  passportExpirationDateAfter,
+  setPassportExpirationDateAfter,
   countries,
 }: StudentFilterProps) {
   const [expanded, setExpanded] = useState(false);
@@ -249,6 +283,99 @@ export default function StudentFilter({
             <Box
               sx={{
                 display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: { xs: "stretch", sm: "center" },
+                gap: 2,
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{ color: "text.secondary", minWidth: "fit-content" }}
+              >
+                Exchange type:
+              </Typography>
+              <ToggleButtonGroup
+                value={
+                  isInbound === null
+                    ? "both"
+                    : isInbound
+                      ? "inbound"
+                      : "outbound"
+                }
+                exclusive
+                onChange={(_event, newValue) => {
+                  setPaginationModel({ ...paginationModel, page: 1 });
+                  if (newValue === null) return;
+                  setIsInbound(
+                    newValue === "both" ? null : newValue === "inbound",
+                  );
+                }}
+                aria-label="exchange type filter"
+                sx={{
+                  gap: 1,
+                  flexWrap: "wrap",
+                  "& .MuiToggleButton-root": {
+                    borderRadius: "20px",
+                    textTransform: "lowercase",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                    padding: { xs: "4px 8px", sm: "6px 12px" },
+                    "&.Mui-selected": {
+                      borderColor: "secondary.main",
+                    },
+                  },
+                }}
+              >
+                <ToggleButton value="inbound" aria-label="inbound">
+                  inbound
+                </ToggleButton>
+                <ToggleButton value="outbound" aria-label="outbound">
+                  outbound
+                </ToggleButton>
+                <ToggleButton value="both" aria-label="both">
+                  both
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                flexWrap: "wrap",
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{ color: "text.secondary", minWidth: "120px" }}
+              >
+                Start year:
+              </Typography>
+              <TextField
+                select
+                value={selectedStartYear ?? ""}
+                onChange={(event) => {
+                  setPaginationModel({ ...paginationModel, page: 1 });
+                  const value = event.target.value;
+                  setSelectedStartYear(value === "" ? null : Number(value));
+                }}
+                size="small"
+                sx={{ minWidth: { xs: "100%", sm: 200 } }}
+              >
+                <MenuItem value="">All years</MenuItem>
+                {YEAR_OPTIONS.map((year) => (
+                  <MenuItem key={year} value={year}>
+                    {year}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
                 flexDirection: "column",
                 gap: 2,
               }}
@@ -349,6 +476,124 @@ export default function StudentFilter({
                       size="small"
                     />
                   )}
+                />
+              </Box>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+              }}
+            >
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                Date of birth:
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  flexWrap: "wrap",
+                }}
+              >
+                <DatePicker
+                  label="After"
+                  format="YYYY-MM-DD"
+                  value={dateOfBirthAfter ? dayjs(dateOfBirthAfter) : null}
+                  onChange={(newValue) => {
+                    setPaginationModel({ ...paginationModel, page: 1 });
+                    setDateOfBirthAfter(
+                      newValue ? newValue.format("YYYY-MM-DD") : "",
+                    );
+                  }}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      sx: { flex: 1, minWidth: 200 },
+                    },
+                  }}
+                />
+                <DatePicker
+                  label="Before"
+                  format="YYYY-MM-DD"
+                  value={dateOfBirthBefore ? dayjs(dateOfBirthBefore) : null}
+                  onChange={(newValue) => {
+                    setPaginationModel({ ...paginationModel, page: 1 });
+                    setDateOfBirthBefore(
+                      newValue ? newValue.format("YYYY-MM-DD") : "",
+                    );
+                  }}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      sx: { flex: 1, minWidth: 200 },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+              }}
+            >
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                Passport expiration date:
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  flexWrap: "wrap",
+                }}
+              >
+                <DatePicker
+                  label="After"
+                  format="YYYY-MM-DD"
+                  value={
+                    passportExpirationDateAfter
+                      ? dayjs(passportExpirationDateAfter)
+                      : null
+                  }
+                  onChange={(newValue) => {
+                    setPaginationModel({ ...paginationModel, page: 1 });
+                    setPassportExpirationDateAfter(
+                      newValue ? newValue.format("YYYY-MM-DD") : "",
+                    );
+                  }}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      sx: { flex: 1, minWidth: 200 },
+                    },
+                  }}
+                />
+                <DatePicker
+                  label="Before"
+                  format="YYYY-MM-DD"
+                  value={
+                    passportExpirationDateBefore
+                      ? dayjs(passportExpirationDateBefore)
+                      : null
+                  }
+                  onChange={(newValue) => {
+                    setPaginationModel({ ...paginationModel, page: 1 });
+                    setPassportExpirationDateBefore(
+                      newValue ? newValue.format("YYYY-MM-DD") : "",
+                    );
+                  }}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      sx: { flex: 1, minWidth: 200 },
+                    },
+                  }}
                 />
               </Box>
             </Box>

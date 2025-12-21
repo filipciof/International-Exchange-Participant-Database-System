@@ -133,6 +133,32 @@ class StudentView(APIView):
             serializer = StudentSerializer(student)
             return Response(serializer.data)
 
+        exchange_start_year = request.query_params.get("start_year")
+
+        if exchange_start_year:
+            try:
+                year = int(exchange_start_year)
+                students = students.filter(
+                    exchange__start_date__year=year, exchange__is_active=True
+                )
+            except (ValueError, TypeError):
+                pass
+
+        is_inbound = request.query_params.get("is_inbound")
+
+        if is_inbound is not None:
+            if is_inbound.lower() in ("true", "1"):
+                students = students.filter(
+                    exchange__is_inbound=True, exchange__is_active=True
+                )
+            elif is_inbound.lower() in ("false", "0"):
+                students = students.filter(
+                    exchange__is_inbound=False, exchange__is_active=True
+                )
+
+        if exchange_start_year or is_inbound is not None:
+            students = students.distinct()
+
         search = request.query_params.get("search")
 
         if search:
@@ -202,6 +228,31 @@ class StudentView(APIView):
 
         if country_of_passport:
             students = students.filter(id_country_of_passport=country_of_passport)
+
+        date_of_birth_before = request.query_params.get("date_of_birth_before")
+        date_of_birth_after = request.query_params.get("date_of_birth_after")
+        passport_expiration_date_before = request.query_params.get(
+            "passport_expiration_date_before"
+        )
+        passport_expiration_date_after = request.query_params.get(
+            "passport_expiration_date_after"
+        )
+
+        if date_of_birth_before:
+            students = students.filter(date_of_birth__lte=date_of_birth_before)
+
+        if date_of_birth_after:
+            students = students.filter(date_of_birth__gte=date_of_birth_after)
+
+        if passport_expiration_date_before:
+            students = students.filter(
+                passport_expiration_date__lte=passport_expiration_date_before
+            )
+
+        if passport_expiration_date_after:
+            students = students.filter(
+                passport_expiration_date__gte=passport_expiration_date_after
+            )
 
         paginator = PageNumberPagination()
         paginator.page_size = min(int(request.query_params.get("page_size", 25)), 100)

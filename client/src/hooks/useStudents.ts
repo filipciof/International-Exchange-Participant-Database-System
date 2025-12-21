@@ -5,24 +5,36 @@ import type { Country, StudentFormData, PaginationModel } from "../utils/types";
 
 interface UseStudentsParams {
   paginationModel: PaginationModel;
-  selectedCountryOfDeparture: Country | null;
-  selectedCountryOfBirth: Country | null;
-  selectedCountryOfPassport: Country | null;
+  selectedCountryOfDepartureId: number | null;
+  selectedCountryOfBirthId: number | null;
+  selectedCountryOfPassportId: number | null;
   selectedGenders: number[];
   selectedShirtSizes: string[];
+  selectedStartYear: number | null;
+  isInbound: boolean | null;
   searchFields: string[];
   searchInput: string;
+  dateOfBirthBefore: string;
+  dateOfBirthAfter: string;
+  passportExpirationDateBefore: string;
+  passportExpirationDateAfter: string;
 }
 
 export function useStudents({
   paginationModel,
-  selectedCountryOfDeparture,
-  selectedCountryOfBirth,
-  selectedCountryOfPassport,
+  selectedCountryOfDepartureId,
+  selectedCountryOfBirthId,
+  selectedCountryOfPassportId,
   selectedGenders,
   selectedShirtSizes,
+  selectedStartYear,
+  isInbound,
   searchFields,
   searchInput,
+  dateOfBirthBefore,
+  dateOfBirthAfter,
+  passportExpirationDateBefore,
+  passportExpirationDateAfter,
 }: UseStudentsParams) {
   const {
     data: students,
@@ -32,13 +44,19 @@ export function useStudents({
     queryKey: [
       "students",
       paginationModel,
-      selectedCountryOfDeparture,
-      selectedCountryOfBirth,
-      selectedCountryOfPassport,
+      selectedCountryOfDepartureId,
+      selectedCountryOfBirthId,
+      selectedCountryOfPassportId,
       selectedGenders,
       selectedShirtSizes,
+      selectedStartYear,
+      isInbound,
       searchFields,
       searchInput,
+      dateOfBirthBefore,
+      dateOfBirthAfter,
+      passportExpirationDateBefore,
+      passportExpirationDateAfter,
     ],
     queryFn: async () => {
       const params = new URLSearchParams({
@@ -62,21 +80,53 @@ export function useStudents({
         params.append("shirt_size", shirtSize);
       });
 
-      if (selectedCountryOfBirth) {
-        params.append("country_of_birth", selectedCountryOfBirth.id.toString());
+      if (selectedCountryOfBirthId) {
+        params.append("country_of_birth", selectedCountryOfBirthId.toString());
       }
 
-      if (selectedCountryOfDeparture) {
+      if (selectedCountryOfDepartureId) {
         params.append(
           "country_of_departure",
-          selectedCountryOfDeparture.id.toString(),
+          selectedCountryOfDepartureId.toString(),
         );
       }
 
-      if (selectedCountryOfPassport) {
+      if (selectedCountryOfPassportId) {
         params.append(
           "country_of_passport",
-          selectedCountryOfPassport.id.toString(),
+          selectedCountryOfPassportId.toString(),
+        );
+      }
+
+      if (selectedStartYear) {
+        params.append("start_year", selectedStartYear.toString());
+      }
+
+      if (isInbound === true) {
+        params.append("is_inbound", "true");
+      } else if (isInbound === false) {
+        params.append("is_inbound", "false");
+      }
+
+      if (dateOfBirthBefore) {
+        params.append("date_of_birth_before", dateOfBirthBefore);
+      }
+
+      if (dateOfBirthAfter) {
+        params.append("date_of_birth_after", dateOfBirthAfter);
+      }
+
+      if (passportExpirationDateBefore) {
+        params.append(
+          "passport_expiration_date_before",
+          passportExpirationDateBefore,
+        );
+      }
+
+      if (passportExpirationDateAfter) {
+        params.append(
+          "passport_expiration_date_after",
+          passportExpirationDateAfter,
         );
       }
 

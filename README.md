@@ -19,6 +19,9 @@ Resources:
 Django admin app migrations:
 .venv/lib/python<version>/site-packages/django/contrib/admin/migrations/
 
+Clearing Vite cache in case of this weird "" MIME type error.
+rm -rf client/node_modules/.vite/
+
 Dropping all tables in postgresql:
 psql -U admin -W -d iepds
 
@@ -31,13 +34,24 @@ pg_dump -U admin -h localhost -d iepds > ~/repos/IEPDS/server/pg_iepds.sql
 Loading the dump (drop all schema before doing this):
 psql -U admin -h localhost -d iepds < ~/repos/IEPDS/server/pg_iepds.sql
 
+country: 249
+district: 600
+contact: 1000
+contactDistrict: 1537
+club: 4000
+family: 40 000
+familyMember: 160 315
+student: 50 009
+staff: 12 000
+exchangeType: 3
+exchange: 99 987
+exchangeFamily: 299 751
+
 TODO:
 
-- Filtering student by exchange information (current exchange inbound students shown by default).
-- Filtering student by dates of birth and passport expiration.
-- URL parameters for pagination and filters.
 - Downloading student table as a csv and pdf file.
 - Adding and uploading and deleting documents to student.
+- Regenerate the database with the academic year set for exchanges.
 - URL parameters for Contacts.
 - Using zod and react hook form for editable elements in the StudentDetail.
 - Filtering students by height.
