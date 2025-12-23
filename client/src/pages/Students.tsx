@@ -1,13 +1,14 @@
 import { useEffect, useRef } from "react";
 import StudentList from "../components/students/StudentList";
 import Loading from "../components/Loading";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, CircularProgress } from "@mui/material";
 import MyPagination from "../components/MyPagination";
 import type { StudentFormData, ViewType } from "../utils/types";
 import StudentDetail from "../components/students/StudentDetail";
 import AddStudent from "../components/students/StudentAdd";
 import UpdateStudent from "../components/students/StudentUpdate";
 import AddIcon from "@mui/icons-material/Add";
+import DownloadIcon from "@mui/icons-material/Download";
 import { useStudents } from "../hooks/useStudents";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 import StudentFilter from "../components/students/StudentFilter";
@@ -116,6 +117,7 @@ export default function Students() {
     addStudentMutation,
     updateStudentMutation,
     deleteStudentMutation,
+    exportStudentsMutation,
   } = useStudents({
     paginationModel,
     selectedCountryOfDepartureId,
@@ -232,6 +234,38 @@ export default function Students() {
         >
           New student
         </Button>
+
+        <Box>
+          <Button
+            variant="outlined"
+            startIcon={
+              exportStudentsMutation.isPending ? (
+                <CircularProgress size={20} />
+              ) : (
+                <DownloadIcon />
+              )
+            }
+            onClick={() => exportStudentsMutation.mutate("csv")}
+            disabled={exportStudentsMutation.isPending}
+          >
+            {exportStudentsMutation.isPending ? "Exporting..." : "Export as CSV"}
+          </Button>
+
+          <Button
+            variant="outlined"
+            startIcon={
+              exportStudentsMutation.isPending ? (
+                <CircularProgress size={20} />
+              ) : (
+                <DownloadIcon />
+              )
+            }
+            onClick={() => exportStudentsMutation.mutate("pdf")}
+            disabled={exportStudentsMutation.isPending}
+          >
+            {exportStudentsMutation.isPending ? "Exporting..." : "Export as PDF"}
+          </Button>
+        </Box>
       </Box>
 
       {selectedId && (

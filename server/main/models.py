@@ -56,6 +56,13 @@ class Gender(models.IntegerChoices):
     NONBINARY = 2
 
 
+GENDER_MAP = {
+    Gender.MALE: "male",
+    Gender.FEMALE: "female",
+    Gender.NONBINARY: "nonbinary",
+}
+
+
 class FamilyMember(models.Model):
     id_family = models.ForeignKey(
         Family, null=True, on_delete=models.SET_NULL, db_column="id_family"
@@ -83,6 +90,14 @@ class LanguageProficiency(models.IntegerChoices):
     CONVERSATIONAL = 1
     ADVANCED = 2
     FLUENT = 3
+
+
+LANG_PROF_MAP = {
+    LanguageProficiency.BEGINNER: "beginner",
+    LanguageProficiency.CONVERSATIONAL: "conversational",
+    LanguageProficiency.ADVANCED: "advanced",
+    LanguageProficiency.FLUENT: "fluent",
+}
 
 
 class Student(models.Model):

@@ -59,82 +59,112 @@ export function useStudents({
       passportExpirationDateAfter,
     ],
     queryFn: async () => {
-      const params = new URLSearchParams({
-        page: paginationModel.page.toString(),
-        page_size: paginationModel.pageSize.toString(),
-      });
-
-      if (searchInput) {
-        params.append("search", searchInput);
-      }
-
-      searchFields.forEach((searchField) => {
-        params.append("search_field", searchField);
-      });
-
-      selectedGenders.forEach((gender) => {
-        params.append("gender", gender.toString());
-      });
-
-      selectedShirtSizes.forEach((shirtSize) => {
-        params.append("shirt_size", shirtSize);
-      });
-
-      if (selectedCountryOfBirthId) {
-        params.append("country_of_birth", selectedCountryOfBirthId.toString());
-      }
-
-      if (selectedCountryOfDepartureId) {
-        params.append(
-          "country_of_departure",
-          selectedCountryOfDepartureId.toString(),
-        );
-      }
-
-      if (selectedCountryOfPassportId) {
-        params.append(
-          "country_of_passport",
-          selectedCountryOfPassportId.toString(),
-        );
-      }
-
-      if (selectedStartYear) {
-        params.append("start_year", selectedStartYear.toString());
-      }
-
-      if (isInbound === true) {
-        params.append("is_inbound", "true");
-      } else if (isInbound === false) {
-        params.append("is_inbound", "false");
-      }
-
-      if (dateOfBirthBefore) {
-        params.append("date_of_birth_before", dateOfBirthBefore);
-      }
-
-      if (dateOfBirthAfter) {
-        params.append("date_of_birth_after", dateOfBirthAfter);
-      }
-
-      if (passportExpirationDateBefore) {
-        params.append(
-          "passport_expiration_date_before",
-          passportExpirationDateBefore,
-        );
-      }
-
-      if (passportExpirationDateAfter) {
-        params.append(
-          "passport_expiration_date_after",
-          passportExpirationDateAfter,
-        );
-      }
-
+      const params = getStudentParams();
       const response = await axiosClient.get(`/students/?${params.toString()}`);
       return response.data;
     },
     placeholderData: (prev) => prev,
   });
+
+  const exportStudentsMutation = useMutation({
+    mutationFn: async (format: "csv" | "pdf") => {
+      const params = getStudentParams();
+      params.append("export_format", format);
+      const response = await axiosClient.get(`/students/?${params.toString()}`, {
+        responseType: 'blob',
+      });
+
+      const blob = new Blob([response.data], {
+        type: format === 'csv' ? 'text/csv' : 'application/pdf',
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `students_export_${new Date().toISOString().split('T')[0]}.${format}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      return response.data;
+    },
+  });
+
+  const getStudentParams = () => {
+    const params = new URLSearchParams({
+      page: paginationModel.page.toString(),
+      page_size: paginationModel.pageSize.toString(),
+    });
+
+    if (searchInput) {
+      params.append("search", searchInput);
+    }
+
+    searchFields.forEach((searchField) => {
+      params.append("search_field", searchField);
+    });
+
+    selectedGenders.forEach((gender) => {
+      params.append("gender", gender.toString());
+    });
+
+    selectedShirtSizes.forEach((shirtSize) => {
+      params.append("shirt_size", shirtSize);
+    });
+
+    if (selectedCountryOfBirthId) {
+      params.append("country_of_birth", selectedCountryOfBirthId.toString());
+    }
+
+    if (selectedCountryOfDepartureId) {
+      params.append(
+        "country_of_departure",
+        selectedCountryOfDepartureId.toString(),
+      );
+    }
+
+    if (selectedCountryOfPassportId) {
+      params.append(
+        "country_of_passport",
+        selectedCountryOfPassportId.toString(),
+      );
+    }
+
+    if (selectedStartYear) {
+      params.append("start_year", selectedStartYear.toString());
+    }
+
+    if (isInbound === true) {
+      params.append("is_inbound", "true");
+    } else if (isInbound === false) {
+      params.append("is_inbound", "false");
+    }
+
+    if (dateOfBirthBefore) {
+      params.append("date_of_birth_before", dateOfBirthBefore);
+    }
+
+    if (dateOfBirthAfter) {
+      params.append("date_of_birth_after", dateOfBirthAfter);
+    }
+
+    if (passportExpirationDateBefore) {
+      params.append(
+        "passport_expiration_date_before",
+        passportExpirationDateBefore,
+      );
+    }
+
+    if (passportExpirationDateAfter) {
+      params.append(
+        "passport_expiration_date_after",
+        passportExpirationDateAfter,
+      );
+    }
+
+    return params;
+  };
 
   const { data: countries = [] } = useQuery<Country[]>({
     queryKey: ["countries"],
@@ -191,5 +221,6 @@ export function useStudents({
     addStudentMutation,
     updateStudentMutation,
     deleteStudentMutation,
+    exportStudentsMutation,
   };
 }

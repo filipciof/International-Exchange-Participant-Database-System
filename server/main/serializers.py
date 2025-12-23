@@ -5,8 +5,8 @@ from .models import (
     Student,
     Country,
     District,
-    Gender,
-    LanguageProficiency,
+    GENDER_MAP,
+    LANG_PROF_MAP,
     ExchangeType,
     Exchange,
     Staff,
@@ -77,25 +77,12 @@ class StudentSerializer(serializers.ModelSerializer):
             if instance.id_country_of_passport
             else ""
         )
-
-        gender_map = {
-            Gender.MALE: "male",
-            Gender.FEMALE: "female",
-            Gender.NONBINARY: "nonbinary",
-        }
-        representation["gender_name"] = gender_map.get(instance.gender, "unknown")
-
-        lang_prof_map = {
-            LanguageProficiency.BEGINNER: "beginner",
-            LanguageProficiency.CONVERSATIONAL: "conversational",
-            LanguageProficiency.ADVANCED: "advanced",
-            LanguageProficiency.FLUENT: "fluent",
-        }
-        representation["second_language_proficiency_name"] = lang_prof_map.get(
-            instance.second_language_proficiency, None
+        representation["gender_name"] = GENDER_MAP.get(instance.gender, "unknown")
+        representation["second_language_proficiency_name"] = LANG_PROF_MAP.get(
+            instance.second_language_proficiency, ""
         )
-        representation["third_language_proficiency_name"] = lang_prof_map.get(
-            instance.third_language_proficiency, None
+        representation["third_language_proficiency_name"] = LANG_PROF_MAP.get(
+            instance.third_language_proficiency, ""
         )
 
         return representation
