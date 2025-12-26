@@ -8,11 +8,11 @@ import {
   Autocomplete,
 } from "@mui/material";
 import { Edit as EditIcon, Save, Close, Flight } from "@mui/icons-material";
-import type { Student, Country } from "../../utils/types";
+import type { Student, Country } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
-import axiosClient from "../../utils/axiosClient";
-import queryClient from "../../utils/queryClient";
-import Section from "./Section";
+import axiosClient from "../../../utils/axiosClient";
+import queryClient from "../../../utils/queryClient";
+import Section from "../Section";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 

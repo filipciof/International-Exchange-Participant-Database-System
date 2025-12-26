@@ -49,9 +49,6 @@ exchangeFamily: 299 751
 
 TODO:
 
-- Refactoring.
-  - Splitting main/views for *each* class (or groups).
-  - Putting editable student section into their own folder.
 - Individual role based pages.
 - Adding and uploading and deleting documents to student.
 - For admin, creating new users (either students or staff).

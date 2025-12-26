@@ -3,14 +3,14 @@ import { ArrowBack } from "@mui/icons-material";
 import type { Country } from "../../utils/types";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
-import EditableHeader from "./EditableHeader";
-import EditablePersonalInfo from "./EditablePersonalInfo";
-import EditableLanguages from "./EditableLanguages";
-import EditableTravelDocs from "./EditableTravelDocs";
-import EditableParentInfo from "./EditableParentInfo";
-import EditableInsurance from "./EditableInsurance";
-import EditableExchanges from "./EditableExchanges";
-import EditableNotes from "./EditableNotes";
+import EditableHeader from "./sections/EditableHeader";
+import EditablePersonalInfo from "./sections/EditablePersonalInfo";
+import EditableLanguages from "./sections/EditableLanguages";
+import EditableTravelDocs from "./sections/EditableTravelDocs";
+import EditableParentInfo from "./sections/EditableParentInfo";
+import EditableInsurance from "./sections/EditableInsurance";
+import EditableExchanges from "./sections/EditableExchanges";
+import EditableNotes from "./sections/EditableNotes";
 import Loading from "../Loading";
 
 type StudentDetailProps = {

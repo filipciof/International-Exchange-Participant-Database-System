@@ -14,12 +14,12 @@ import {
   Delete as DeleteIcon,
   SwapHoriz as ExchangeIcon,
 } from "@mui/icons-material";
-import type { Exchange, ExchangeFormData } from "../../utils/types";
+import type { Exchange, ExchangeFormData } from "../../../utils/types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axiosClient from "../../utils/axiosClient";
-import Section from "./Section";
+import axiosClient from "../../../utils/axiosClient";
+import Section from "../Section";
 import AddEditExchangeDialog from "./AddEditExchangeDialog";
-import DeleteConfirmationDialog from "../DeleteConfirmationDialog";
+import DeleteConfirmationDialog from "../../DeleteConfirmationDialog";
 
 type EditableExchangesProps = {
   studentId: number;

@@ -13,11 +13,11 @@ import {
 } from "@mui/material";
 import { Edit as EditIcon, Save, Close } from "@mui/icons-material";
 import { SingleFileUpload, FileDropzoneInputBody } from "mui-file-upload";
-import type { Student } from "../../utils/types";
-import { Gender, ShirtSize } from "../../utils/types";
+import type { Student } from "../../../utils/types";
+import { Gender, ShirtSize } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
-import axiosClient from "../../utils/axiosClient";
-import queryClient from "../../utils/queryClient";
+import axiosClient from "../../../utils/axiosClient";
+import queryClient from "../../../utils/queryClient";
 
 type EditableHeaderProps = {
   student: Student;

@@ -18,11 +18,11 @@ import type {
   ExchangeFormData,
   ExchangeType,
   Staff,
-} from "../../utils/types";
+} from "../../../utils/types";
 import { useQuery } from "@tanstack/react-query";
-import axiosClient from "../../utils/axiosClient";
-import StaffAutocomplete from "../StaffAutocomplete";
-import { handleValidationErrors } from "../../utils/handleValidationErrors";
+import axiosClient from "../../../utils/axiosClient";
+import StaffAutocomplete from "../../StaffAutocomplete";
+import { handleValidationErrors } from "../../../utils/handleValidationErrors";
 
 type AddEditExchangeDialogProps = {
   dialogOpen: boolean;

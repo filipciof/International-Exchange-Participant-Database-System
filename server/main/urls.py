@@ -3,14 +3,13 @@ from .views import (
     not_found_view,
     ClubView,
     FamilyView,
-    StudentView,
     CountryView,
     DistrictView,
-    StudentPhotoView,
     ExchangeTypeView,
     ExchangeView,
     StaffView,
 )
+from .student_views import StudentView, StudentPhotoView
 from config.settings import DEBUG
 
 not_found_url = path("", not_found_view, name="root-not-found")

@@ -7,11 +7,11 @@ import {
   TextField,
 } from "@mui/material";
 import { Edit as EditIcon, Save, Close, HealthAndSafety } from "@mui/icons-material";
-import type { Student } from "../../utils/types";
+import type { Student } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
-import axiosClient from "../../utils/axiosClient";
-import queryClient from "../../utils/queryClient";
-import Section from "./Section";
+import axiosClient from "../../../utils/axiosClient";
+import queryClient from "../../../utils/queryClient";
+import Section from "../Section";
 
 type EditableInsuranceProps = {
   student: Student;
