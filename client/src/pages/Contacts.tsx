@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Loading from "../components/Loading";
 import {
   Box,
@@ -18,25 +18,63 @@ import ContactList from "../components/contacts/ContactList";
 import type {
   Contact,
   ContactFormData,
-  Country,
   ViewType,
 } from "../utils/types";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 import { useContacts } from "../hooks/useContacts";
 import MyPagination from "../components/MyPagination";
 import ContactFilter from "../components/contacts/ContactFilter";
+import { useQueryState } from "nuqs";
+import {
+  parseAsStringLiteral,
+  parseAsInteger,
+  parseAsString,
+  parseAsArrayOf,
+} from "nuqs";
 
 export default function Contacts() {
-  const [currentView, setCurrentView] = useState<ViewType>("list");
-  const [viewMode, setViewMode] = useState<"card" | "list">("card");
-  const [paginationModel, setPaginationModel] = useState({
-    page: 1,
-    pageSize: 25,
-  });
-  const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
-  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
-  const [searchInput, setSearchInput] = useState("");
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [currentView, setCurrentView] = useQueryState(
+    "view",
+    parseAsStringLiteral([
+      "list",
+      "add",
+      "update",
+      "delete",
+      "detail",
+    ]).withDefault("list"),
+  );
+  const [viewMode, setViewMode] = useQueryState(
+    "viewMode",
+    parseAsStringLiteral(["card", "list"]).withDefault("card"),
+  );
+  const [selectedId, setSelectedId] = useQueryState("id", parseAsInteger);
+
+  // Pagination
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+  const [pageSize, setPageSize] = useQueryState(
+    "pageSize",
+    parseAsInteger.withDefault(25),
+  );
+  const paginationModel = { page, pageSize };
+  const setPaginationModel = (model: { page: number; pageSize: number }) => {
+    setPage(model.page);
+    setPageSize(model.pageSize);
+  };
+
+  // Filters
+  const [selectedGroups, setSelectedGroups] = useQueryState(
+    "groups",
+    parseAsArrayOf(parseAsString).withDefault([]),
+  );
+  const [selectedCountryId, setSelectedCountryId] = useQueryState(
+    "country",
+    parseAsInteger,
+  );
+  const [searchInput, setSearchInput] = useQueryState(
+    "search",
+    parseAsString.withDefault(""),
+  );
+
   const scrollPositionRef = useRef<number>(0);
 
   useEffect(() => {
@@ -67,7 +105,7 @@ export default function Contacts() {
   } = useContacts({
     paginationModel,
     selectedGroups,
-    selectedCountry,
+    selectedCountryId,
     searchInput,
   });
 
@@ -76,22 +114,22 @@ export default function Contacts() {
   };
 
   const handleUpdateContact = (data: ContactFormData) => {
-    if (selectedContact) {
-      updateContactMutation.mutate({ id: selectedContact.id, data });
+    if (selectedId) {
+      updateContactMutation.mutate({ id: selectedId, data });
     }
   };
 
-  const handleDeleteContact = (contact: Contact) => {
-    if (selectedContact) {
-      deleteContactMutation.mutate(contact.id);
+  const handleDeleteContact = () => {
+    if (selectedId) {
+      deleteContactMutation.mutate(selectedId);
     }
   };
 
   const handleClose = () => {
+    setSelectedId(null);
     addContactMutation.reset();
     updateContactMutation.reset();
     deleteContactMutation.reset();
-    setSelectedContact(null);
     handleViewChange("list");
   };
 
@@ -100,17 +138,17 @@ export default function Contacts() {
   };
 
   const handleUpdateOpen = (contact: Contact) => {
-    setSelectedContact(contact);
+    setSelectedId(contact.id);
     handleViewChange("update");
   };
 
   const handleDeleteOpen = (contact: Contact) => {
-    setSelectedContact(contact);
+    setSelectedId(contact.id);
     handleViewChange("delete");
   };
 
   const handleDetailOpen = (contact: Contact) => {
-    setSelectedContact(contact);
+    setSelectedId(contact.id);
     handleViewChange("detail");
   };
 
@@ -123,6 +161,10 @@ export default function Contacts() {
     }
   };
 
+  const selectedContact = selectedId
+    ? contacts.results.find((c: Contact) => c.id === selectedId)
+    : null;
+
   if (isLoading && currentView === "list") return <Loading />;
   if (error && currentView === "list")
     return (
@@ -130,6 +172,12 @@ export default function Contacts() {
         Error: {error.message}
       </Typography>
     );
+
+  if (currentView === "detail" && selectedContact) {
+    return (
+      <ContactDetail contact={selectedContact} handleClose={handleClose} />
+    );
+  }
 
   if (currentView === "add") {
     return (
@@ -155,12 +203,6 @@ export default function Contacts() {
         countries={countries}
         contact={selectedContact}
       />
-    );
-  }
-
-  if (currentView === "detail" && selectedContact) {
-    return (
-      <ContactDetail contact={selectedContact} handleClose={handleClose} />
     );
   }
 
@@ -190,14 +232,14 @@ export default function Contacts() {
         </ToggleButtonGroup>
       </Box>
 
-      {selectedContact && (
+      {selectedId && (
         <DeleteConfirmationDialog
           open={currentView === "delete"}
           handleClose={handleClose}
           isLoading={deleteContactMutation.isPending}
           isSuccess={deleteContactMutation.isSuccess}
           error={deleteContactMutation.error}
-          onConfirm={() => handleDeleteContact(selectedContact)}
+          onConfirm={() => handleDeleteContact()}
         />
       )}
 
@@ -206,8 +248,12 @@ export default function Contacts() {
         setSearchInput={setSearchInput}
         paginationModel={paginationModel}
         setPaginationModel={setPaginationModel}
-        selectedCountry={selectedCountry}
-        setSelectedCountry={setSelectedCountry}
+        selectedCountry={
+          countries.find((c) => c.id === selectedCountryId) || null
+        }
+        setSelectedCountry={(country) =>
+          setSelectedCountryId(country?.id || null)
+        }
         countries={countries}
         selectedGroups={selectedGroups}
         setSelectedGroups={setSelectedGroups}

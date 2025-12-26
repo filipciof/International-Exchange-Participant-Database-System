@@ -6,14 +6,14 @@ import type { Country, ContactFormData, PaginationModel } from "../utils/types";
 interface UseContactsParams {
   paginationModel: PaginationModel,
   selectedGroups: string[];
-  selectedCountry: Country | null;
+  selectedCountryId: number | null;
   searchInput: string;
 }
 
 export function useContacts({
   paginationModel,
   selectedGroups,
-  selectedCountry,
+  selectedCountryId,
   searchInput,
 }: UseContactsParams) {
   const {
@@ -25,7 +25,7 @@ export function useContacts({
       "contacts",
       paginationModel,
       selectedGroups,
-      selectedCountry,
+      selectedCountryId,
       searchInput,
     ],
     queryFn: async () => {
@@ -34,8 +34,8 @@ export function useContacts({
         page_size: paginationModel.pageSize.toString(),
       });
 
-      if (selectedCountry) {
-        params.append("country", selectedCountry.id.toString());
+      if (selectedCountryId) {
+        params.append("country", selectedCountryId.toString());
       }
 
       selectedGroups.forEach((group) => {

@@ -49,9 +49,12 @@ exchangeFamily: 299 751
 
 TODO:
 
-- Downloading student table as a csv and pdf file.
+- Refactoring.
+  - Splitting main/views for *each* class (or groups).
+  - Putting editable student section into their own folder.
+- Individual role based pages.
 - Adding and uploading and deleting documents to student.
+- For admin, creating new users (either students or staff).
 - Regenerate the database with the academic year set for exchanges.
-- URL parameters for Contacts.
 - Using zod and react hook form for editable elements in the StudentDetail.
 - Filtering students by height.
