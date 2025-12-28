@@ -6,7 +6,6 @@ import {
   Grid,
   Avatar,
   Chip,
-  Divider,
   Paper,
   IconButton,
   Stack,
@@ -18,80 +17,30 @@ import {
   ArrowBack,
   School,
 } from "@mui/icons-material";
-import type { Contact } from "../../utils/types";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
+import Section from "../Section";
+import InfoItem from "../InfoItem";
+import Loading from "../Loading";
 
 type ContactDetailProps = {
-  contact: Contact;
+  id: number;
   handleClose: () => void;
 };
 
-type InfoItemProps = {
-  label: string;
-  value: string | number | Date | null | undefined;
-  fullWidth?: boolean;
-};
-
-const InfoItem = ({ label, value, fullWidth = false }: InfoItemProps) => {
-  const displayValue = value
-    ? value instanceof Date
-      ? value.toLocaleDateString()
-      : value
-    : "—";
-
-  return (
-    <Grid size={{ xs: 12, sm: fullWidth ? 12 : 6, md: fullWidth ? 12 : 4 }}>
-      <Box>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ fontWeight: 600 }}
-        >
-          {label}
-        </Typography>
-        <Typography variant="body2" sx={{ mt: 0.5 }}>
-          {displayValue}
-        </Typography>
-      </Box>
-    </Grid>
-  );
-};
-
-type SectionProps = {
-  title: string;
-  icon: React.ReactNode;
-  children: React.ReactNode;
-};
-
-const Section = ({ title, icon, children }: SectionProps) => (
-  <Paper
-    elevation={0}
-    sx={{
-      p: 3,
-      mb: 3,
-      borderRadius: 2,
-      border: "1px solid",
-      borderColor: "divider",
-    }}
-  >
-    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-      <Box sx={{ color: "primary.main", mr: 1, display: "flex" }}>{icon}</Box>
-      <Typography variant="h6" sx={{ fontWeight: 600 }}>
-        {title}
-      </Typography>
-    </Box>
-    <Divider sx={{ mb: 2 }} />
-    {children}
-  </Paper>
-);
-
 export default function ContactDetail({
-  contact,
+  id,
   handleClose,
 }: ContactDetailProps) {
+  const { data: contact, isLoading: isContactLoading } = useQuery({
+    queryKey: ["contacts", id],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/contacts/?id=${id}`);
+      return response.data;
+    },
+  });
   const { data: imageUrl, isLoading } = useQuery({
-    queryKey: ["contactPhoto", contact.photo],
+    queryKey: ["contactPhoto", contact?.photo],
     queryFn: async () => {
       const photoName = contact.photo.split("/")[3];
       const response = await axiosClient.get(
@@ -100,9 +49,13 @@ export default function ContactDetail({
       );
       return URL.createObjectURL(response.data);
     },
-    enabled: !!contact.photo,
+    enabled: !!contact?.photo,
     staleTime: Infinity,
   });
+
+  if (isContactLoading) {
+    return <Loading />;
+  }
 
   const fullName = [contact.first_name, contact.middle_name, contact.last_name]
     .filter(Boolean)

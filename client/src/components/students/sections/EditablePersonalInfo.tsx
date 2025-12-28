@@ -12,7 +12,7 @@ import type { Student, Country } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
-import Section from "../Section";
+import Section from "../../Section";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 

@@ -137,18 +137,18 @@ export default function Contacts() {
     handleViewChange("add");
   };
 
-  const handleUpdateOpen = (contact: Contact) => {
-    setSelectedId(contact.id);
+  const handleUpdateOpen = (id: number) => {
+    setSelectedId(id);
     handleViewChange("update");
   };
 
-  const handleDeleteOpen = (contact: Contact) => {
-    setSelectedId(contact.id);
+  const handleDeleteOpen = (id: number) => {
+    setSelectedId(id);
     handleViewChange("delete");
   };
 
-  const handleDetailOpen = (contact: Contact) => {
-    setSelectedId(contact.id);
+  const handleDetailOpen = (id: number) => {
+    setSelectedId(id);
     handleViewChange("detail");
   };
 
@@ -161,10 +161,6 @@ export default function Contacts() {
     }
   };
 
-  const selectedContact = selectedId
-    ? contacts.results.find((c: Contact) => c.id === selectedId)
-    : null;
-
   if (isLoading && currentView === "list") return <Loading />;
   if (error && currentView === "list")
     return (
@@ -173,9 +169,9 @@ export default function Contacts() {
       </Typography>
     );
 
-  if (currentView === "detail" && selectedContact) {
+  if (currentView === "detail" && selectedId) {
     return (
-      <ContactDetail contact={selectedContact} handleClose={handleClose} />
+      <ContactDetail id={selectedId} handleClose={handleClose} />
     );
   }
 
@@ -192,7 +188,7 @@ export default function Contacts() {
     );
   }
 
-  if (currentView === "update" && selectedContact) {
+  if (currentView === "update" && selectedId) {
     return (
       <UpdateContact
         handleClose={handleClose}
@@ -201,7 +197,7 @@ export default function Contacts() {
         isSuccess={updateContactMutation.isSuccess}
         error={updateContactMutation.error}
         countries={countries}
-        contact={selectedContact}
+        id={selectedId}
       />
     );
   }

@@ -203,6 +203,8 @@ class Staff(models.Model):
     photo = models.ImageField(upload_to="staff_photos/", blank=True, default="")
     notes = models.TextField(blank=True, default="")
 
+    is_active = models.BooleanField(default=True)
+
     class Meta:
         db_table = "staff"
 

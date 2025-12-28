@@ -17,7 +17,7 @@ import {
 import type { Exchange, ExchangeFormData } from "../../../utils/types";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
-import Section from "../Section";
+import Section from "../../Section";
 import AddEditExchangeDialog from "./AddEditExchangeDialog";
 import DeleteConfirmationDialog from "../../DeleteConfirmationDialog";
 

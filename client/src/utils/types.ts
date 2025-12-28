@@ -71,7 +71,7 @@ export const contactSchema = z.object({
   id_districts: z.array(z.number()).nullable().optional(),
   gender: z.number().nullable().optional(),
   email: z.email().or(z.literal("")),
-  phone: z.string(),
+  phone: z.string().optional(),
   is_longterm: z.boolean(),
   is_family_to_family: z.boolean(),
   is_camp: z.boolean(),
@@ -166,7 +166,8 @@ export type Student = {
   notes: string;
 };
 
-type Club = {
+export type Club = {
+  id: number;
   name: string;
   country: string;
   district: number;
@@ -212,10 +213,35 @@ export type ExchangeType = {
 
 export type Staff = {
   id: number;
+  id_club: number;
+  club_name: string;
   first_name: string;
   middle_name: string;
   last_name: string;
+  gender: number;
+  gender_name: string;
+  email: string;
+  phone: string;
+  photo: string;
+  notes: string;
 }
+
+export const staffSchema = z.object({
+  id_club: z.number().nullable().optional(),
+  first_name: z.string().min(1, "First name is required"),
+  middle_name: z.string().optional(),
+  last_name: z.string().min(1, "Last name is required"),
+  gender: z.number().nullable().optional(),
+  email: z.email().or(z.literal("")),
+  phone: z.string().optional(),
+  notes: z.string().optional(),
+})
+
+export type StaffFormInputs = z.infer<typeof staffSchema>;
+
+export type StaffFormData = StaffFormInputs & {
+  photo: File | null;
+};
 
 export type SearchableField = {
   value: string;

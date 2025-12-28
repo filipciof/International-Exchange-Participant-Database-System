@@ -12,9 +12,9 @@ export default function ContactCard({
   onDelete,
 }: {
   contact: Contact;
-  onCardClick: (contact: Contact) => void;
-  onEdit: (contact: Contact) => void;
-  onDelete: (contact: Contact) => void;
+  onCardClick: (id: number) => void;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
 }) {
   const { data: imageUrl, isLoading } = useQuery({
     queryKey: ["contactPhoto", contact.photo],
@@ -62,9 +62,9 @@ export default function ContactCard({
         contact.gender_name,
       ]}
       chips={chips}
-      onClick={() => onCardClick(contact)}
-      onEdit={() => onEdit(contact)}
-      onDelete={() => onDelete(contact)}
+      onClick={() => onCardClick(contact.id)}
+      onEdit={() => onEdit(contact.id)}
+      onDelete={() => onDelete(contact.id)}
     />
   );
 }

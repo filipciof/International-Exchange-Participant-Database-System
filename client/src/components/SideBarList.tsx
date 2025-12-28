@@ -6,6 +6,7 @@ import {
   ListItemButton,
 } from "@mui/material";
 import SchoolIcon from "@mui/icons-material/School";
+import WorkIcon from '@mui/icons-material/Work';
 import HouseIcon from "@mui/icons-material/House";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PersonIcon from "@mui/icons-material/Person";
@@ -36,6 +37,7 @@ export default function SideBarList() {
         return [
           { text: "Home", icon: <PersonIcon />, path: "/" },
           { text: "Students", icon: <SchoolIcon />, path: "/students" },
+          { text: "Staff", icon: <WorkIcon />, path: "/staff" },
           { text: "Clubs", icon: <GroupsIcon />, path: "/clubs" },
           { text: "Families", icon: <HouseIcon />, path: "/families" },
           { text: "Contacts", icon: <ContactPageIcon />, path: "/contacts" },

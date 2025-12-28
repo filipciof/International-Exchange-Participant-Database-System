@@ -175,3 +175,10 @@ class StaffSerializer(serializers.ModelSerializer):
     class Meta:
         model = Staff
         fields = "__all__"
+        extra_kwargs = {"is_active": {"required": False, "default": True}}
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["club_name"] = instance.id_club.name if instance.id_club else ""
+        representation["gender_name"] = GENDER_MAP.get(instance.gender, "unknown")
+        return representation

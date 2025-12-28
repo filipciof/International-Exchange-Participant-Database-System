@@ -11,7 +11,7 @@ import type { Student } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
-import Section from "../Section";
+import Section from "../../Section";
 
 type EditableParentInfoProps = {
   student: Student;

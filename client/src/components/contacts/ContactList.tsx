@@ -9,9 +9,9 @@ type ContactListProps = {
   paginationModel: PaginationModel;
   setPaginationModel: (newPaginationModel: PaginationModel) => void;
   isLoading: boolean;
-  onEdit?: (contact: Contact) => void;
-  onDelete?: (contact: Contact) => void;
-  onRowClick?: (contact: Contact) => void;
+  onEdit?: (id: number) => void;
+  onDelete?: (id: number) => void;
+  onRowClick?: (id: number) => void;
 };
 
 export default function ContactList({
@@ -103,7 +103,7 @@ export default function ContactList({
           <Tooltip title="Edit">
             <IconButton
               size="small"
-              onClick={() => onEdit?.(params.row)}
+              onClick={() => onEdit?.(params.row.id)}
               color="primary"
             >
               <EditIcon fontSize="small" />
@@ -112,7 +112,7 @@ export default function ContactList({
           <Tooltip title="Delete">
             <IconButton
               size="small"
-              onClick={() => onDelete?.(params.row)}
+              onClick={() => onDelete?.(params.row.id)}
               color="error"
             >
               <DeleteIcon fontSize="small" />
@@ -142,7 +142,7 @@ export default function ContactList({
           });
         }}
         onRowClick={(params) => {
-          onRowClick?.(params.row);
+          onRowClick?.(params.row.id);
         }}
         pageSizeOptions={[10, 25, 50, 100]}
         hideFooter

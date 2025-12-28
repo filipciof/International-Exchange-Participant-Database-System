@@ -14,6 +14,7 @@ import SignIn from "./pages/SignIn";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UserInfo from "./pages/UserInfo";
 import Contacts from "./pages/Contacts";
+import Staff from "./pages/Staff";
 
 const allowedGroups = ["admin", "correspondent", "club_officer", "kwm_officer"];
 
@@ -38,6 +39,14 @@ function App() {
               element={
                 <ProtectedRoute allowedGroups={allowedGroups}>
                   <Students />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="staff"
+              element={
+                <ProtectedRoute allowedGroups={allowedGroups}>
+                  <Staff />
                 </ProtectedRoute>
               }
             />
