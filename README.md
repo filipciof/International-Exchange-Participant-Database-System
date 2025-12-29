@@ -50,9 +50,10 @@ exchangeFamily: 299 751
 TODO:
 
 - Create CRUD pages for staff, families and clubs.
+  - Exchange Family information as well.
 - Individual role based pages.
+  - For admin, creating new users (either students or staff).
 - Adding and uploading and deleting documents to student.
-- For admin, creating new users (either students or staff).
 - Regenerate the database with the academic year set for exchanges.
 - Using zod and react hook form for editable elements in the StudentDetail.
 - Filtering students by height.

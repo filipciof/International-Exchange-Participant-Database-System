@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   Box,
   Grid,
-  Typography,
   IconButton,
   TextField,
   MenuItem,
@@ -14,36 +13,10 @@ import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
 import Section from "../../Section";
+import InfoItem from "../../InfoItem";
 
 type EditableLanguagesProps = {
   student: Student;
-};
-
-type InfoItemProps = {
-  label: string;
-  value: string | number | null | undefined;
-  fullWidth?: boolean;
-};
-
-const InfoItem = ({ label, value, fullWidth = false }: InfoItemProps) => {
-  const displayValue = value?.toString() || "—";
-
-  return (
-    <Grid size={{ xs: 12, sm: fullWidth ? 12 : 6, md: fullWidth ? 12 : 4 }}>
-      <Box>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ fontWeight: 600 }}
-        >
-          {label}
-        </Typography>
-        <Typography variant="body2" sx={{ mt: 0.5 }}>
-          {displayValue}
-        </Typography>
-      </Box>
-    </Grid>
-  );
 };
 
 export default function EditableLanguages({ student }: EditableLanguagesProps) {

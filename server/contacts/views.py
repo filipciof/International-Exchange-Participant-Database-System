@@ -70,6 +70,12 @@ class ContactView(APIView):
         contacts = Contact.objects.order_by("-id")
         contacts = contacts.filter(is_active=True)
 
+        id = request.query_params.get("id")
+        if id:
+            contact = contacts.get(id=id)
+            serializer = ContactSerializer(contact)
+            return Response(serializer.data)
+
         country = request.query_params.get("country")
         if country:
             contacts = contacts.filter(id_country=country)

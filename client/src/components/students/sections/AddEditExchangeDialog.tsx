@@ -10,14 +10,20 @@ import {
   Stack,
   TextField,
   Typography,
+  Divider,
+  CircularProgress,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
+import { useState, useEffect } from "react";
 import type {
   Exchange,
   ExchangeFormData,
   ExchangeType,
   Staff,
+  Country,
+  District,
+  Club,
 } from "../../../utils/types";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
@@ -47,6 +53,11 @@ export default function AddEditExchangeDialog({
   isSuccess = false,
   error = null,
 }: AddEditExchangeDialogProps) {
+  const [sendingCountry, setSendingCountry] = useState<number | null>(null);
+  const [sendingDistrict, setSendingDistrict] = useState<number | null>(null);
+  const [receivingCountry, setReceivingCountry] = useState<number | null>(null);
+  const [receivingDistrict, setReceivingDistrict] = useState<number | null>(null);
+
   const { data: exchangeTypes } = useQuery({
     queryKey: ["exchangeTypes"],
     queryFn: async () => {
@@ -54,6 +65,72 @@ export default function AddEditExchangeDialog({
       return response.data;
     },
   });
+
+  const { data: countries = [] } = useQuery({
+    queryKey: ["countries"],
+    queryFn: async () => {
+      const response = await axiosClient.get("/countries/");
+      return response.data;
+    },
+  });
+
+  const { data: sendingDistricts = [], isLoading: isLoadingSendingDistricts } = useQuery({
+    queryKey: ["districts", sendingCountry],
+    queryFn: async () => {
+      const response = await axiosClient.get(
+        `/districts/?country=${sendingCountry}`,
+      );
+      return response.data;
+    },
+    enabled: sendingCountry !== null && sendingCountry > 0,
+  });
+
+  const { data: receivingDistricts = [], isLoading: isLoadingReceivingDistricts } = useQuery({
+    queryKey: ["districts", receivingCountry],
+    queryFn: async () => {
+      const response = await axiosClient.get(
+        `/districts/?country=${receivingCountry}`,
+      );
+      return response.data;
+    },
+    enabled: receivingCountry !== null && receivingCountry > 0,
+  });
+
+  const { data: sendingClubs = [], isLoading: isLoadingSendingClubs } = useQuery({
+    queryKey: ["clubs", sendingDistrict],
+    queryFn: async () => {
+      const response = await axiosClient.get(
+        `/clubs/?id_district=${sendingDistrict}`,
+      );
+      return response.data;
+    },
+    enabled: sendingDistrict !== null && sendingDistrict > 0,
+  });
+
+  const { data: receivingClubs = [], isLoading: isLoadingReceivingClubs } = useQuery({
+    queryKey: ["clubs", receivingDistrict],
+    queryFn: async () => {
+      const response = await axiosClient.get(
+        `/clubs/?id_district=${receivingDistrict}`,
+      );
+      return response.data;
+    },
+    enabled: receivingDistrict !== null && receivingDistrict > 0,
+  });
+
+  // Set initial country/district when editing
+  useEffect(() => {
+    if (editingExchange) {
+      if (editingExchange.sending_club) {
+        setSendingCountry(editingExchange.sending_club.id_country);
+        setSendingDistrict(editingExchange.sending_club.id_district);
+      }
+      if (editingExchange.receiving_club) {
+        setReceivingCountry(editingExchange.receiving_club.id_country);
+        setReceivingDistrict(editingExchange.receiving_club.id_district);
+      }
+    }
+  }, [editingExchange]);
 
   return (
     <Dialog
@@ -137,6 +214,180 @@ export default function AddEditExchangeDialog({
               });
             }}
           />
+
+          <Divider sx={{ my: 1 }}>Sending Club</Divider>
+
+          <Autocomplete
+            value={countries.find((c: Country) => c.id === sendingCountry) || null}
+            onChange={(_event, newValue) => {
+              setSendingCountry(newValue?.id || null);
+              setSendingDistrict(null);
+              setFormData({ ...formData, id_sending_club: null });
+            }}
+            options={countries}
+            getOptionLabel={(option) => option.name}
+            fullWidth
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Sending Country"
+                placeholder="Select country"
+              />
+            )}
+          />
+
+          <Autocomplete
+            value={sendingDistricts.find((d: District) => d.id === sendingDistrict) || null}
+            onChange={(_event, newValue) => {
+              setSendingDistrict(newValue?.id || null);
+              setFormData({ ...formData, id_sending_club: null });
+            }}
+            options={sendingDistricts}
+            getOptionLabel={(option) => option.number.toString()}
+            disabled={!sendingCountry || isLoadingSendingDistricts}
+            loading={isLoadingSendingDistricts}
+            fullWidth
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Sending District"
+                placeholder="Select district"
+                slotProps={{
+                  input: {
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {isLoadingSendingDistricts ? (
+                          <CircularProgress color="inherit" size={20} />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  },
+                }}
+              />
+            )}
+          />
+
+          <Autocomplete
+            value={sendingClubs.find((c: Club) => c.id === formData.id_sending_club) || null}
+            onChange={(_event, newValue) => {
+              setFormData({ ...formData, id_sending_club: newValue?.id || null });
+            }}
+            options={sendingClubs}
+            getOptionLabel={(option) => option.name}
+            disabled={!sendingDistrict || isLoadingSendingClubs}
+            loading={isLoadingSendingClubs}
+            fullWidth
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Sending Club"
+                placeholder="Select club"
+                slotProps={{
+                  input: {
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {isLoadingSendingClubs ? (
+                          <CircularProgress color="inherit" size={20} />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  },
+                }}
+              />
+            )}
+          />
+
+          <Divider sx={{ my: 1 }}>Receiving Club</Divider>
+
+          <Autocomplete
+            value={countries.find((c: Country) => c.id === receivingCountry) || null}
+            onChange={(_event, newValue) => {
+              setReceivingCountry(newValue?.id || null);
+              setReceivingDistrict(null);
+              setFormData({ ...formData, id_receiving_club: null });
+            }}
+            options={countries}
+            getOptionLabel={(option) => option.name}
+            fullWidth
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Receiving Country"
+                placeholder="Select country"
+              />
+            )}
+          />
+
+          <Autocomplete
+            value={receivingDistricts.find((d: District) => d.id === receivingDistrict) || null}
+            onChange={(_event, newValue) => {
+              setReceivingDistrict(newValue?.id || null);
+              setFormData({ ...formData, id_receiving_club: null });
+            }}
+            options={receivingDistricts}
+            getOptionLabel={(option) => option.number.toString()}
+            disabled={!receivingCountry || isLoadingReceivingDistricts}
+            loading={isLoadingReceivingDistricts}
+            fullWidth
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Receiving District"
+                placeholder="Select district"
+                slotProps={{
+                  input: {
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {isLoadingReceivingDistricts ? (
+                          <CircularProgress color="inherit" size={20} />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  },
+                }}
+              />
+            )}
+          />
+
+          <Autocomplete
+            value={receivingClubs.find((c: Club) => c.id === formData.id_receiving_club) || null}
+            onChange={(_event, newValue) => {
+              setFormData({ ...formData, id_receiving_club: newValue?.id || null });
+            }}
+            options={receivingClubs}
+            getOptionLabel={(option) => option.name}
+            disabled={!receivingDistrict || isLoadingReceivingClubs}
+            loading={isLoadingReceivingClubs}
+            fullWidth
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Receiving Club"
+                placeholder="Select club"
+                slotProps={{
+                  input: {
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {isLoadingReceivingClubs ? (
+                          <CircularProgress color="inherit" size={20} />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  },
+                }}
+              />
+            )}
+          />
+
+          <Divider sx={{ my: 1 }}>Staff</Divider>
 
           <StaffAutocomplete
             initialStaffId={formData.id_counsellor}

@@ -170,9 +170,19 @@ export type Club = {
   id: number;
   name: string;
   country: string;
+  id_country: number;
+  id_district: number;
   district: number;
   city: string;
 };
+
+export const clubSchema = z.object({
+  name: z.string().min(1, "Club name is required"),
+  id_district: z.number().nullable().optional(),
+  city: z.string().optional(),
+});
+
+export type ClubFormData = z.infer<typeof clubSchema>;
 
 export type Exchange = {
   id: number;
@@ -214,7 +224,7 @@ export type ExchangeType = {
 export type Staff = {
   id: number;
   id_club: number;
-  club_name: string;
+  club: Club | null;
   first_name: string;
   middle_name: string;
   last_name: string;
@@ -224,7 +234,7 @@ export type Staff = {
   phone: string;
   photo: string;
   notes: string;
-}
+};
 
 export const staffSchema = z.object({
   id_club: z.number().nullable().optional(),
@@ -235,13 +245,64 @@ export const staffSchema = z.object({
   email: z.email().or(z.literal("")),
   phone: z.string().optional(),
   notes: z.string().optional(),
-})
+});
 
 export type StaffFormInputs = z.infer<typeof staffSchema>;
 
 export type StaffFormData = StaffFormInputs & {
   photo: File | null;
 };
+
+export type Family = {
+  id: number;
+  id_club: number;
+  club: Club | null;
+  name: string;
+  city: string;
+  address: string;
+  notes: string;
+};
+
+export const familySchema = z.object({
+  id_club: z.number().nullable().optional(),
+  name: z.string().min(1, "Family name is required"),
+  city: z.string().optional(),
+  address: z.string().optional(),
+  notes: z.string().optional(),
+})
+
+export type FamilyFormData = z.infer<typeof familySchema>;
+
+export type FamilyMember = {
+  id: number;
+  id_family: number;
+  family_name: string;
+  first_name: string;
+  middle_name: string;
+  last_name: string;
+  gender: number;
+  gender_name: string;
+  date_of_birth: string;
+  email: string;
+  phone: string;
+  is_head_of_family: boolean;
+  occupation: string;
+};
+
+export const familyMemberSchema = z.object({
+  id_family: z.number().nullable().optional(),
+  first_name: z.string().min(1, "First name is required"),
+  middle_name: z.string().min(1, "Middle name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+  gender: z.number().nullable().optional(),
+  date_of_birth: z.string().nullable().optional(),
+  email: z.email().or(z.literal("")),
+  phone: z.string().optional(),
+  is_head_of_family: z.boolean(),
+  occupation: z.string().optional(),
+})
+
+export type FamilyMemberFormData = z.infer<typeof familyMemberSchema>;
 
 export type SearchableField = {
   value: string;

@@ -15,38 +15,16 @@ import {
   SwapHoriz as ExchangeIcon,
 } from "@mui/icons-material";
 import type { Exchange, ExchangeFormData } from "../../../utils/types";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
+import queryClient from "../../../utils/queryClient";
 import Section from "../../Section";
 import AddEditExchangeDialog from "./AddEditExchangeDialog";
 import DeleteConfirmationDialog from "../../DeleteConfirmationDialog";
+import InfoItem from "../../InfoItem";
 
 type EditableExchangesProps = {
   studentId: number;
-};
-
-type InfoItemProps = {
-  label: string;
-  value: string | number | null | undefined;
-};
-
-const InfoItem = ({ label, value }: InfoItemProps) => {
-  const displayValue = value?.toString() || "—";
-
-  return (
-    <Box>
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ fontWeight: 600 }}
-      >
-        {label}
-      </Typography>
-      <Typography variant="body2" sx={{ mt: 0.5 }}>
-        {displayValue}
-      </Typography>
-    </Box>
-  );
 };
 
 // Helper function to get current academic year in YYYY/YY format
@@ -74,7 +52,9 @@ export default function EditableExchanges({
     null | "update" | "add" | "delete"
   >(null);
   const [editingExchange, setEditingExchange] = useState<Exchange | null>(null);
-  const [deletingExchange, setDeletingExchange] = useState<Exchange | null>(null);
+  const [deletingExchange, setDeletingExchange] = useState<Exchange | null>(
+    null,
+  );
   const [formData, setFormData] = useState<ExchangeFormData>({
     id_student: studentId,
     year: "",
@@ -87,8 +67,6 @@ export default function EditableExchanges({
     id_sending_club: null,
     id_receiving_club: null,
   });
-
-  const queryClient = useQueryClient();
 
   const {
     data: exchanges,
@@ -310,16 +288,32 @@ export default function EditableExchanges({
                     {exchange.end_date && (
                       <InfoItem label="End Date" value={exchange.end_date} />
                     )}
+                    {exchange.sending_club && (
+                      <InfoItem
+                        label="Sending Club"
+                        value={`${exchange.sending_club.name} - ${exchange.sending_club.country}, District ${exchange.sending_club.district}`}
+                        linkPath={`/clubs?id=${exchange.id_sending_club}&view=detail`}
+                      />
+                    )}
+                    {exchange.receiving_club && (
+                      <InfoItem
+                        label="Receiving Club"
+                        value={`${exchange.receiving_club.name} - ${exchange.receiving_club.country}, District ${exchange.receiving_club.district}`}
+                        linkPath={`/clubs?id=${exchange.id_receiving_club}&view=detail`}
+                      />
+                    )}
                     {exchange.counsellor && (
                       <InfoItem
                         label="Counsellor"
                         value={exchange.counsellor}
+                        linkPath={`/staff?id=${exchange.id_counsellor}&view=detail`}
                       />
                     )}
                     {exchange.kwm_officer && (
                       <InfoItem
                         label="KWM Officer"
                         value={exchange.kwm_officer}
+                        linkPath={`/staff?id=${exchange.id_kwm_officer}&view=detail`}
                       />
                     )}
                   </Grid>
@@ -348,7 +342,9 @@ export default function EditableExchanges({
         isLoading={deleteMutation.isPending}
         isSuccess={deleteMutation.isSuccess}
         error={deleteMutation.error}
-        onConfirm={() => deletingExchange && deleteMutation.mutate(deletingExchange.id)}
+        onConfirm={() =>
+          deletingExchange && deleteMutation.mutate(deletingExchange.id)
+        }
       />
     </Section>
   );

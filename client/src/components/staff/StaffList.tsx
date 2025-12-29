@@ -41,9 +41,22 @@ export default function StaffList({
       width: 100,
     },
     {
+      field: "country",
+      headerName: "Country",
+      width: 150,
+      valueGetter: (_, row) => row.club?.country || "",
+    },
+    {
+      field: "district",
+      headerName: "District",
+      width: 120,
+      valueGetter: (_, row) => row.club?.district || "",
+    },
+    {
       field: "club_name",
       headerName: "Club",
       width: 150,
+      valueGetter: (_, row) => row.club?.name || "",
     },
     {
       field: "gender_name",
@@ -60,16 +73,6 @@ export default function StaffList({
       headerName: "Phone number",
       width: 150,
     },
-    // {
-    //   field: "country",
-    //   headerName: "Country",
-    //   width: 150,
-    // },
-    // {
-    //   field: "districts",
-    //   headerName: "Districts",
-    //   width: 120,
-    // },
     {
       field: "notes",
       headerName: "Notes",

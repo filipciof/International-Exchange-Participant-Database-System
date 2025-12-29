@@ -18,7 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { SingleFileUpload, FileDropzoneInputBody } from "mui-file-upload";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { StaffFormData, StaffFormInputs, Club } from "../../utils/types";
+import type { StaffFormData, StaffFormInputs, Club, Country, District, Staff } from "../../utils/types";
 import { staffSchema, Gender } from "../../utils/types";
 import axiosClient from "../../utils/axiosClient";
 import { handleValidationErrors } from "../../utils/handleValidationErrors";
@@ -30,7 +30,7 @@ type StaffFormProps = {
   isLoading: boolean;
   isSuccess: boolean;
   error: any | null;
-  initialData?: StaffFormInputs;
+  initialData?: Staff | StaffFormInputs;
   submitButtonText?: string;
 };
 
@@ -45,6 +45,8 @@ export default function StaffForm({
   submitButtonText = "Submit",
 }: StaffFormProps) {
   const [photo, setPhoto] = useState<File | null>(null);
+  const [country, setCountry] = useState<number | null>(null);
+  const [district, setDistrict] = useState<number | null>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -53,6 +55,7 @@ export default function StaffForm({
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<StaffFormInputs>({
     resolver: zodResolver(staffSchema),
     defaultValues: initialData || {
@@ -67,17 +70,41 @@ export default function StaffForm({
     },
   });
 
-  const { data: clubs = [], isLoading: isLoadingClubs } = useQuery({
-    queryKey: ["clubs"],
+  const { data: countries = [] } = useQuery({
+    queryKey: ["countries"],
     queryFn: async () => {
-      const response = await axiosClient.get("/clubs/");
+      const response = await axiosClient.get("/countries/");
       return response.data;
     },
+  });
+
+  const { data: districts = [], isLoading: isLoadingDistricts } = useQuery({
+    queryKey: ["districts", country],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/districts/?country=${country}`);
+      return response.data;
+    },
+    enabled: country !== null && country > 0,
+  });
+
+  const { data: clubs = [], isLoading: isLoadingClubs } = useQuery({
+    queryKey: ["clubs", district],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/clubs/?id_district=${district}`);
+      return response.data;
+    },
+    enabled: district !== null && district > 0,
   });
 
   useEffect(() => {
     if (initialData) {
       reset(initialData);
+      // Set country and district from the staff's club
+      // Check if initialData is a Staff object (has club property)
+      if ("club" in initialData && initialData.club) {
+        setCountry(initialData.club.id_country);
+        setDistrict(initialData.club.id_district);
+      }
     }
   }, [initialData, reset]);
 
@@ -198,6 +225,58 @@ export default function StaffForm({
                 </TextField>
               )}
             />
+            <Autocomplete
+              value={countries.find((c: Country) => c.id === country) || null}
+              onChange={(_event, newValue) => {
+                setCountry(newValue?.id || null);
+                setDistrict(null);
+                setValue("id_club", undefined);
+              }}
+              options={countries}
+              getOptionLabel={(option) => option.name}
+              fullWidth
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Country"
+                  placeholder="Select country"
+                />
+              )}
+            />
+
+            <Autocomplete
+              value={districts.find((d: District) => d.id === district) || null}
+              onChange={(_event, newValue) => {
+                setDistrict(newValue?.id || null);
+                setValue("id_club", undefined);
+              }}
+              options={districts}
+              getOptionLabel={(option) => option.number.toString()}
+              disabled={!country || isLoadingDistricts}
+              loading={isLoadingDistricts}
+              fullWidth
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="District"
+                  placeholder="Select district"
+                  slotProps={{
+                    input: {
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {isLoadingDistricts ? (
+                            <CircularProgress color="inherit" size={20} />
+                          ) : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    },
+                  }}
+                />
+              )}
+            />
+
             <Controller
               name="id_club"
               control={control}
@@ -208,9 +287,8 @@ export default function StaffForm({
                     field.onChange(newValue?.id || undefined);
                   }}
                   options={clubs}
-                  getOptionLabel={(option) =>
-                    `${option.name} - ${option.country}, District ${option.district}`
-                  }
+                  getOptionLabel={(option) => option.name}
+                  disabled={!district || isLoadingClubs}
                   loading={isLoadingClubs}
                   fullWidth
                   renderInput={(params) => (

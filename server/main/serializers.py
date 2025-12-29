@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import (
     Club,
     Family,
+    FamilyMember,
     Student,
     Country,
     District,
@@ -16,7 +17,7 @@ from .models import (
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
-        fields = ["id", "name", "code"]
+        fields = "__all__"
 
 
 class DistrictSerializer(serializers.ModelSerializer):
@@ -26,33 +27,51 @@ class DistrictSerializer(serializers.ModelSerializer):
 
 
 class ClubSerializer(serializers.ModelSerializer):
-    district = serializers.SerializerMethodField()
-    country = serializers.SerializerMethodField()
-
     class Meta:
         model = Club
-        fields = ["id", "country", "district", "name", "city"]
+        fields = "__all__"
+        extra_kwargs = {"is_active": {"required": False, "default": True}}
 
-    def get_district(self, obj):
-        return obj.id_district.number if obj.id_district else None
-
-    def get_country(self, obj):
-        return (
-            obj.id_district.id_country.name
-            if obj.id_district and obj.id_district.id_country
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["district"] = (
+            instance.id_district.number if instance.id_district else None
+        )
+        representation["country"] = (
+            instance.id_district.id_country.name
+            if instance.id_district and instance.id_district.id_country
             else None
         )
+        representation["id_country"] = (
+            instance.id_district.id_country.id
+            if instance.id_district and instance.id_district.id_country
+            else None
+        )
+        return representation
 
 
 class FamilySerializer(serializers.ModelSerializer):
-    club = serializers.SerializerMethodField()
+    club = ClubSerializer(source="id_club", read_only=True)
 
     class Meta:
         model = Family
-        fields = ["id", "name", "club", "city", "address", "notes"]
+        fields = "__all__"
+        extra_kwargs = {"is_active": {"required": False, "default": True}}
 
-    def get_club(self, obj):
-        return obj.id_club.name if obj.id_club else None
+
+class FamilyMemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FamilyMember
+        fields = "__all__"
+        extra_kwargs = {"is_active": {"required": False, "default": True}}
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["family_name"] = (
+            instance.id_family.name if instance.id_family else None
+        )
+        representation["gender_name"] = GENDER_MAP.get(instance.gender, "unknown")
+        return representation
 
 
 class StudentSerializer(serializers.ModelSerializer):
@@ -172,6 +191,8 @@ class ExchangeSerializer(serializers.ModelSerializer):
 
 
 class StaffSerializer(serializers.ModelSerializer):
+    club = ClubSerializer(source="id_club", read_only=True)
+
     class Meta:
         model = Staff
         fields = "__all__"
@@ -179,6 +200,5 @@ class StaffSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation["club_name"] = instance.id_club.name if instance.id_club else ""
         representation["gender_name"] = GENDER_MAP.get(instance.gender, "unknown")
         return representation

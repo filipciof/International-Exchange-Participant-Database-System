@@ -33,6 +33,8 @@ class Club(models.Model):
     name = models.CharField(max_length=30)
     city = models.CharField(max_length=30, blank=True, default="")
 
+    is_active = models.BooleanField(default=True)
+
     class Meta:
         db_table = "club"
 
@@ -45,6 +47,8 @@ class Family(models.Model):
     city = models.CharField(max_length=60, blank=True, default="")
     address = models.CharField(max_length=60, blank=True, default="")
     notes = models.TextField(max_length=60, blank=True, default="")
+
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = "family"
@@ -80,6 +84,8 @@ class FamilyMember(models.Model):
 
     is_head_of_family = models.BooleanField(default=False)
     occupation = models.CharField(max_length=30, blank=True, default="")
+
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = "familyMember"

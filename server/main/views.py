@@ -1,6 +1,7 @@
 from .models import (
     Club,
     Family,
+    FamilyMember,
     Country,
     District,
     Exchange,
@@ -10,6 +11,7 @@ from .models import (
 from .serializers import (
     ClubSerializer,
     FamilySerializer,
+    FamilyMemberSerializer,
     CountrySerializer,
     DistrictSerializer,
     ExchangeTypeSerializer,
@@ -87,8 +89,32 @@ class ClubView(APIView):
             )
 
         clubs = Club.objects.order_by("-id")
-        page = request.query_params.get("page")
+        clubs = clubs.filter(is_active=True)
 
+        id = request.query_params.get("id")
+        if id:
+            club = clubs.get(id=id)
+            serializer = ClubSerializer(club)
+            return Response(serializer.data)
+        
+        id_district = request.query_params.get("id_district")
+        if id_district:
+            clubs = clubs.filter(id_district=id_district)
+
+        search = request.query_params.get("search")
+        if search:
+            search_query = Q()
+            search_fields = [
+                "name",
+                "city",
+            ]
+
+            for field in search_fields:
+                search_query |= Q(**{f"{field}__icontains": search})
+
+            clubs = clubs.filter(search_query)
+
+        page = request.query_params.get("page")
         if page:
             paginator = PageNumberPagination()
             paginator.page_size = min(
@@ -100,6 +126,53 @@ class ClubView(APIView):
 
         serializer = ClubSerializer(clubs, many=True)
         return Response(serializer.data)
+
+    def post(self, request):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        data = request.data.copy()
+        serializer = ClubSerializer(data=data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data, status=HTTP_201_CREATED)
+
+    def patch(self, request, pk=None):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        try:
+            club = Club.objects.get(pk=pk, is_active=True)
+        except Club.DoesNotExist:
+            return Response({"message": "Club not found."}, status=HTTP_404_NOT_FOUND)
+
+        data = request.data.copy()
+        serializer = ClubSerializer(club, data=data, partial=True)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        club = serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, pk=None):
+        updated = Club.objects.filter(id=pk).update(is_active=False)
+        if updated == 0:
+            return Response({"error": "Club not found"}, status=HTTP_404_NOT_FOUND)
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 class FamilyView(APIView):
@@ -113,11 +186,192 @@ class FamilyView(APIView):
             )
 
         families = Family.objects.order_by("-id")
-        paginator = PageNumberPagination()
-        paginator.page_size = min(int(request.query_params.get("page_size", 25)), 100)
-        result_page = paginator.paginate_queryset(families, request, view=self)
-        serializer = FamilySerializer(result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        families = families.filter(is_active=True)
+
+        id = request.query_params.get("id")
+        if id:
+            family = families.get(id=id)
+            serializer = FamilySerializer(family)
+            return Response(serializer.data)
+
+        search = request.query_params.get("search")
+        if search:
+            search_query = Q()
+            search_fields = [
+                "name",
+                "city",
+                "address",
+            ]
+
+            for field in search_fields:
+                search_query |= Q(**{f"{field}__icontains": search})
+
+            families = families.filter(search_query)
+
+        page = request.query_params.get("page")
+        if page:
+            paginator = PageNumberPagination()
+            paginator.page_size = min(
+                int(request.query_params.get("page_size", 25)), 100
+            )
+            result_page = paginator.paginate_queryset(families, request, view=self)
+            serializer = FamilySerializer(result_page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
+        serializer = FamilySerializer(families, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        data = request.data.copy()
+        serializer = FamilySerializer(data=data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data, status=HTTP_201_CREATED)
+
+    def patch(self, request, pk=None):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        try:
+            family = Family.objects.get(pk=pk, is_active=True)
+        except Family.DoesNotExist:
+            return Response({"message": "Family not found."}, status=HTTP_404_NOT_FOUND)
+
+        data = request.data.copy()
+        serializer = FamilySerializer(family, data=data, partial=True)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        family = serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, pk=None):
+        updated = Family.objects.filter(id=pk).update(is_active=False)
+        if updated == 0:
+            return Response({"error": "Family not found"}, status=HTTP_404_NOT_FOUND)
+        return Response(status=HTTP_204_NO_CONTENT)
+
+
+class FamilyMemberView(APIView):
+    def get(self, request):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(get_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        family_members = FamilyMember.objects.order_by("-id")
+        family_members = family_members.filter(is_active=True)
+
+        id = request.query_params.get("id")
+        if id:
+            family_member = family_members.get(id=id)
+            serializer = FamilyMemberSerializer(family_member)
+            return Response(serializer.data)
+        
+        id_family = request.query_params.get("id_family")
+        if id_family:
+            family_members = family_members.filter(id_family=id_family)
+            serializer = FamilyMemberSerializer(family_members, many=True)
+            return Response(serializer.data)
+
+        search = request.query_params.get("search")
+        if search:
+            search_query = Q()
+            search_fields = [
+                "first_name",
+                "middle_name",
+                "last_name",
+                "email",
+                "phone",
+                "occupation",
+            ]
+
+            for field in search_fields:
+                search_query |= Q(**{f"{field}__icontains": search})
+
+            family_members = family_members.filter(search_query)
+
+        page = request.query_params.get("page")
+        if page:
+            paginator = PageNumberPagination()
+            paginator.page_size = min(
+                int(request.query_params.get("page_size", 25)), 100
+            )
+            result_page = paginator.paginate_queryset(
+                family_members, request, view=self
+            )
+            serializer = FamilyMemberSerializer(result_page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
+        serializer = FamilyMemberSerializer(family_members, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        data = request.data.copy()
+        serializer = FamilySerializer(data=data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data, status=HTTP_201_CREATED)
+
+    def patch(self, request, pk=None):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        try:
+            family = Family.objects.get(pk=pk, is_active=True)
+        except Family.DoesNotExist:
+            return Response({"message": "Family not found."}, status=HTTP_404_NOT_FOUND)
+
+        data = request.data.copy()
+        serializer = FamilySerializer(family, data=data, partial=True)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        family = serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, pk=None):
+        updated = Family.objects.filter(id=pk).update(is_active=False)
+        if updated == 0:
+            return Response({"error": "Family not found"}, status=HTTP_404_NOT_FOUND)
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 class ExchangeTypeView(APIView):
@@ -147,13 +401,12 @@ class ExchangeView(APIView):
 
         exchanges = Exchange.objects.order_by("-id")
         exchanges = exchanges.filter(is_active=True)
-        id_student = request.query_params.get("id_student")
 
+        id_student = request.query_params.get("id_student")
         if id_student:
             exchanges = exchanges.filter(id_student=id_student)
 
         page = request.query_params.get("page")
-
         if page:
             paginator = PageNumberPagination()
             paginator.page_size = min(
@@ -227,15 +480,15 @@ class StaffView(APIView):
             )
 
         staff = Staff.objects.order_by("-id")
-        search = request.query_params.get("search")
+        staff = staff.filter(is_active=True)
 
         id = request.query_params.get("id")
-
         if id:
             staff = staff.get(id=id)
             serializer = StaffSerializer(staff)
             return Response(serializer.data)
 
+        search = request.query_params.get("search")
         if search:
             search_query = Q()
             search_fields = [
@@ -252,7 +505,6 @@ class StaffView(APIView):
             staff = staff.filter(search_query)
 
         page = request.query_params.get("page")
-
         if page:
             paginator = PageNumberPagination()
             paginator.page_size = min(

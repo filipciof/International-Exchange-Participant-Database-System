@@ -1,17 +1,19 @@
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography, Link } from "@mui/material";
 
 type InfoItemProps = {
   label: string;
-  value: string | number | Date | null | undefined;
+  value: string | number | null | undefined;
+  linkPath?: string | null;
   fullWidth?: boolean;
 };
 
-export default function InfoItem({ label, value, fullWidth = false }: InfoItemProps) {
-  const displayValue = value
-    ? value instanceof Date
-      ? value.toLocaleDateString()
-      : value
-    : "—";
+export default function InfoItem({
+  label,
+  value,
+  linkPath,
+  fullWidth = false,
+}: InfoItemProps) {
+  const displayValue = value?.toString() || "—";
 
   return (
     <Grid size={{ xs: 12, sm: fullWidth ? 12 : 6, md: fullWidth ? 12 : 4 }}>
@@ -24,7 +26,17 @@ export default function InfoItem({ label, value, fullWidth = false }: InfoItemPr
           {label}
         </Typography>
         <Typography variant="body2" sx={{ mt: 0.5 }}>
-          {displayValue}
+          {linkPath ? (
+            <Link
+              href={linkPath}
+              underline="hover"
+              sx={{ cursor: "pointer" }}
+            >
+              {displayValue}
+            </Link>
+          ) : (
+            displayValue
+          )}
         </Typography>
       </Box>
     </Grid>

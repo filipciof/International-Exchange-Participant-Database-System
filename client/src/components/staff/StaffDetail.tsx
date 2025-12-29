@@ -119,10 +119,17 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
       </Card>
 
       {/* Club Information */}
-      {staff.club_name && (
+      {staff.club && (
         <Section title="Club Information" icon={<Business />}>
           <Grid container spacing={3}>
-            <InfoItem label="Club" value={staff.club_name} fullWidth />
+            <InfoItem label="Country" value={staff.club.country} />
+            <InfoItem label="District" value={staff.club.district} />
+            <InfoItem
+              label="Club"
+              value={staff.club.name}
+              linkPath={`/clubs?id=${staff.club.id}&view=detail`}
+              fullWidth
+            />
           </Grid>
         </Section>
       )}
