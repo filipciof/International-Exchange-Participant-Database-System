@@ -288,6 +288,8 @@ class ExchangeFamily(models.Model):
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
 
+    is_active = models.BooleanField(default=True)
+
     class Meta:
         db_table = "exchangeFamily"
 
@@ -308,6 +310,8 @@ class Document(models.Model):
     id_district = models.ForeignKey(
         District, null=True, on_delete=models.SET_NULL, db_column="id_district"
     )
+
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = "document"

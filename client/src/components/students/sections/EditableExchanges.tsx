@@ -22,6 +22,7 @@ import Section from "../../Section";
 import AddEditExchangeDialog from "./AddEditExchangeDialog";
 import DeleteConfirmationDialog from "../../DeleteConfirmationDialog";
 import InfoItem from "../../InfoItem";
+import EditableExchangeFamilies from "./EditableExchangeFamilies";
 
 type EditableExchangesProps = {
   studentId: number;
@@ -317,6 +318,8 @@ export default function EditableExchanges({
                       />
                     )}
                   </Grid>
+
+                  <EditableExchangeFamilies exchangeId={exchange.id} id_receiving_club={exchange.id_receiving_club}/>
                 </Paper>
               ))}
             </Stack>

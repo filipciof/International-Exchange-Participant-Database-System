@@ -2,68 +2,92 @@ import * as React from "react";
 import { Autocomplete, TextField, CircularProgress, Box } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
-import type { Staff } from "../utils/types";
 
-type StaffAutocompleteProps = {
-  initialStaffId: number | null;
-  handleStaffChange: (staff: Staff) => void;
+type MyAutocompleteProps<T extends { id: number }> = {
+  initialId: number | null | undefined;
+  handleChange: (item: T) => void;
   label: string;
+  endpoint: string;
+  getOptionLabel: (item: T) => string;
+  searchParam?: string;
+  params?: Record<string, string>;
 };
 
-export default function StaffAutocomplete({
-  initialStaffId,
-  handleStaffChange,
+export default function MyAutocomplete<T extends { id: number }>({
+  initialId,
+  handleChange,
   label,
-}: StaffAutocompleteProps) {
+  endpoint,
+  getOptionLabel,
+  searchParam = "search",
+  params,
+}: MyAutocompleteProps<T>) {
   /* -------------------------------------------------
    * State
    * ------------------------------------------------- */
-  const [value, setValue] = React.useState<Staff | null>(null);
+  const [value, setValue] = React.useState<T | null>(null);
   const [inputValue, setInputValue] = React.useState("");
   const [search, setSearch] = React.useState("");
   const [page, setPage] = React.useState(1);
-  const [options, setOptions] = React.useState<Staff[]>([]);
+  const [options, setOptions] = React.useState<T[]>([]);
   const [hasMore, setHasMore] = React.useState(true);
 
   const listboxRef = React.useRef<HTMLUListElement | null>(null);
   const scrollTopRef = React.useRef(0);
+  const hasSetInitialValue = React.useRef(false);
 
   /* -------------------------------------------------
-   * Initial staff (single entity)
+   * Initial item (single entity)
    * ------------------------------------------------- */
-  const { data: initialStaff } = useQuery<Staff>({
-    queryKey: ["staff", initialStaffId],
-    enabled: !!initialStaffId,
+  const { data: initialItem } = useQuery<T>({
+    queryKey: [endpoint, initialId, params],
+    enabled: !!initialId,
     queryFn: async () => {
-      const res = await axiosClient.get(`/staff/?id=${initialStaffId}`);
+      const searchParams = new URLSearchParams({ id: String(initialId) });
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          searchParams.append(key, value);
+        });
+      }
+      const res = await axiosClient.get(
+        `/${endpoint}/?${searchParams.toString()}`,
+      );
       return res.data;
     },
   });
 
   React.useEffect(() => {
-    if (initialStaff && !value) {
-      setValue(initialStaff);
+    if (initialItem && !hasSetInitialValue.current) {
+      setValue(initialItem);
       setOptions((prev) =>
-        prev.some((o) => o.id === initialStaff.id)
+        prev.some((o) => o.id === initialItem.id)
           ? prev
-          : [initialStaff, ...prev],
+          : [initialItem, ...prev],
       );
+      hasSetInitialValue.current = true;
     }
-  }, [initialStaff, value]);
+  }, [initialItem]);
 
   /* -------------------------------------------------
-   * Staff search (paginated)
+   * Item search (paginated)
    * ------------------------------------------------- */
   const { data, isFetching } = useQuery({
-    queryKey: ["staff-search", search, page],
+    queryKey: [endpoint, search, page, params],
     queryFn: async () => {
-      const params = new URLSearchParams({
+      const searchParams = new URLSearchParams({
         page: page.toString(),
         page_size: "25",
       });
-      if (search) params.append("search", search);
+      if (search) searchParams.append(searchParam, search);
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          searchParams.append(key, value);
+        });
+      }
 
-      const res = await axiosClient.get(`/staff/?${params.toString()}`);
+      const res = await axiosClient.get(
+        `/${endpoint}/?${searchParams.toString()}`,
+      );
       return res.data;
     },
     placeholderData: (previousData) => previousData,
@@ -148,19 +172,19 @@ export default function StaffAutocomplete({
    * Render
    * ------------------------------------------------- */
   return (
-    <Autocomplete<Staff>
+    <Autocomplete<T>
       value={value}
       inputValue={inputValue}
       options={options}
       loading={isFetching && page === 1}
       filterOptions={(x) => x}
       isOptionEqualToValue={(o, v) => o.id === v.id}
-      getOptionLabel={(o) => `${o.first_name} ${o.last_name}`}
+      getOptionLabel={getOptionLabel}
       slots={{ listbox: ListboxComponent }}
       onChange={(_, newValue) => {
         setValue(newValue);
         if (newValue) {
-          handleStaffChange(newValue);
+          handleChange(newValue);
         }
       }}
       onInputChange={(_, newInput, reason) => {
@@ -173,14 +197,16 @@ export default function StaffAutocomplete({
         <TextField
           {...params}
           label={label}
-          InputProps={{
-            ...params.InputProps,
-            endAdornment: (
-              <>
-                {isFetching && page === 1 && <CircularProgress size={20} />}
-                {params.InputProps.endAdornment}
-              </>
-            ),
+          slotProps={{
+            input: {
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {isFetching && page === 1 && <CircularProgress size={20} />}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            },
           }}
         />
       )}

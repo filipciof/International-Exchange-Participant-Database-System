@@ -304,6 +304,25 @@ export const familyMemberSchema = z.object({
 
 export type FamilyMemberFormData = z.infer<typeof familyMemberSchema>;
 
+export type ExchangeFamily = {
+  id: number;
+  id_exchange: number;
+  id_family: number | null;
+  family_name: string;
+  student_name: string;
+  start_date: string;
+  end_date: string;
+};
+
+export const exchangeFamilySchema = z.object({
+  id_exchange: z.number().nullable().optional(),
+  id_family: z.number().nullable().optional(),
+  start_date: z.string().nullable().optional(),
+  end_date: z.string().nullable().optional(),
+});
+
+export type ExchangeFamilyFormData = z.infer<typeof exchangeFamilySchema>;
+
 export type SearchableField = {
   value: string;
   label: string;

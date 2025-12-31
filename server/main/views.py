@@ -1,5 +1,8 @@
+from pickletools import read_uint1
 from .models import (
     Club,
+    Document,
+    ExchangeFamily,
     Family,
     FamilyMember,
     Country,
@@ -10,6 +13,8 @@ from .models import (
 )
 from .serializers import (
     ClubSerializer,
+    DocumentSerializer,
+    ExchangeFamilySerializer,
     FamilySerializer,
     FamilyMemberSerializer,
     CountrySerializer,
@@ -96,7 +101,7 @@ class ClubView(APIView):
             club = clubs.get(id=id)
             serializer = ClubSerializer(club)
             return Response(serializer.data)
-        
+
         id_district = request.query_params.get("id_district")
         if id_district:
             clubs = clubs.filter(id_district=id_district)
@@ -193,6 +198,10 @@ class FamilyView(APIView):
             family = families.get(id=id)
             serializer = FamilySerializer(family)
             return Response(serializer.data)
+        
+        id_club = request.query_params.get("id_club")
+        if id_club:
+            families = families.filter(id_club=id_club)
 
         search = request.query_params.get("search")
         if search:
@@ -287,7 +296,7 @@ class FamilyMemberView(APIView):
             family_member = family_members.get(id=id)
             serializer = FamilyMemberSerializer(family_member)
             return Response(serializer.data)
-        
+
         id_family = request.query_params.get("id_family")
         if id_family:
             family_members = family_members.filter(id_family=id_family)
@@ -467,6 +476,216 @@ class ExchangeView(APIView):
 
         exchange = serializer.save()
         return Response(serializer.data)
+
+
+class ExchangeFamilyView(APIView):
+    def get(self, request):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(get_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        exchange_families = ExchangeFamily.objects.order_by("-id")
+        exchange_families = exchange_families.filter(is_active=True)
+
+        id = request.query_params.get("id")
+        if id:
+            exchange_family = exchange_families.get(id=id)
+            serializer = ExchangeFamilySerializer(exchange_family)
+            return Response(serializer.data)
+
+        id_exchange = request.query_params.get("id_exchange")
+        if id_exchange:
+            exchange_families = exchange_families.filter(id_exchange=id_exchange)
+        
+        id_family = request.query_params.get("id_family")
+        if id_family:
+            exchange_families = exchange_families.filter(id_family=id_family)
+
+        search = request.query_params.get("search")
+        if search:
+            search_query = Q()
+            search_fields = [
+                "id_family__name",
+                "id_family__city",
+                "id_family__address",
+            ]
+
+            for field in search_fields:
+                search_query |= Q(**{f"{field}__icontains": search})
+
+            exchange_families = exchange_families.filter(search_query)
+
+        page = request.query_params.get("page")
+        if page:
+            paginator = PageNumberPagination()
+            paginator.page_size = min(
+                int(request.query_params.get("page_size", 25)), 100
+            )
+            result_page = paginator.paginate_queryset(
+                exchange_families, request, view=self
+            )
+            serializer = ExchangeFamilySerializer(result_page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
+        serializer = ExchangeFamilySerializer(exchange_families, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        data = request.data.copy()
+        serializer = ExchangeFamilySerializer(data=data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data, status=HTTP_201_CREATED)
+
+    def patch(self, request, pk=None):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        try:
+            exchange_family = ExchangeFamily.objects.get(pk=pk, is_active=True)
+        except ExchangeFamily.DoesNotExist:
+            return Response(
+                {"message": "ExchangeFamily not found."}, status=HTTP_404_NOT_FOUND
+            )
+
+        data = request.data.copy()
+        serializer = ExchangeFamilySerializer(exchange_family, data=data, partial=True)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        exchange_family = serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, pk=None):
+        updated = ExchangeFamily.objects.filter(id=pk).update(is_active=False)
+        if updated == 0:
+            return Response(
+                {"error": "ExchangeFamily not found"}, status=HTTP_404_NOT_FOUND
+            )
+        return Response(status=HTTP_204_NO_CONTENT)
+
+
+class DocumentView(APIView):
+    def get(self, request):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(get_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        documents = Document.objects.order_by("-id")
+        documents = documents.filter(is_active=True)
+
+        id = request.query_params.get("id")
+        if id:
+            document = documents.get(id=id)
+            serializer = DocumentSerializer(document)
+            return Response(serializer.data)
+
+        id_student = request.query_params.get("id_student")
+        if id_student:
+            documents = documents.filter(id_student=id_student)
+
+        id_staff = request.query_params.get("id_staff")
+        if id_staff:
+            documents = documents.filter(id_staff=id_staff)
+
+        id_club = request.query_params.get("id_club")
+        if id_club:
+            documents = documents.filter(id_club=id_club)
+
+        id_family = request.query_params.get("id_family")
+        if id_family:
+            documents = documents.filter(id_family=id_family)
+
+        id_district = request.query_params.get("id_district")
+        if id_district:
+            documents = documents.filter(id_district=id_district)
+
+        page = request.query_params.get("page")
+        if page:
+            paginator = PageNumberPagination()
+            paginator.page_size = min(
+                int(request.query_params.get("page_size", 25)), 100
+            )
+            result_page = paginator.paginate_queryset(documents, request, view=self)
+            serializer = DocumentSerializer(result_page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
+        serializer = DocumentSerializer(documents, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        data = request.data.copy()
+        serializer = DocumentSerializer(data=data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+        return Response(serializer.data, status=HTTP_201_CREATED)
+
+    def patch(self, request, pk=None):
+        user_groups = request.user.groups.values_list("name", flat=True)
+
+        if not set(user_groups).intersection(crud_allowed_groups):
+            return Response(
+                {"message": "You are not authorized to do this."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        try:
+            document = Document.objects.get(pk=pk, is_active=True)
+        except Document.DoesNotExist:
+            return Response(
+                {"message": "Document not found."}, status=HTTP_404_NOT_FOUND
+            )
+
+        data = request.data.copy()
+        serializer = DocumentSerializer(document, data=data, partial=True)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        document = serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request, pk=None):
+        updated = Document.objects.filter(id=pk).update(is_active=False)
+        if updated == 0:
+            return Response({"error": "Document not found"}, status=HTTP_404_NOT_FOUND)
+        return Response(status=HTTP_204_NO_CONTENT)
 
 
 class StaffView(APIView):

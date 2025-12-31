@@ -27,8 +27,8 @@ import type {
 } from "../../../utils/types";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
-import StaffAutocomplete from "../../StaffAutocomplete";
 import { handleValidationErrors } from "../../../utils/handleValidationErrors";
+import MyAutocomplete from "../../MyAutocomplete";
 
 type AddEditExchangeDialogProps = {
   dialogOpen: boolean;
@@ -56,7 +56,9 @@ export default function AddEditExchangeDialog({
   const [sendingCountry, setSendingCountry] = useState<number | null>(null);
   const [sendingDistrict, setSendingDistrict] = useState<number | null>(null);
   const [receivingCountry, setReceivingCountry] = useState<number | null>(null);
-  const [receivingDistrict, setReceivingDistrict] = useState<number | null>(null);
+  const [receivingDistrict, setReceivingDistrict] = useState<number | null>(
+    null,
+  );
 
   const { data: exchangeTypes } = useQuery({
     queryKey: ["exchangeTypes"],
@@ -74,18 +76,22 @@ export default function AddEditExchangeDialog({
     },
   });
 
-  const { data: sendingDistricts = [], isLoading: isLoadingSendingDistricts } = useQuery({
-    queryKey: ["districts", sendingCountry],
-    queryFn: async () => {
-      const response = await axiosClient.get(
-        `/districts/?country=${sendingCountry}`,
-      );
-      return response.data;
-    },
-    enabled: sendingCountry !== null && sendingCountry > 0,
-  });
+  const { data: sendingDistricts = [], isLoading: isLoadingSendingDistricts } =
+    useQuery({
+      queryKey: ["districts", sendingCountry],
+      queryFn: async () => {
+        const response = await axiosClient.get(
+          `/districts/?country=${sendingCountry}`,
+        );
+        return response.data;
+      },
+      enabled: sendingCountry !== null && sendingCountry > 0,
+    });
 
-  const { data: receivingDistricts = [], isLoading: isLoadingReceivingDistricts } = useQuery({
+  const {
+    data: receivingDistricts = [],
+    isLoading: isLoadingReceivingDistricts,
+  } = useQuery({
     queryKey: ["districts", receivingCountry],
     queryFn: async () => {
       const response = await axiosClient.get(
@@ -96,27 +102,29 @@ export default function AddEditExchangeDialog({
     enabled: receivingCountry !== null && receivingCountry > 0,
   });
 
-  const { data: sendingClubs = [], isLoading: isLoadingSendingClubs } = useQuery({
-    queryKey: ["clubs", sendingDistrict],
-    queryFn: async () => {
-      const response = await axiosClient.get(
-        `/clubs/?id_district=${sendingDistrict}`,
-      );
-      return response.data;
-    },
-    enabled: sendingDistrict !== null && sendingDistrict > 0,
-  });
+  const { data: sendingClubs = [], isLoading: isLoadingSendingClubs } =
+    useQuery({
+      queryKey: ["clubs", sendingDistrict],
+      queryFn: async () => {
+        const response = await axiosClient.get(
+          `/clubs/?id_district=${sendingDistrict}`,
+        );
+        return response.data;
+      },
+      enabled: sendingDistrict !== null && sendingDistrict > 0,
+    });
 
-  const { data: receivingClubs = [], isLoading: isLoadingReceivingClubs } = useQuery({
-    queryKey: ["clubs", receivingDistrict],
-    queryFn: async () => {
-      const response = await axiosClient.get(
-        `/clubs/?id_district=${receivingDistrict}`,
-      );
-      return response.data;
-    },
-    enabled: receivingDistrict !== null && receivingDistrict > 0,
-  });
+  const { data: receivingClubs = [], isLoading: isLoadingReceivingClubs } =
+    useQuery({
+      queryKey: ["clubs", receivingDistrict],
+      queryFn: async () => {
+        const response = await axiosClient.get(
+          `/clubs/?id_district=${receivingDistrict}`,
+        );
+        return response.data;
+      },
+      enabled: receivingDistrict !== null && receivingDistrict > 0,
+    });
 
   // Set initial country/district when editing
   useEffect(() => {
@@ -218,7 +226,9 @@ export default function AddEditExchangeDialog({
           <Divider sx={{ my: 1 }}>Sending Club</Divider>
 
           <Autocomplete
-            value={countries.find((c: Country) => c.id === sendingCountry) || null}
+            value={
+              countries.find((c: Country) => c.id === sendingCountry) || null
+            }
             onChange={(_event, newValue) => {
               setSendingCountry(newValue?.id || null);
               setSendingDistrict(null);
@@ -237,7 +247,11 @@ export default function AddEditExchangeDialog({
           />
 
           <Autocomplete
-            value={sendingDistricts.find((d: District) => d.id === sendingDistrict) || null}
+            value={
+              sendingDistricts.find(
+                (d: District) => d.id === sendingDistrict,
+              ) || null
+            }
             onChange={(_event, newValue) => {
               setSendingDistrict(newValue?.id || null);
               setFormData({ ...formData, id_sending_club: null });
@@ -270,9 +284,16 @@ export default function AddEditExchangeDialog({
           />
 
           <Autocomplete
-            value={sendingClubs.find((c: Club) => c.id === formData.id_sending_club) || null}
+            value={
+              sendingClubs.find(
+                (c: Club) => c.id === formData.id_sending_club,
+              ) || null
+            }
             onChange={(_event, newValue) => {
-              setFormData({ ...formData, id_sending_club: newValue?.id || null });
+              setFormData({
+                ...formData,
+                id_sending_club: newValue?.id || null,
+              });
             }}
             options={sendingClubs}
             getOptionLabel={(option) => option.name}
@@ -304,7 +325,9 @@ export default function AddEditExchangeDialog({
           <Divider sx={{ my: 1 }}>Receiving Club</Divider>
 
           <Autocomplete
-            value={countries.find((c: Country) => c.id === receivingCountry) || null}
+            value={
+              countries.find((c: Country) => c.id === receivingCountry) || null
+            }
             onChange={(_event, newValue) => {
               setReceivingCountry(newValue?.id || null);
               setReceivingDistrict(null);
@@ -323,7 +346,11 @@ export default function AddEditExchangeDialog({
           />
 
           <Autocomplete
-            value={receivingDistricts.find((d: District) => d.id === receivingDistrict) || null}
+            value={
+              receivingDistricts.find(
+                (d: District) => d.id === receivingDistrict,
+              ) || null
+            }
             onChange={(_event, newValue) => {
               setReceivingDistrict(newValue?.id || null);
               setFormData({ ...formData, id_receiving_club: null });
@@ -356,9 +383,16 @@ export default function AddEditExchangeDialog({
           />
 
           <Autocomplete
-            value={receivingClubs.find((c: Club) => c.id === formData.id_receiving_club) || null}
+            value={
+              receivingClubs.find(
+                (c: Club) => c.id === formData.id_receiving_club,
+              ) || null
+            }
             onChange={(_event, newValue) => {
-              setFormData({ ...formData, id_receiving_club: newValue?.id || null });
+              setFormData({
+                ...formData,
+                id_receiving_club: newValue?.id || null,
+              });
             }}
             options={receivingClubs}
             getOptionLabel={(option) => option.name}
@@ -389,20 +423,28 @@ export default function AddEditExchangeDialog({
 
           <Divider sx={{ my: 1 }}>Staff</Divider>
 
-          <StaffAutocomplete
-            initialStaffId={formData.id_counsellor}
-            handleStaffChange={(staff: Staff) => {
+          <MyAutocomplete
+            initialId={formData.id_counsellor}
+            handleChange={(staff: Staff) => {
               setFormData({ ...formData, id_counsellor: staff.id });
             }}
             label="Counsellor"
+            endpoint="staff"
+            getOptionLabel={(item: Staff) =>
+              `${item.first_name} ${item.last_name}`
+            }
           />
 
-          <StaffAutocomplete
-            initialStaffId={formData.id_kwm_officer}
-            handleStaffChange={(staff: Staff) => {
+          <MyAutocomplete
+            initialId={formData.id_kwm_officer}
+            handleChange={(staff: Staff) => {
               setFormData({ ...formData, id_kwm_officer: staff.id });
             }}
             label="KWM Officer"
+            endpoint="staff"
+            getOptionLabel={(item: Staff) =>
+              `${item.first_name} ${item.last_name}`
+            }
           />
         </Stack>
       </DialogContent>

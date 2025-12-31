@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import (
     Club,
+    Document,
+    ExchangeFamily,
     Family,
     FamilyMember,
     Student,
@@ -190,6 +192,34 @@ class ExchangeSerializer(serializers.ModelSerializer):
         return representation
 
 
+class ExchangeFamilySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExchangeFamily
+        fields = "__all__"
+        extra_kwargs = {"is_active": {"required": False, "default": True}}
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["family_name"] = (
+            instance.id_family.name if instance.id_family else ""
+        )
+        representation["student_name"] = (
+            " ".join(
+                filter(
+                    None,
+                    [
+                        instance.id_exchange.id_student.first_name,
+                        instance.id_exchange.id_student.middle_name,
+                        instance.id_exchange.id_student.last_name,
+                    ],
+                )
+            )
+            if instance.id_exchange and instance.id_exchange.id_student
+            else ""
+        )
+        return representation
+
+
 class StaffSerializer(serializers.ModelSerializer):
     club = ClubSerializer(source="id_club", read_only=True)
 
@@ -201,4 +231,15 @@ class StaffSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation["gender_name"] = GENDER_MAP.get(instance.gender, "unknown")
+        return representation
+
+
+class DocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Document
+        fields = "__all__"
+        extra_kwargs = {"is_active": {"required": False, "default": True}}
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
         return representation
