@@ -11,6 +11,7 @@ import EditableParentInfo from "./sections/EditableParentInfo";
 import EditableInsurance from "./sections/EditableInsurance";
 import EditableExchanges from "./sections/EditableExchanges";
 import EditableNotes from "./sections/EditableNotes";
+import EditableUserAccount from "./sections/EditableUserAccount";
 import Loading from "../Loading";
 
 type StudentDetailProps = {
@@ -19,7 +20,11 @@ type StudentDetailProps = {
 };
 
 export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
-  const { data: student, isLoading: isStudentLoading } = useQuery({
+  const {
+    data: student,
+    isLoading: isStudentLoading,
+    error: studentError,
+  } = useQuery({
     queryKey: ["students", id],
     queryFn: async () => {
       const response = await axiosClient.get(`/students/?id=${id}`);
@@ -51,6 +56,14 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
 
   if (isStudentLoading) {
     return <Loading />;
+  }
+
+  if (studentError) {
+    return (
+      <Typography sx={{ color: "error.main" }}>
+        Error: {studentError.message}
+      </Typography>
+    );
   }
 
   return (
@@ -86,6 +99,9 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
 
       {/* Insurance Information */}
       <EditableInsurance student={student} />
+
+      {/* User Account */}
+      <EditableUserAccount student={student} />
 
       {/* Exchange History */}
       <EditableExchanges studentId={student.id} />

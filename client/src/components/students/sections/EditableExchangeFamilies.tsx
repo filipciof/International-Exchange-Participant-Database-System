@@ -20,11 +20,13 @@ import InfoItem from "../../InfoItem";
 type EditableExchangeFamiliesProps = {
   exchangeId: number;
   id_receiving_club: number | null;
+  readOnly?: boolean;
 };
 
 export default function EditableExchangeFamilies({
   exchangeId,
   id_receiving_club,
+  readOnly = false,
 }: EditableExchangeFamiliesProps) {
   const [dialogOpen, setDialogOpen] = useState<
     null | "update" | "add" | "delete"
@@ -155,9 +157,11 @@ export default function EditableExchangeFamilies({
             Host Families
           </Typography>
         </Box>
-        <IconButton size="small" onClick={handleOpenAddDialog}>
-          <AddIcon fontSize="small" />
-        </IconButton>
+        {!readOnly && (
+          <IconButton size="small" onClick={handleOpenAddDialog}>
+            <AddIcon fontSize="small" />
+          </IconButton>
+        )}
       </Box>
 
       {isLoading && (
@@ -248,24 +252,26 @@ export default function EditableExchangeFamilies({
                           )}
                         </Grid>
                       </Box>
-                      <Box sx={{ display: "flex", gap: 0.5 }}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleOpenEditDialog(exchangeFamily)}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            setDeletingExchangeFamily(exchangeFamily);
-                            setDialogOpen("delete");
-                          }}
-                          color="error"
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
+                      {!readOnly && (
+                        <Box sx={{ display: "flex", gap: 0.5 }}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleOpenEditDialog(exchangeFamily)}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              setDeletingExchangeFamily(exchangeFamily);
+                              setDialogOpen("delete");
+                            }}
+                            color="error"
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      )}
                     </Box>
                   </Paper>
                 ))}

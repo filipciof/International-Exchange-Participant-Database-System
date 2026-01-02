@@ -105,6 +105,9 @@ class StudentSerializer(serializers.ModelSerializer):
         representation["third_language_proficiency_name"] = LANG_PROF_MAP.get(
             instance.third_language_proficiency, ""
         )
+        representation["user_email"] = (
+            instance.id_user.email if instance.id_user else ""
+        )
 
         return representation
 

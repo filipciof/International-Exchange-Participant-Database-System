@@ -13,7 +13,7 @@ from .views import (
     StaffView,
     StaffPhotoView,
 )
-from .student_views import StudentView, StudentPhotoView
+from .student_views import StudentView, StudentPhotoView, StudentUserAccountView
 from config.settings import DEBUG
 
 not_found_url = path("", not_found_view, name="root-not-found")
@@ -29,6 +29,7 @@ urlpatterns = [
     path("family-members/<int:pk>/", FamilyMemberView.as_view()),
     path("students/", StudentView.as_view()),
     path("students/<int:pk>/", StudentView.as_view()),
+    path("students/<int:pk>/user-account/", StudentUserAccountView.as_view()),
     path("students/photos/", StudentPhotoView.as_view()),
     path("exchanges/", ExchangeView.as_view()),
     path("exchanges/<int:pk>/", ExchangeView.as_view()),

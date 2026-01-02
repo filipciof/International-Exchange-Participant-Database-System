@@ -26,6 +26,7 @@ import EditableExchangeFamilies from "./EditableExchangeFamilies";
 
 type EditableExchangesProps = {
   studentId: number;
+  readOnly?: boolean;
 };
 
 // Helper function to get current academic year in YYYY/YY format
@@ -48,6 +49,7 @@ const getCurrentAcademicYear = (): string => {
 
 export default function EditableExchanges({
   studentId,
+  readOnly = false,
 }: EditableExchangesProps) {
   const [dialogOpen, setDialogOpen] = useState<
     null | "update" | "add" | "delete"
@@ -177,11 +179,11 @@ export default function EditableExchanges({
     }
   };
 
-  const actions = (
+  const actions = !readOnly ? (
     <IconButton size="small" onClick={handleOpenAddDialog}>
       <AddIcon />
     </IconButton>
-  );
+  ) : undefined;
 
   return (
     <Section title="Exchange History" icon={<ExchangeIcon />} actions={actions}>
@@ -260,22 +262,26 @@ export default function EditableExchanges({
                           {exchange.year}
                         </Typography>
                       )}
-                      <IconButton
-                        size="small"
-                        onClick={() => handleOpenEditDialog(exchange)}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          setDeletingExchange(exchange);
-                          setDialogOpen("delete");
-                        }}
-                        color="error"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
+                      {!readOnly && (
+                        <>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleOpenEditDialog(exchange)}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              setDeletingExchange(exchange);
+                              setDialogOpen("delete");
+                            }}
+                            color="error"
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </>
+                      )}
                     </Box>
                   </Box>
 
@@ -319,7 +325,7 @@ export default function EditableExchanges({
                     )}
                   </Grid>
 
-                  <EditableExchangeFamilies exchangeId={exchange.id} id_receiving_club={exchange.id_receiving_club}/>
+                  <EditableExchangeFamilies exchangeId={exchange.id} id_receiving_club={exchange.id_receiving_club} readOnly={readOnly} />
                 </Paper>
               ))}
             </Stack>

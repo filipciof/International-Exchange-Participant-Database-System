@@ -164,6 +164,7 @@ export type Student = {
   insurance_amount: string;
   photo: string;
   notes: string;
+  user_email: string;
 };
 
 export type Club = {

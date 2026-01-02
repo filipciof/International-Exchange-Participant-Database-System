@@ -12,7 +12,7 @@ import Families from "./pages/Families";
 import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import ProtectedRoute from "./components/ProtectedRoute";
-import UserInfo from "./pages/UserInfo";
+import UserProfile from "./pages/UserProfile";
 import Contacts from "./pages/Contacts";
 import Staff from "./pages/Staff";
 
@@ -33,7 +33,7 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<UserInfo />} />
+            <Route index element={<UserProfile />} />
             <Route
               path="students"
               element={

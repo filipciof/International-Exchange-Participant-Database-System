@@ -8,12 +8,15 @@ import {
   MenuItem,
   IconButton,
   CircularProgress,
+  Autocomplete,
 } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SingleFileUpload, FileDropzoneInputBody } from "mui-file-upload";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 import type {
   StudentFormData,
   StudentFormInputs,
@@ -277,13 +280,20 @@ export default function StudentForm({
             name="date_of_birth"
             control={control}
             render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                type="date"
-                slotProps={{ inputLabel: { shrink: true } }}
-                error={!!errors.date_of_birth}
-                helperText={errors.date_of_birth?.message}
+              <DatePicker
+                label="Date of Birth"
+                format="YYYY-MM-DD"
+                value={field.value ? dayjs(field.value) : null}
+                onChange={(date) => {
+                  field.onChange(date ? date.format("YYYY-MM-DD") : "");
+                }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    error: !!errors.date_of_birth,
+                    helperText: errors.date_of_birth?.message,
+                  },
+                }}
               />
             )}
           />
@@ -294,19 +304,26 @@ export default function StudentForm({
             name="id_country_of_birth"
             control={control}
             render={({ field }) => (
-              <TextField
-                {...field}
-                select
+              <Autocomplete
+                value={
+                  countries.find((c) => c.id === field.value) || null
+                }
+                onChange={(_event, newValue) => {
+                  field.onChange(newValue?.id || undefined);
+                }}
+                options={countries}
+                getOptionLabel={(option) => option.name}
                 fullWidth
-                error={!!errors.id_country_of_birth}
-                helperText={errors.id_country_of_birth?.message}
-              >
-                {countries.map((country) => (
-                  <MenuItem key={country.id} value={country.id}>
-                    {country.name}
-                  </MenuItem>
-                ))}
-              </TextField>
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Country of Birth"
+                    placeholder="Select country"
+                    error={!!errors.id_country_of_birth}
+                    helperText={errors.id_country_of_birth?.message}
+                  />
+                )}
+              />
             )}
           />
         </QuestionField>
@@ -547,19 +564,26 @@ export default function StudentForm({
             name="id_country_of_departure"
             control={control}
             render={({ field }) => (
-              <TextField
-                {...field}
-                select
+              <Autocomplete
+                value={
+                  countries.find((c) => c.id === field.value) || null
+                }
+                onChange={(_event, newValue) => {
+                  field.onChange(newValue?.id || undefined);
+                }}
+                options={countries}
+                getOptionLabel={(option) => option.name}
                 fullWidth
-                error={!!errors.id_country_of_departure}
-                helperText={errors.id_country_of_departure?.message}
-              >
-                {countries.map((country) => (
-                  <MenuItem key={country.id} value={country.id}>
-                    {country.name}
-                  </MenuItem>
-                ))}
-              </TextField>
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Country of Departure"
+                    placeholder="Select country"
+                    error={!!errors.id_country_of_departure}
+                    helperText={errors.id_country_of_departure?.message}
+                  />
+                )}
+              />
             )}
           />
         </QuestionField>
@@ -569,19 +593,26 @@ export default function StudentForm({
             name="id_country_of_passport"
             control={control}
             render={({ field }) => (
-              <TextField
-                {...field}
-                select
+              <Autocomplete
+                value={
+                  countries.find((c) => c.id === field.value) || null
+                }
+                onChange={(_event, newValue) => {
+                  field.onChange(newValue?.id || undefined);
+                }}
+                options={countries}
+                getOptionLabel={(option) => option.name}
                 fullWidth
-                error={!!errors.id_country_of_passport}
-                helperText={errors.id_country_of_passport?.message}
-              >
-                {countries.map((country) => (
-                  <MenuItem key={country.id} value={country.id}>
-                    {country.name}
-                  </MenuItem>
-                ))}
-              </TextField>
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Country of Passport"
+                    placeholder="Select country"
+                    error={!!errors.id_country_of_passport}
+                    helperText={errors.id_country_of_passport?.message}
+                  />
+                )}
+              />
             )}
           />
         </QuestionField>
@@ -607,13 +638,20 @@ export default function StudentForm({
             name="passport_expiration_date"
             control={control}
             render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                type="date"
-                slotProps={{ inputLabel: { shrink: true } }}
-                error={!!errors.passport_expiration_date}
-                helperText={errors.passport_expiration_date?.message}
+              <DatePicker
+                label="Passport Expiration Date"
+                format="YYYY-MM-DD"
+                value={field.value ? dayjs(field.value) : null}
+                onChange={(date) => {
+                  field.onChange(date ? date.format("YYYY-MM-DD") : "");
+                }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    error: !!errors.passport_expiration_date,
+                    helperText: errors.passport_expiration_date?.message,
+                  },
+                }}
               />
             )}
           />

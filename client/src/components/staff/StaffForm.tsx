@@ -24,8 +24,8 @@ import axiosClient from "../../utils/axiosClient";
 import { handleValidationErrors } from "../../utils/handleValidationErrors";
 
 type StaffFormProps = {
-  title: string;
-  handleClose: () => void;
+  title?: string;
+  handleClose?: () => void;
   handleSubmit: (staff: StaffFormData) => void;
   isLoading: boolean;
   isSuccess: boolean;
@@ -134,7 +134,7 @@ export default function StaffForm({
   const onClose = () => {
     reset();
     setPhoto(null);
-    handleClose();
+    handleClose?.();
   };
 
   return (
@@ -148,14 +148,20 @@ export default function StaffForm({
     >
       <Paper elevation={0}>
         {/* Header with back button */}
-        <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
-          <IconButton onClick={onClose} edge="start">
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography variant="h5" component="h1">
-            {title}
-          </Typography>
-        </Stack>
+        {(title || handleClose) && (
+          <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+            {handleClose && (
+              <IconButton onClick={onClose} edge="start">
+                <ArrowBackIcon />
+              </IconButton>
+            )}
+            {title && (
+              <Typography variant="h5" component="h1">
+                {title}
+              </Typography>
+            )}
+          </Stack>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={3}>
@@ -382,9 +388,11 @@ export default function StaffForm({
                   {submitButtonText}
                 </Button>
               )}
-              <Button variant="outlined" onClick={onClose} size="large">
-                Cancel
-              </Button>
+              {handleClose && (
+                <Button variant="outlined" onClick={onClose} size="large">
+                  Cancel
+                </Button>
+              )}
             </Stack>
             {error && (
               <Stack spacing={1}>

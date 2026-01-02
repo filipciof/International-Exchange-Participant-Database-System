@@ -27,7 +27,7 @@ type StaffDetailProps = {
 };
 
 export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
-  const { data: staff, isLoading: isStaffLoading } = useQuery({
+  const { data: staff, isLoading: isStaffLoading, error: staffError } = useQuery({
     queryKey: ["staff", id],
     queryFn: async () => {
       const response = await axiosClient.get(`/staff/?id=${id}`);
@@ -50,6 +50,14 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
 
   if (isStaffLoading) {
     return <Loading />;
+  }
+  
+  if (staffError) {
+    return (
+      <Typography sx={{ color: "error.main" }}>
+        Error: {staffError.message}
+      </Typography>
+    );
   }
 
   const fullName = [staff.first_name, staff.middle_name, staff.last_name]

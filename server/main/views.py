@@ -1,4 +1,3 @@
-from pickletools import read_uint1
 from .models import (
     Club,
     Document,
@@ -10,6 +9,7 @@ from .models import (
     Exchange,
     ExchangeType,
     Staff,
+    Student,
 )
 from .serializers import (
     ClubSerializer,
@@ -40,7 +40,7 @@ import os
 from uuid import uuid4
 from django.core.files.storage import default_storage
 
-get_allowed_groups = ["admin", "correspondent", "club_officer", "kwm_officer"]
+get_allowed_groups = ["admin", "correspondent", "club_officer", "kwm_officer", "staff"]
 crud_allowed_groups = ["admin", "correspondent"]
 
 
@@ -50,14 +50,6 @@ def not_found_view(request):
 
 class CountryView(APIView):
     def get(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(get_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
         countries = Country.objects.order_by("id")
         serializer = CountrySerializer(countries, many=True)
         return Response(serializer.data)
@@ -385,14 +377,6 @@ class FamilyMemberView(APIView):
 
 class ExchangeTypeView(APIView):
     def get(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(get_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
         exchange_types = ExchangeType.objects.order_by("id")
         serializer = ExchangeTypeSerializer(exchange_types, many=True)
         return Response(serializer.data)
@@ -401,8 +385,9 @@ class ExchangeTypeView(APIView):
 class ExchangeView(APIView):
     def get(self, request):
         user_groups = request.user.groups.values_list("name", flat=True)
+        is_student = "student" in user_groups
 
-        if not set(user_groups).intersection(get_allowed_groups):
+        if not is_student and not set(user_groups).intersection(get_allowed_groups):
             return Response(
                 {"message": "You are not authorized to do this."},
                 status=HTTP_403_FORBIDDEN,
@@ -411,9 +396,21 @@ class ExchangeView(APIView):
         exchanges = Exchange.objects.order_by("-id")
         exchanges = exchanges.filter(is_active=True)
 
-        id_student = request.query_params.get("id_student")
-        if id_student:
-            exchanges = exchanges.filter(id_student=id_student)
+        # If user is a student, only allow them to see their own exchanges
+        if is_student:
+            try:
+                student = Student.objects.get(id_user=request.user, is_active=True)
+                exchanges = exchanges.filter(id_student=student.id)
+            except Student.DoesNotExist:
+                return Response(
+                    {"message": "Student profile not found for this user."},
+                    status=HTTP_404_NOT_FOUND,
+                )
+        else:
+            # For staff/admin users, allow filtering by id_student
+            id_student = request.query_params.get("id_student")
+            if id_student:
+                exchanges = exchanges.filter(id_student=id_student)
 
         page = request.query_params.get("page")
         if page:
@@ -707,6 +704,18 @@ class StaffView(APIView):
             serializer = StaffSerializer(staff)
             return Response(serializer.data)
 
+        me = request.query_params.get("me")
+        if me and me.lower() in ("true", "1"):
+            try:
+                staff_member = staff.get(id_user=request.user)
+                serializer = StaffSerializer(staff_member)
+                return Response(serializer.data)
+            except Staff.DoesNotExist:
+                return Response(
+                    {"message": "Staff profile not found for this user."},
+                    status=HTTP_404_NOT_FOUND,
+                )
+
         search = request.query_params.get("search")
         if search:
             search_query = Q()
@@ -738,14 +747,32 @@ class StaffView(APIView):
 
     def post(self, request):
         user_groups = request.user.groups.values_list("name", flat=True)
+        is_staff_user = "staff" in user_groups
+        is_admin_user = bool(set(user_groups).intersection(crud_allowed_groups))
 
-        if not set(user_groups).intersection(crud_allowed_groups):
+        if not is_staff_user and not is_admin_user:
             return Response(
                 {"message": "You are not authorized to do this."},
                 status=HTTP_403_FORBIDDEN,
             )
 
+        # If staff user, check if they already have a staff profile
+        if is_staff_user:
+            existing_staff = Staff.objects.filter(
+                id_user=request.user, is_active=True
+            ).first()
+            if existing_staff:
+                return Response(
+                    {"message": "You already have a staff profile."},
+                    status=HTTP_400_BAD_REQUEST,
+                )
+
         data = request.data.copy()
+
+        # Auto-assign id_user for staff users
+        if is_staff_user:
+            data["id_user"] = request.user.id
+
         photo = request.FILES.get("photo")
 
         if photo:
@@ -765,8 +792,10 @@ class StaffView(APIView):
 
     def patch(self, request, pk=None):
         user_groups = request.user.groups.values_list("name", flat=True)
+        is_staff_user = "staff" in user_groups
+        is_admin_user = bool(set(user_groups).intersection(crud_allowed_groups))
 
-        if not set(user_groups).intersection(crud_allowed_groups):
+        if not is_staff_user and not is_admin_user:
             return Response(
                 {"message": "You are not authorized to do this."},
                 status=HTTP_403_FORBIDDEN,
@@ -775,9 +804,22 @@ class StaffView(APIView):
         try:
             staff = Staff.objects.get(pk=pk, is_active=True)
         except Staff.DoesNotExist:
-            return Response({"message": "Staff not found."}, status=HTTP_404_NOT_FOUND)
+            return Response(
+                {"message": "Staff not found."}, status=HTTP_404_NOT_FOUND
+            )
+
+        # If staff user, verify they can only edit their own profile
+        if is_staff_user and staff.id_user != request.user:
+            return Response(
+                {"message": "You can only edit your own staff profile."},
+                status=HTTP_403_FORBIDDEN,
+            )
 
         data = request.data.copy()
+
+        # Prevent staff users from changing id_user
+        if is_staff_user and "id_user" in data:
+            del data["id_user"]
 
         photo = request.FILES.get("photo")
         if photo:

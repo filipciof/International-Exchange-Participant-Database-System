@@ -50,11 +50,24 @@ exchangeFamily: 299 751
 TODO:
 
 - Individual role based pages.
-  - For admin, creating new users (either students or staff).
-- Adding and uploading and deleting documents to student.
-
+  - Admin:
+    - Creating new users (either students or staff) (for existing students and staff or for nonexistent).
+    - Changing passwords/emails.
+    - Fully unrestricted access.
+  - Student:
+    - Adjusting your own personal information.
+    - Uploading monthly/biweekly reports.
+    - Can see his host families but cannot edit them.
+  - Correspondent/KWM officer:
+    - Basically admin except cannot create new users or change them.
+  - Club officer:
+    - Can see everything but can only modify data related to his club.
+- Tabulate StudentForm.
+- Create users for some existing staff and students.
 ---
-
+- How to add a unique indentifier for these lists in React?
+  - This is important both in terms of the error that happens in the console and the UX.
 - Regenerate the database with the academic year set for exchanges.
 - Using zod and react hook form for editable elements in the StudentDetail.
 - Filtering students by height.
+- Removing the errors from console by catching them and doing nothing.
