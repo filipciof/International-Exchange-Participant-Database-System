@@ -1,8 +1,11 @@
+import { useState } from "react";
 import {
   Box,
   Typography,
   IconButton,
   Stack,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import {
   ArrowBack,
@@ -22,6 +25,7 @@ type StaffDetailProps = {
 };
 
 export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
+  const [activeTab, setActiveTab] = useState(0);
   const { data: staff, isLoading: isStaffLoading, error: staffError } = useQuery({
     queryKey: ["staff", id],
     queryFn: async () => {
@@ -75,17 +79,43 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
         staffId={id}
       />
 
+      {/* Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+        <Tabs
+          value={activeTab}
+          onChange={(_, newValue) => setActiveTab(newValue)}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
+          <Tab label="All" />
+          <Tab label="Club" />
+          <Tab label="Contact" />
+          <Tab label="Account" />
+          <Tab label="Notes" />
+        </Tabs>
+      </Box>
+
+      {/* All sections */}
+      {activeTab === 0 && (
+        <>
+          <EditableClubInfo staff={staff} staffId={id} />
+          <EditableContactInfo staff={staff} staffId={id} />
+          <EditableUserAccount staff={staff} staffId={id} />
+          <EditableNotes staff={staff} staffId={id} />
+        </>
+      )}
+
       {/* Club Information */}
-      <EditableClubInfo staff={staff} staffId={id} />
+      {activeTab === 1 && <EditableClubInfo staff={staff} staffId={id} />}
 
       {/* Contact Information */}
-      <EditableContactInfo staff={staff} staffId={id} />
+      {activeTab === 2 && <EditableContactInfo staff={staff} staffId={id} />}
 
       {/* User Account */}
-      <EditableUserAccount staff={staff} staffId={id} />
+      {activeTab === 3 && <EditableUserAccount staff={staff} staffId={id} />}
 
       {/* Notes */}
-      <EditableNotes staff={staff} staffId={id} />
+      {activeTab === 4 && <EditableNotes staff={staff} staffId={id} />}
     </Box>
   );
 }

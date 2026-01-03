@@ -1,4 +1,5 @@
-import { Box, Typography, Stack } from "@mui/material";
+import { useState } from "react";
+import { Box, Typography, Stack, Tabs, Tab } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import Loading from "../components/Loading";
@@ -15,6 +16,7 @@ import EditableUserAccount from "../components/staff/sections/EditableUserAccoun
 type StaffProfileProps = {};
 
 export default function StaffProfile({}: StaffProfileProps) {
+  const [activeTab, setActiveTab] = useState(0);
   const {
     data: staff,
     isLoading: isStaffLoading,
@@ -88,17 +90,43 @@ export default function StaffProfile({}: StaffProfileProps) {
         isLoading={isImageLoading}
       />
 
+      {/* Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+        <Tabs
+          value={activeTab}
+          onChange={(_, newValue) => setActiveTab(newValue)}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
+          <Tab label="All" />
+          <Tab label="Club" />
+          <Tab label="Contact" />
+          <Tab label="Account" />
+          <Tab label="Notes" />
+        </Tabs>
+      </Box>
+
+      {/* All sections */}
+      {activeTab === 0 && (
+        <>
+          <EditableClubInfo staff={staff} />
+          <EditableContactInfo staff={staff} />
+          <EditableUserAccount staff={staff} readOnly />
+          <EditableNotes staff={staff} />
+        </>
+      )}
+
       {/* Club Information */}
-      <EditableClubInfo staff={staff} />
+      {activeTab === 1 && <EditableClubInfo staff={staff} />}
 
       {/* Contact Information */}
-      <EditableContactInfo staff={staff} />
+      {activeTab === 2 && <EditableContactInfo staff={staff} />}
 
       {/* User Account */}
-      <EditableUserAccount staff={staff} readOnly />
+      {activeTab === 3 && <EditableUserAccount staff={staff} readOnly />}
 
       {/* Notes */}
-      <EditableNotes staff={staff} />
+      {activeTab === 4 && <EditableNotes staff={staff} />}
     </Box>
   );
 }

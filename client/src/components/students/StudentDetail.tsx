@@ -1,4 +1,5 @@
-import { Box, Typography, IconButton, Stack } from "@mui/material";
+import { useState } from "react";
+import { Box, Typography, IconButton, Stack, Tabs, Tab } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import type { Country } from "../../utils/types";
 import { useQuery } from "@tanstack/react-query";
@@ -20,6 +21,7 @@ type StudentDetailProps = {
 };
 
 export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
+  const [activeTab, setActiveTab] = useState(0);
   const {
     data: student,
     isLoading: isStudentLoading,
@@ -85,29 +87,63 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
         isLoading={isImageLoading}
       />
 
+      {/* Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+        <Tabs
+          value={activeTab}
+          onChange={(_, newValue) => setActiveTab(newValue)}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
+          <Tab label="All" />
+          <Tab label="Personal" />
+          <Tab label="Languages" />
+          <Tab label="Travel" />
+          <Tab label="Parents" />
+          <Tab label="Insurance" />
+          <Tab label="Account" />
+          <Tab label="Exchanges" />
+          <Tab label="Notes" />
+        </Tabs>
+      </Box>
+
+      {/* All sections */}
+      {activeTab === 0 && (
+        <>
+          <EditablePersonalInfo student={student} countries={countries} />
+          <EditableLanguages student={student} />
+          <EditableTravelDocs student={student} countries={countries} />
+          <EditableParentInfo student={student} />
+          <EditableInsurance student={student} />
+          <EditableUserAccount student={student} />
+          <EditableExchanges studentId={student.id} />
+          <EditableNotes student={student} />
+        </>
+      )}
+
       {/* Personal Information */}
-      <EditablePersonalInfo student={student} countries={countries} />
+      {activeTab === 1 && <EditablePersonalInfo student={student} countries={countries} />}
 
       {/* Languages */}
-      <EditableLanguages student={student} />
+      {activeTab === 2 && <EditableLanguages student={student} />}
 
       {/* Travel Documents */}
-      <EditableTravelDocs student={student} countries={countries} />
+      {activeTab === 3 && <EditableTravelDocs student={student} countries={countries} />}
 
       {/* Parent/Guardian Information */}
-      <EditableParentInfo student={student} />
+      {activeTab === 4 && <EditableParentInfo student={student} />}
 
       {/* Insurance Information */}
-      <EditableInsurance student={student} />
+      {activeTab === 5 && <EditableInsurance student={student} />}
 
       {/* User Account */}
-      <EditableUserAccount student={student} />
+      {activeTab === 6 && <EditableUserAccount student={student} />}
 
       {/* Exchange History */}
-      <EditableExchanges studentId={student.id} />
+      {activeTab === 7 && <EditableExchanges studentId={student.id} />}
 
       {/* Notes */}
-      <EditableNotes student={student} />
+      {activeTab === 8 && <EditableNotes student={student} />}
     </Box>
   );
 }

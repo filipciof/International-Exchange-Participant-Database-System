@@ -9,6 +9,9 @@ import {
   IconButton,
   CircularProgress,
   Autocomplete,
+  Stepper,
+  Step,
+  StepLabel,
 } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import { useState, useEffect } from "react";
@@ -74,6 +77,15 @@ const QuestionField = ({
   </Box>
 );
 
+const steps = [
+  "Personal Information",
+  "Languages",
+  "Travel Documents",
+  "Parents/Guardian",
+  "Insurance",
+  "Additional Info",
+];
+
 export default function StudentForm({
   title = "Student Application Form",
   handleClose,
@@ -85,6 +97,7 @@ export default function StudentForm({
   isSuccess,
   error,
 }: StudentFormProps) {
+  const [activeStep, setActiveStep] = useState(0);
   const [photo, setPhoto] = useState<File | null>(null);
 
   const {
@@ -167,6 +180,16 @@ export default function StudentForm({
     handleClose?.();
   };
 
+  const handleNext = () => {
+    setActiveStep((prevStep) => prevStep + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevStep) => prevStep - 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <Box>
       {/* Header */}
@@ -181,11 +204,22 @@ export default function StudentForm({
         </Stack>
       )}
 
+      {/* Stepper */}
+      <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
+        {steps.map((label) => (
+          <Step key={label}>
+            <StepLabel>{label}</StepLabel>
+          </Step>
+        ))}
+      </Stepper>
+
       <form onSubmit={handleSubmit(onSubmit, onError)}>
         {/* Personal Information */}
-        <Typography variant="h6" sx={{ mb: 3, color: "primary.main" }}>
-          Personal Information
-        </Typography>
+        {activeStep === 0 && (
+          <>
+            <Typography variant="h6" sx={{ mb: 3, color: "primary.main" }}>
+              Personal Information
+            </Typography>
 
         <QuestionField question="What is your first name?" required>
           <Controller
@@ -445,10 +479,15 @@ export default function StudentForm({
           />
         </QuestionField>
 
+          </>
+        )}
+
         {/* Languages */}
-        <Typography variant="h6" sx={{ mb: 3, mt: 5, color: "primary.main" }}>
-          Languages
-        </Typography>
+        {activeStep === 1 && (
+          <>
+            <Typography variant="h6" sx={{ mb: 3, color: "primary.main" }}>
+              Languages
+            </Typography>
 
         <QuestionField question="What is your first (native) language?">
           <Controller
@@ -554,10 +593,15 @@ export default function StudentForm({
           </QuestionField>
         )}
 
+          </>
+        )}
+
         {/* Travel Documents */}
-        <Typography variant="h6" sx={{ mb: 3, mt: 5, color: "primary.main" }}>
-          Travel Documents
-        </Typography>
+        {activeStep === 2 && (
+          <>
+            <Typography variant="h6" sx={{ mb: 3, color: "primary.main" }}>
+              Travel Documents
+            </Typography>
 
         <QuestionField question="What country will you be departing from?">
           <Controller
@@ -657,10 +701,15 @@ export default function StudentForm({
           />
         </QuestionField>
 
+          </>
+        )}
+
         {/* Parent/Guardian Information */}
-        <Typography variant="h6" sx={{ mb: 3, mt: 5, color: "primary.main" }}>
-          Parent/Guardian Information
-        </Typography>
+        {activeStep === 3 && (
+          <>
+            <Typography variant="h6" sx={{ mb: 3, color: "primary.main" }}>
+              Parent/Guardian Information
+            </Typography>
 
         <QuestionField question="What is the full name of your first parent/guardian?">
           <Controller
@@ -749,10 +798,15 @@ export default function StudentForm({
           />
         </QuestionField>
 
+          </>
+        )}
+
         {/* Insurance Information */}
-        <Typography variant="h6" sx={{ mb: 3, mt: 5, color: "primary.main" }}>
-          Insurance Information
-        </Typography>
+        {activeStep === 4 && (
+          <>
+            <Typography variant="h6" sx={{ mb: 3, color: "primary.main" }}>
+              Insurance Information
+            </Typography>
 
         <QuestionField question="What is the name of your insurance company?">
           <Controller
@@ -828,10 +882,15 @@ export default function StudentForm({
           />
         </QuestionField>
 
+          </>
+        )}
+
         {/* Additional Information */}
-        <Typography variant="h6" sx={{ mb: 3, mt: 5, color: "primary.main" }}>
-          Additional Information
-        </Typography>
+        {activeStep === 5 && (
+          <>
+            <Typography variant="h6" sx={{ mb: 3, color: "primary.main" }}>
+              Additional Information
+            </Typography>
 
         <QuestionField question="Please upload a recent photo of yourself">
           <SingleFileUpload
@@ -858,38 +917,45 @@ export default function StudentForm({
             )}
           />
         </QuestionField>
+          </>
+        )}
 
-        {/* Submit Button */}
-        {/* <Box
-          sx={{ mt: 5, display: "flex", gap: 2, justifyContent: "flex-end" }}
-        >
-          {handleClose && (
-            <Button onClick={handleClose} variant="outlined" size="large">
-              Cancel
-            </Button>
-          )}
-          <Button type="submit" variant="contained" size="large">
-            {submitButtonText}
+        {/* Navigation Buttons */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
+          <Button
+            onClick={handleBack}
+            disabled={activeStep === 0}
+            size="large"
+          >
+            Back
           </Button>
-        </Box> */}
 
-        <Stack
-          direction="row"
-          spacing={2}
-          justifyContent="flex-start"
-          sx={{ pt: 2 }}
-        >
-          {isLoading ? (
-            <CircularProgress sx={{ color: "secondary.main" }} />
-          ) : (
-            <Button variant="contained" type="submit" size="large">
-              {submitButtonText}
-            </Button>
-          )}
-          <Button variant="outlined" onClick={onClose} size="large">
-            Cancel
-          </Button>
-        </Stack>
+          <Stack direction="row" spacing={2}>
+            {handleClose && (
+              <Button onClick={onClose} variant="outlined" size="large">
+                Cancel
+              </Button>
+            )}
+
+            {activeStep === steps.length - 1 ? (
+              isLoading ? (
+                <CircularProgress sx={{ color: "secondary.main" }} />
+              ) : (
+                <Button variant="contained" type="submit" size="large">
+                  {submitButtonText}
+                </Button>
+              )
+            ) : (
+              <Button
+                variant="contained"
+                onClick={handleNext}
+                size="large"
+              >
+                Next
+              </Button>
+            )}
+          </Stack>
+        </Box>
         {error && (
           <Stack spacing={1}>
             {handleValidationErrors(error.response?.data).map(
