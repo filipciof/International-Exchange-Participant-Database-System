@@ -1,23 +1,16 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Grid,
-  Avatar,
-  Paper,
-  Stack,
-} from "@mui/material";
-import { ContactPhone, StickyNote2, Business } from "@mui/icons-material";
+import { Box, Typography, Stack } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import Loading from "../components/Loading";
-import Section from "../components/Section";
-import InfoItem from "../components/InfoItem";
 import StaffForm from "../components/staff/StaffForm";
 import type { StaffFormData } from "../utils/types";
 import { AxiosError } from "axios";
 import { useStaffMutations } from "../hooks/useStaffMutations";
+import EditableHeader from "../components/staff/sections/EditableHeader";
+import EditableContactInfo from "../components/staff/sections/EditableContactInfo";
+import EditableClubInfo from "../components/staff/sections/EditableClubInfo";
+import EditableNotes from "../components/staff/sections/EditableNotes";
+import EditableUserAccount from "../components/staff/sections/EditableUserAccount";
 
 type StaffProfileProps = {};
 
@@ -34,7 +27,7 @@ export default function StaffProfile({}: StaffProfileProps) {
     },
     retry: false,
   });
-  const { data: imageUrl, isLoading } = useQuery({
+  const { data: imageUrl, isLoading: isImageLoading } = useQuery({
     queryKey: ["staffPhoto", staff?.photo],
     queryFn: async () => {
       const photoName = staff.photo.split("/")[3];
@@ -48,7 +41,7 @@ export default function StaffProfile({}: StaffProfileProps) {
     staleTime: Infinity,
   });
 
-  const { addStaffMutation } = useStaffMutations();
+  const { addMyStaffProfileMutation } = useStaffMutations();
 
   if (isStaffLoading) {
     return <Loading />;
@@ -61,12 +54,13 @@ export default function StaffProfile({}: StaffProfileProps) {
     if (is404) {
       return (
         <StaffForm
+          title="Create Profile"
           handleSubmit={(staff: StaffFormData) => {
-            addStaffMutation.mutate(staff);
+            addMyStaffProfileMutation.mutate(staff);
           }}
-          isLoading={addStaffMutation.isPending}
-          isSuccess={addStaffMutation.isSuccess}
-          error={addStaffMutation.error}
+          isLoading={addMyStaffProfileMutation.isPending}
+          isSuccess={addMyStaffProfileMutation.isSuccess}
+          error={addMyStaffProfileMutation.error}
           submitButtonText="Create Profile"
         />
       );
@@ -78,114 +72,33 @@ export default function StaffProfile({}: StaffProfileProps) {
     );
   }
 
-  const fullName = [staff.first_name, staff.middle_name, staff.last_name]
-    .filter(Boolean)
-    .join(" ");
-
   return (
     <Box sx={{}}>
       {/* Header with back button */}
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
-        {/* <IconButton onClick={handleClose} edge="start">
-          <ArrowBack />
-        </IconButton> */}
         <Typography variant="h5" component="h1">
           Staff Details
         </Typography>
       </Stack>
 
-      {/* Header Card */}
-      <Card
-        sx={{
-          mb: 3,
-          bgcolor: "primary.main",
-          opacity: 0.9,
-        }}
-      >
-        <CardContent>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 3,
-              flexWrap: "wrap",
-            }}
-          >
-            <Avatar
-              src={!isLoading ? imageUrl || undefined : undefined}
-              alt={fullName}
-              sx={{
-                width: 100,
-                height: 100,
-                border: "4px solid white",
-                boxShadow: 3,
-              }}
-            >
-              {staff.first_name[0]}
-              {staff.last_name[0]}
-            </Avatar>
-            <Box sx={{ flex: 1, minWidth: 200 }}>
-              <Typography
-                variant="h4"
-                sx={{ color: "white", fontWeight: 700, mb: 1 }}
-              >
-                {fullName}
-              </Typography>
-              {staff.gender_name && (
-                <Typography
-                  variant="h6"
-                  sx={{ color: "rgba(255,255,255,0.9)", mb: 1 }}
-                >
-                  {staff.gender_name}
-                </Typography>
-              )}
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
+      {/* Editable Header Card */}
+      <EditableHeader
+        staff={staff}
+        imageUrl={imageUrl}
+        isLoading={isImageLoading}
+      />
 
       {/* Club Information */}
-      {staff.club && (
-        <Section title="Club Information" icon={<Business />}>
-          <Grid container spacing={3}>
-            <InfoItem label="Country" value={staff.club.country} />
-            <InfoItem label="District" value={staff.club.district} />
-            <InfoItem
-              label="Club"
-              value={staff.club.name}
-              linkPath={`/clubs?id=${staff.club.id}&view=detail`}
-              fullWidth
-            />
-          </Grid>
-        </Section>
-      )}
+      <EditableClubInfo staff={staff} />
 
       {/* Contact Information */}
-      <Section title="Contact Information" icon={<ContactPhone />}>
-        <Grid container spacing={3}>
-          <InfoItem label="Email" value={staff.email} fullWidth />
-          <InfoItem label="Phone" value={staff.phone} />
-        </Grid>
-      </Section>
+      <EditableContactInfo staff={staff} />
+
+      {/* User Account */}
+      <EditableUserAccount staff={staff} readOnly />
 
       {/* Notes */}
-      {staff.notes && (
-        <Section title="Additional Notes" icon={<StickyNote2 />}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2,
-              bgcolor: "warning.lighter",
-              border: "1px solid",
-              borderColor: "warning.light",
-            }}
-          >
-            <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-              {staff.notes}
-            </Typography>
-          </Paper>
-        </Section>
-      )}
+      <EditableNotes staff={staff} />
     </Box>
   );
 }

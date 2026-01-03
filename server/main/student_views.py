@@ -8,8 +8,6 @@ from .models import Student, GENDER_MAP, LANG_PROF_MAP
 from .serializers import StudentSerializer
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-
-User = get_user_model()
 from django.http import HttpResponse, StreamingHttpResponse
 from config.settings import MEDIA_ROOT
 import os
@@ -28,6 +26,7 @@ from rest_framework.status import (
     HTTP_204_NO_CONTENT,
 )
 
+User = get_user_model()
 get_allowed_groups = ["admin", "correspondent", "club_officer", "kwm_officer", "student"]
 crud_allowed_groups = ["admin", "correspondent"]
 

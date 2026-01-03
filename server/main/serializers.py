@@ -234,6 +234,9 @@ class StaffSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation["gender_name"] = GENDER_MAP.get(instance.gender, "unknown")
+        representation["user_email"] = (
+            instance.id_user.email if instance.id_user else ""
+        )
         return representation
 
 

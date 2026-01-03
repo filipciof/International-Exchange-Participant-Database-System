@@ -42,9 +42,35 @@ export function useStaffMutations() {
     },
   });
 
+  const addMyStaffProfileMutation = useMutation({
+    mutationFn: async (data: StaffFormData) => {
+      const response = await axiosClient.post("/staff/?me=true", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["staff"] });
+    },
+  });
+
+  const updateMyStaffProfileMutation = useMutation({
+    mutationFn: async (data: StaffFormData) => {
+      const response = await axiosClient.patch("/staff/?me=true", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["staff"] });
+    },
+  });
+
   return {
     addStaffMutation,
     updateStaffMutation,
     deleteStaffMutation,
+    addMyStaffProfileMutation,
+    updateMyStaffProfileMutation,
   };
 }

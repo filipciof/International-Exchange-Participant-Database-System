@@ -63,7 +63,6 @@ TODO:
   - Club officer:
     - Can see everything but can only modify data related to his club.
 - Tabulate StudentForm.
-- Create users for some existing staff and students.
 ---
 - How to add a unique indentifier for these lists in React?
   - This is important both in terms of the error that happens in the console and the UX.

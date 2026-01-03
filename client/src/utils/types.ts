@@ -226,6 +226,7 @@ export type Staff = {
   id: number;
   id_club: number;
   club: Club | null;
+  position: string;
   first_name: string;
   middle_name: string;
   last_name: string;
@@ -235,10 +236,12 @@ export type Staff = {
   phone: string;
   photo: string;
   notes: string;
+  user_email: string;
 };
 
 export const staffSchema = z.object({
   id_club: z.number().nullable().optional(),
+  position: z.string().optional(),
   first_name: z.string().min(1, "First name is required"),
   middle_name: z.string().optional(),
   last_name: z.string().min(1, "Last name is required"),
