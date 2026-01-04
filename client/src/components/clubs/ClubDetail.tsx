@@ -4,13 +4,11 @@ import {
   CardContent,
   Typography,
   Grid,
-  Paper,
   IconButton,
   Stack,
 } from "@mui/material";
 import {
   ArrowBack,
-  Business,
   LocationOn,
 } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
@@ -18,6 +16,7 @@ import axiosClient from "../../utils/axiosClient";
 import Section from "../Section";
 import InfoItem from "../InfoItem";
 import Loading from "../Loading";
+import EditableDocuments from "../EditableDocuments";
 
 type ClubDetailProps = {
   id: number;
@@ -92,6 +91,9 @@ export default function ClubDetail({ id, handleClose }: ClubDetailProps) {
           <InfoItem label="City" value={club.city} />
         </Grid>
       </Section>
+
+      {/* Documents */}
+      <EditableDocuments ownerType="club" ownerId={club.id} />
     </Box>
   );
 }

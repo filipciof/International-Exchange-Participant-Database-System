@@ -275,10 +275,11 @@ class StaffUserAccountView(APIView):
 
         email = request.data.get("email")
         password = request.data.get("password")
+        group_name = request.data.get("group")
 
-        if not email or not password:
+        if not email or not password or not group_name:
             return Response(
-                {"message": "Email and password are required."},
+                {"message": "Email, password, and group are required."},
                 status=HTTP_400_BAD_REQUEST,
             )
 
@@ -289,16 +290,22 @@ class StaffUserAccountView(APIView):
                 status=HTTP_400_BAD_REQUEST,
             )
 
+        # Validate group
+        valid_groups = ["admin", "correspondent", "club_officer", "kwm_officer"]
+        if group_name not in valid_groups:
+            return Response(
+                {"message": f"Invalid group. Must be one of: {', '.join(valid_groups)}"},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
         # Create user
         user = User.objects.create_user(
-            username=email,
             email=email,
             password=password,
         )
 
-        # Add user to appropriate group based on staff role
-        # Default to club_officer if no specific role is defined
-        staff_group, _ = Group.objects.get_or_create(name="club_officer")
+        # Add user to selected group
+        staff_group, _ = Group.objects.get_or_create(name=group_name)
         user.groups.add(staff_group)
 
         # Link user to staff
@@ -311,7 +318,7 @@ class StaffUserAccountView(APIView):
         )
 
     def patch(self, request, pk=None):
-        """Update a staff member's user account (email/password)"""
+        """Update a staff member's user account (email/password/group)"""
         user_groups = request.user.groups.values_list("name", flat=True)
         is_staff_user = bool(set(user_groups).intersection(get_allowed_groups))
         is_admin_user = bool(set(user_groups).intersection(crud_allowed_groups))
@@ -345,6 +352,28 @@ class StaffUserAccountView(APIView):
         user = staff.id_user
         email = request.data.get("email")
         password = request.data.get("password")
+        group_name = request.data.get("group")
+
+        # Only admins can update groups
+        if group_name:
+            if not is_admin_user:
+                return Response(
+                    {"message": "Only admins can update user groups."},
+                    status=HTTP_403_FORBIDDEN,
+                )
+
+            # Validate group
+            valid_groups = ["admin", "correspondent", "club_officer", "kwm_officer"]
+            if group_name not in valid_groups:
+                return Response(
+                    {"message": f"Invalid group. Must be one of: {', '.join(valid_groups)}"},
+                    status=HTTP_400_BAD_REQUEST,
+                )
+
+            # Update user's groups
+            user.groups.clear()
+            new_group, _ = Group.objects.get_or_create(name=group_name)
+            user.groups.add(new_group)
 
         # Update email if provided
         if email and email != user.email:

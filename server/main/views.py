@@ -185,7 +185,7 @@ class FamilyView(APIView):
             family = families.get(id=id)
             serializer = FamilySerializer(family)
             return Response(serializer.data)
-        
+
         id_club = request.query_params.get("id_club")
         if id_club:
             families = families.filter(id_club=id_club)
@@ -473,8 +473,9 @@ class ExchangeView(APIView):
 class ExchangeFamilyView(APIView):
     def get(self, request):
         user_groups = request.user.groups.values_list("name", flat=True)
+        is_student = "student" in user_groups
 
-        if not set(user_groups).intersection(get_allowed_groups):
+        if not is_student and not set(user_groups).intersection(get_allowed_groups):
             return Response(
                 {"message": "You are not authorized to do this."},
                 status=HTTP_403_FORBIDDEN,
@@ -483,19 +484,32 @@ class ExchangeFamilyView(APIView):
         exchange_families = ExchangeFamily.objects.order_by("-id")
         exchange_families = exchange_families.filter(is_active=True)
 
+        # If user is a student, only allow them to see exchange families related to their exchanges
+        if is_student:
+            try:
+                student = Student.objects.get(id_user=request.user, is_active=True)
+                exchange_families = exchange_families.filter(
+                    id_exchange__id_student=student.id
+                )
+            except Student.DoesNotExist:
+                return Response(
+                    {"message": "Student profile not found for this user."},
+                    status=HTTP_404_NOT_FOUND,
+                )
+
+        id_exchange = request.query_params.get("id_exchange")
+        if id_exchange:
+            exchange_families = exchange_families.filter(id_exchange=id_exchange)
+
+        id_family = request.query_params.get("id_family")
+        if id_family:
+            exchange_families = exchange_families.filter(id_family=id_family)
+
         id = request.query_params.get("id")
         if id:
             exchange_family = exchange_families.get(id=id)
             serializer = ExchangeFamilySerializer(exchange_family)
             return Response(serializer.data)
-
-        id_exchange = request.query_params.get("id_exchange")
-        if id_exchange:
-            exchange_families = exchange_families.filter(id_exchange=id_exchange)
-        
-        id_family = request.query_params.get("id_family")
-        if id_family:
-            exchange_families = exchange_families.filter(id_family=id_family)
 
         search = request.query_params.get("search")
         if search:
@@ -581,8 +595,9 @@ class ExchangeFamilyView(APIView):
 class DocumentView(APIView):
     def get(self, request):
         user_groups = request.user.groups.values_list("name", flat=True)
+        is_student = "student" in user_groups
 
-        if not set(user_groups).intersection(get_allowed_groups):
+        if not is_student and not set(user_groups).intersection(get_allowed_groups):
             return Response(
                 {"message": "You are not authorized to do this."},
                 status=HTTP_403_FORBIDDEN,
@@ -590,6 +605,16 @@ class DocumentView(APIView):
 
         documents = Document.objects.order_by("-id")
         documents = documents.filter(is_active=True)
+
+        if is_student:
+            try:
+                student = Student.objects.get(id_user=request.user, is_active=True)
+                documents = documents.filter(id_student=student.id)
+            except Student.DoesNotExist:
+                return Response(
+                    {"message": "Student profile not found for this user."},
+                    status=HTTP_404_NOT_FOUND,
+                )
 
         id = request.query_params.get("id")
         if id:
@@ -632,14 +657,26 @@ class DocumentView(APIView):
 
     def post(self, request):
         user_groups = request.user.groups.values_list("name", flat=True)
+        is_student = "student" in user_groups
 
-        if not set(user_groups).intersection(crud_allowed_groups):
+        if not is_student and not set(user_groups).intersection(crud_allowed_groups):
             return Response(
                 {"message": "You are not authorized to do this."},
                 status=HTTP_403_FORBIDDEN,
             )
 
         data = request.data.copy()
+        if is_student:
+            data.update(
+                {
+                    "id_student": request.user.id_student.id,
+                    "id_staff": None,
+                    "id_club": None,
+                    "id_family": None,
+                    "id_district": None,
+                }
+            )
+
         serializer = DocumentSerializer(data=data)
 
         if not serializer.is_valid():
@@ -650,8 +687,9 @@ class DocumentView(APIView):
 
     def patch(self, request, pk=None):
         user_groups = request.user.groups.values_list("name", flat=True)
+        is_student = "student" in user_groups
 
-        if not set(user_groups).intersection(crud_allowed_groups):
+        if not is_student and not set(user_groups).intersection(crud_allowed_groups):
             return Response(
                 {"message": "You are not authorized to do this."},
                 status=HTTP_403_FORBIDDEN,
@@ -664,7 +702,24 @@ class DocumentView(APIView):
                 {"message": "Document not found."}, status=HTTP_404_NOT_FOUND
             )
 
+        if is_student and document.id_student != request.user.id_student.id:
+            return Response(
+                {"message": "You can only edit your own documents."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
         data = request.data.copy()
+        if is_student:
+            data.update(
+                {
+                    "id_student": request.user.id_student.id,
+                    "id_staff": None,
+                    "id_club": None,
+                    "id_family": None,
+                    "id_district": None,
+                }
+            )
+
         serializer = DocumentSerializer(document, data=data, partial=True)
 
         if not serializer.is_valid():
@@ -678,6 +733,3 @@ class DocumentView(APIView):
         if updated == 0:
             return Response({"error": "Document not found"}, status=HTTP_404_NOT_FOUND)
         return Response(status=HTTP_204_NO_CONTENT)
-
-
-

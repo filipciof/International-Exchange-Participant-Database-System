@@ -20,6 +20,7 @@ import Section from "../Section";
 import InfoItem from "../InfoItem";
 import Loading from "../Loading";
 import EditableFamilyMembers from "./sections/EditableFamilyMembers";
+import EditableDocuments from "../EditableDocuments";
 
 type FamilyDetailProps = {
   id: number;
@@ -97,7 +98,7 @@ export default function FamilyDetail({ id, handleClose }: FamilyDetailProps) {
             <InfoItem
               label="Club"
               value={family.club.name}
-              linkPath={`/clubs?id=${family.club.id}&view=detail`}
+              linkPath={`/clubs/?id=${family.club.id}&view=detail`}
               fullWidth
             />
           </Grid>
@@ -114,6 +115,9 @@ export default function FamilyDetail({ id, handleClose }: FamilyDetailProps) {
 
       {/* Family Members */}
       <EditableFamilyMembers familyId={family.id} />
+
+      {/* Documents */}
+      <EditableDocuments ownerType="family" ownerId={family.id} />
 
       {/* Notes */}
       {family.notes && (

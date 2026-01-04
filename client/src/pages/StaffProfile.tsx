@@ -79,7 +79,7 @@ export default function StaffProfile({}: StaffProfileProps) {
       {/* Header with back button */}
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
         <Typography variant="h5" component="h1">
-          Staff Details
+          Staff Profile
         </Typography>
       </Stack>
 

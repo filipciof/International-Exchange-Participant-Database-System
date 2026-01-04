@@ -132,7 +132,7 @@ export default function EditableClubInfo({
               <InfoItem
                 label="Club"
                 value={staff.club.name}
-                linkPath={`/clubs?id=${staff.club.id}&view=detail`}
+                linkPath={`/clubs/?id=${staff.club.id}&view=detail`}
                 fullWidth
               />
             </>

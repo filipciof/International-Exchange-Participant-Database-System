@@ -18,6 +18,7 @@ import EditableContactInfo from "./sections/EditableContactInfo";
 import EditableClubInfo from "./sections/EditableClubInfo";
 import EditableNotes from "./sections/EditableNotes";
 import EditableUserAccount from "./sections/EditableUserAccount";
+import EditableDocuments from "../EditableDocuments";
 
 type StaffDetailProps = {
   id: number;
@@ -91,6 +92,7 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
           <Tab label="Club" />
           <Tab label="Contact" />
           <Tab label="Account" />
+          <Tab label="Documents" />
           <Tab label="Notes" />
         </Tabs>
       </Box>
@@ -114,8 +116,11 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
       {/* User Account */}
       {activeTab === 3 && <EditableUserAccount staff={staff} staffId={id} />}
 
+      {/* Documents */}
+      {activeTab === 4 && <EditableDocuments ownerType="staff" ownerId={id} />}
+
       {/* Notes */}
-      {activeTab === 4 && <EditableNotes staff={staff} staffId={id} />}
+      {activeTab === 5 && <EditableNotes staff={staff} staffId={id} />}
     </Box>
   );
 }

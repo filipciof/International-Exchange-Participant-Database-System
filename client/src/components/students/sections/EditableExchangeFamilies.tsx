@@ -236,7 +236,7 @@ export default function EditableExchangeFamilies({
                             value={
                               exchangeFamily.family_name || "Unknown Family"
                             }
-                            linkPath={`/families/?id=${exchangeFamily.id_family}&view=detail`}
+                            linkPath={readOnly ? null : `/families/?id=${exchangeFamily.id_family}&view=detail`}
                           />
                           {exchangeFamily.start_date && (
                             <InfoItem

@@ -38,21 +38,26 @@ export default function MainPage() {
     }
   };
 
+  const userGroups = localStorage.getItem("userGroups");
+  const isStudent = userGroups?.includes("student");
+
   return (
     <Box>
       <Box>
         <AppBar position="fixed">
           <Toolbar>
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              sx={{ mr: 2, display: { sm: "block", md: "none" } }}
-              onClick={toggleDrawer(true)}
-            >
-              <MenuIcon />
-            </IconButton>
+            {!isStudent && (
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                sx={{ mr: 2, display: { sm: "block", md: "none" } }}
+                onClick={toggleDrawer(true)}
+              >
+                <MenuIcon />
+              </IconButton>
+            )}
 
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
               IEPDS
@@ -65,23 +70,31 @@ export default function MainPage() {
         </AppBar>
       </Box>
 
-      <Box
-        sx={{
-          position: "fixed",
-          borderRight: "1px solid",
-          borderColor: "divider",
-          width: drawerWidth,
-          height: `calc(100vh - ${appBarHeight}px)`,
-          display: { xs: "none", sm: "none", md: "flex" },
-        }}
-      >
-        <SideBarList />
-      </Box>
+      {!isStudent && (
+        <Box
+          sx={{
+            position: "fixed",
+            borderRight: "1px solid",
+            borderColor: "divider",
+            width: drawerWidth,
+            height: `calc(100vh - ${appBarHeight}px)`,
+            display: { xs: "none", sm: "none", md: "flex" },
+          }}
+        >
+          <SideBarList />
+        </Box>
+      )}
 
       <Box
         sx={{
           mt: `${appBarHeight}px`,
-          ml: { xs: 0, sm: 0, md: `${drawerWidth}px` },
+          ml: {
+            xs: 0,
+            sm: 0,
+            md: !isStudent ? `${drawerWidth + 32}px` : "32px",
+            lg: !isStudent ? `${drawerWidth + 64}px` : "64px",
+          },
+          mr: { xs: 0, sm: 0, md: "32px", lg: "64px" },
           flexGrow: 1,
           p: 3,
         }}
@@ -89,18 +102,20 @@ export default function MainPage() {
         {loading ? <Loading /> : <Outlet />}
       </Box>
 
-      <Drawer
-        sx={{
-          "& .MuiDrawer-paper": {
-            boxSizing: "border-box",
-            width: drawerWidth,
-          },
-        }}
-        open={open}
-        onClose={toggleDrawer(false)}
-      >
-        <SideBarList />
-      </Drawer>
+      {!isStudent && (
+        <Drawer
+          sx={{
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
+          }}
+          open={open}
+          onClose={toggleDrawer(false)}
+        >
+          <SideBarList />
+        </Drawer>
+      )}
     </Box>
   );
 }

@@ -14,6 +14,7 @@ import EditableExchanges from "./sections/EditableExchanges";
 import EditableNotes from "./sections/EditableNotes";
 import EditableUserAccount from "./sections/EditableUserAccount";
 import Loading from "../Loading";
+import EditableDocuments from "../EditableDocuments";
 
 type StudentDetailProps = {
   id: number;
@@ -103,6 +104,7 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
           <Tab label="Insurance" />
           <Tab label="Account" />
           <Tab label="Exchanges" />
+          <Tab label="Documents" />
           <Tab label="Notes" />
         </Tabs>
       </Box>
@@ -117,18 +119,23 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
           <EditableInsurance student={student} />
           <EditableUserAccount student={student} />
           <EditableExchanges studentId={student.id} />
+          <EditableDocuments ownerType="student" ownerId={student.id} />
           <EditableNotes student={student} />
         </>
       )}
 
       {/* Personal Information */}
-      {activeTab === 1 && <EditablePersonalInfo student={student} countries={countries} />}
+      {activeTab === 1 && (
+        <EditablePersonalInfo student={student} countries={countries} />
+      )}
 
       {/* Languages */}
       {activeTab === 2 && <EditableLanguages student={student} />}
 
       {/* Travel Documents */}
-      {activeTab === 3 && <EditableTravelDocs student={student} countries={countries} />}
+      {activeTab === 3 && (
+        <EditableTravelDocs student={student} countries={countries} />
+      )}
 
       {/* Parent/Guardian Information */}
       {activeTab === 4 && <EditableParentInfo student={student} />}
@@ -142,8 +149,13 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
       {/* Exchange History */}
       {activeTab === 7 && <EditableExchanges studentId={student.id} />}
 
+      {/* Documents */}
+      {activeTab === 8 && (
+        <EditableDocuments ownerType="student" ownerId={student.id} />
+      )}
+
       {/* Notes */}
-      {activeTab === 8 && <EditableNotes student={student} />}
+      {activeTab === 9 && <EditableNotes student={student} />}
     </Box>
   );
 }

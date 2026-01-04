@@ -569,7 +569,6 @@ class StudentUserAccountView(APIView):
 
         # Create user
         user = User.objects.create_user(
-            username=email,
             email=email,
             password=password,
         )

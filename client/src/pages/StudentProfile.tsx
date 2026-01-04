@@ -10,6 +10,7 @@ import EditableTravelDocs from "../components/students/sections/EditableTravelDo
 import EditableParentInfo from "../components/students/sections/EditableParentInfo";
 import EditableInsurance from "../components/students/sections/EditableInsurance";
 import EditableExchanges from "../components/students/sections/EditableExchanges";
+import EditableDocuments from "../components/EditableDocuments";
 import EditableNotes from "../components/students/sections/EditableNotes";
 import Loading from "../components/Loading";
 import StudentForm from "../components/students/StudentForm";
@@ -96,7 +97,7 @@ export default function StudentProfile({}: StudentProfileProps) {
           <ArrowBack />
         </IconButton> */}
         <Typography variant="h5" component="h1">
-          Student Details
+          Student Profile
         </Typography>
       </Stack>
 
@@ -123,6 +124,7 @@ export default function StudentProfile({}: StudentProfileProps) {
           <Tab label="Insurance" />
           <Tab label="Account" />
           <Tab label="Exchanges" />
+          <Tab label="Documents" />
           <Tab label="Notes" />
         </Tabs>
       </Box>
@@ -137,18 +139,27 @@ export default function StudentProfile({}: StudentProfileProps) {
           <EditableInsurance student={student} />
           <EditableUserAccount student={student} readOnly />
           <EditableExchanges studentId={student.id} readOnly />
+          <EditableDocuments
+            ownerType="student"
+            ownerId={student.id}
+            readOnly
+          />
           <EditableNotes student={student} />
         </>
       )}
 
       {/* Personal Information */}
-      {activeTab === 1 && <EditablePersonalInfo student={student} countries={countries} />}
+      {activeTab === 1 && (
+        <EditablePersonalInfo student={student} countries={countries} />
+      )}
 
       {/* Languages */}
       {activeTab === 2 && <EditableLanguages student={student} />}
 
       {/* Travel Documents */}
-      {activeTab === 3 && <EditableTravelDocs student={student} countries={countries} />}
+      {activeTab === 3 && (
+        <EditableTravelDocs student={student} countries={countries} />
+      )}
 
       {/* Parent/Guardian Information */}
       {activeTab === 4 && <EditableParentInfo student={student} />}
@@ -162,8 +173,13 @@ export default function StudentProfile({}: StudentProfileProps) {
       {/* Exchange History */}
       {activeTab === 7 && <EditableExchanges studentId={student.id} readOnly />}
 
+      {/* Documents */}
+      {activeTab === 8 && (
+        <EditableDocuments ownerType="student" ownerId={student.id} readOnly />
+      )}
+
       {/* Notes */}
-      {activeTab === 8 && <EditableNotes student={student} />}
+      {activeTab === 9 && <EditableNotes student={student} />}
     </Box>
   );
 }

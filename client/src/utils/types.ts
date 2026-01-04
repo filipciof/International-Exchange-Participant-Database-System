@@ -237,6 +237,7 @@ export type Staff = {
   photo: string;
   notes: string;
   user_email: string;
+  user_groups: string[];
 };
 
 export const staffSchema = z.object({
@@ -326,6 +327,35 @@ export const exchangeFamilySchema = z.object({
 });
 
 export type ExchangeFamilyFormData = z.infer<typeof exchangeFamilySchema>;
+
+export type Document = {
+  id: number;
+  id_student: number | null;
+  id_staff: number | null;
+  id_club: number | null;
+  id_family: number | null;
+  id_district: number | null;
+  name: string;
+  file: string;
+  description: string;
+  uploaded_at: string;
+}
+
+export const documentSchema = z.object({
+  id_student: z.number().nullable().optional(),
+  id_staff: z.number().nullable().optional(),
+  id_club: z.number().nullable().optional(),
+  id_family: z.number().nullable().optional(),
+  id_district: z.number().nullable().optional(),
+  name: z.string().min(1, "Document name is required"),
+  description: z.string().optional(),
+});
+
+export type DocumentFormInputs = z.infer<typeof documentSchema>;
+
+export type DocumentFormData = DocumentFormInputs & {
+  file: File | null;
+}
 
 export type SearchableField = {
   value: string;

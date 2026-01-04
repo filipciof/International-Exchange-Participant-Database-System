@@ -107,8 +107,12 @@ LANG_PROF_MAP = {
 
 
 class Student(models.Model):
-    id_user = models.ForeignKey(
-        User, null=True, on_delete=models.SET_NULL, db_column="id_user"
+    id_user = models.OneToOneField(
+        User,
+        null=True,
+        on_delete=models.SET_NULL,
+        db_column="id_user",
+        related_name="id_student",
     )
 
     # Names
@@ -189,8 +193,12 @@ class Student(models.Model):
 
 
 class Staff(models.Model):
-    id_user = models.ForeignKey(
-        User, null=True, on_delete=models.SET_NULL, db_column="id_user"
+    id_user = models.OneToOneField(
+        User,
+        null=True,
+        on_delete=models.SET_NULL,
+        db_column="id_user",
+        related_name="id_staff",
     )
 
     id_club = models.ForeignKey(
@@ -310,6 +318,11 @@ class Document(models.Model):
     id_district = models.ForeignKey(
         District, null=True, on_delete=models.SET_NULL, db_column="id_district"
     )
+
+    name = models.CharField(max_length=100, default="")
+    file = models.FileField(upload_to="documents/", blank=True, default="")
+    description = models.TextField(blank=True, default="")
+    uploaded_at = models.DateTimeField(auto_now=True)
 
     is_active = models.BooleanField(default=True)
 

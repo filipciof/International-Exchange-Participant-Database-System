@@ -237,6 +237,11 @@ class StaffSerializer(serializers.ModelSerializer):
         representation["user_email"] = (
             instance.id_user.email if instance.id_user else ""
         )
+        representation["user_groups"] = (
+            list(instance.id_user.groups.values_list("name", flat=True))
+            if instance.id_user
+            else []
+        )
         return representation
 
 

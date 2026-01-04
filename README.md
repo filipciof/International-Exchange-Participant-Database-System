@@ -62,7 +62,7 @@ TODO:
     - Basically admin except cannot create new users or change them.
   - Club officer:
     - Can see everything but can only modify data related to his club.
-- Tabulate StudentForm.
+  - Allow students to see detail pages of entities related to them without ability to edit.
 ---
 - How to add a unique indentifier for these lists in React?
   - This is important both in terms of the error that happens in the console and the UX.

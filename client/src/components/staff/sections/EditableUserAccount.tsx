@@ -6,6 +6,10 @@ import {
   TextField,
   Button,
   Alert,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -36,13 +40,21 @@ export default function EditableUserAccount({
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    group: "",
   });
 
   const hasUserAccount = Boolean(staff.user_email);
   const effectiveStaffId = staffId || staff.id;
 
+  // Check if current user is admin
+  const userGroupsWrapper = localStorage.getItem("userGroups");
+  const userGroups: string[] = userGroupsWrapper
+    ? JSON.parse(userGroupsWrapper)
+    : [];
+  const isAdmin = userGroups.includes("admin") || userGroups.includes("correspondent");
+
   const createMutation = useMutation({
-    mutationFn: async (data: { email: string; password: string }) => {
+    mutationFn: async (data: { email: string; password: string; group: string }) => {
       const response = await axiosClient.post(
         `/staff/${effectiveStaffId}/user-account/`,
         data,
@@ -52,12 +64,12 @@ export default function EditableUserAccount({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["staff"] });
       setIsEditing(false);
-      setFormData({ email: "", password: "" });
+      setFormData({ email: "", password: "", group: "" });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (data: { email?: string; password?: string }) => {
+    mutationFn: async (data: { email?: string; password?: string; group?: string }) => {
       const response = await axiosClient.patch(
         `/staff/${effectiveStaffId}/user-account/`,
         data,
@@ -67,16 +79,17 @@ export default function EditableUserAccount({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["staff"] });
       setIsEditing(false);
-      setFormData({ email: "", password: "" });
+      setFormData({ email: "", password: "", group: "" });
     },
   });
 
   const handleSave = () => {
     if (hasUserAccount) {
       // Only send fields that have values
-      const updateData: { email?: string; password?: string } = {};
+      const updateData: { email?: string; password?: string; group?: string } = {};
       if (formData.email) updateData.email = formData.email;
       if (formData.password) updateData.password = formData.password;
+      if (formData.group && isAdmin) updateData.group = formData.group;
       updateMutation.mutate(updateData);
     } else {
       createMutation.mutate(formData);
@@ -84,17 +97,21 @@ export default function EditableUserAccount({
   };
 
   const handleCancel = () => {
-    setFormData({ email: "", password: "" });
+    setFormData({ email: "", password: "", group: "" });
     setIsEditing(false);
   };
 
   const handleCreate = () => {
-    setFormData({ email: "", password: "" });
+    setFormData({ email: "", password: "", group: "" });
     setIsEditing(true);
   };
 
   const handleEdit = () => {
-    setFormData({ email: staff.user_email || "", password: "" });
+    setFormData({
+      email: staff.user_email || "",
+      password: "",
+      group: staff.user_groups?.[0] || "",
+    });
     setIsEditing(true);
   };
 
@@ -123,7 +140,7 @@ export default function EditableUserAccount({
         onClick={handleSave}
         disabled={
           isLoading ||
-          (!hasUserAccount && (!formData.email || !formData.password))
+          (!hasUserAccount && (!formData.email || !formData.password || !formData.group))
         }
         color="primary"
       >
@@ -148,6 +165,17 @@ export default function EditableUserAccount({
           {hasUserAccount ? (
             <Grid container spacing={3}>
               <InfoItem label="Email" value={staff.user_email} />
+              <InfoItem
+                label="Group"
+                value={
+                  staff.user_groups?.length > 0
+                    ? staff.user_groups[0]
+                        .split("_")
+                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(" ")
+                    : "No group assigned"
+                }
+              />
             </Grid>
           ) : (
             <Box
@@ -215,6 +243,39 @@ export default function EditableUserAccount({
                 : "Password is required"
             }
           />
+          <FormControl
+            fullWidth
+            required={!hasUserAccount}
+            disabled={isLoading || (hasUserAccount && !isAdmin)}
+          >
+            <InputLabel id="group-select-label">Group</InputLabel>
+            <Select
+              labelId="group-select-label"
+              id="group-select"
+              value={formData.group}
+              label="Group"
+              onChange={(e) =>
+                setFormData({ ...formData, group: e.target.value })
+              }
+            >
+              <MenuItem value="admin">Admin</MenuItem>
+              <MenuItem value="correspondent">Correspondent</MenuItem>
+              <MenuItem value="club_officer">Club Officer</MenuItem>
+              <MenuItem value="kwm_officer">KWM Officer</MenuItem>
+            </Select>
+            {hasUserAccount && !isAdmin && (
+              <Box
+                sx={{
+                  fontSize: "0.75rem",
+                  color: "text.secondary",
+                  mt: 0.5,
+                  ml: 1.75,
+                }}
+              >
+                Only admins can change groups
+              </Box>
+            )}
+          </FormControl>
         </Box>
       )}
     </Section>

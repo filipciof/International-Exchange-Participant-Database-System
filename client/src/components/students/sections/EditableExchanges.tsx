@@ -299,33 +299,53 @@ export default function EditableExchanges({
                       <InfoItem
                         label="Sending Club"
                         value={`${exchange.sending_club.name} - ${exchange.sending_club.country}, District ${exchange.sending_club.district}`}
-                        linkPath={`/clubs?id=${exchange.id_sending_club}&view=detail`}
+                        linkPath={
+                          readOnly
+                            ? null
+                            : `/clubs/?id=${exchange.id_sending_club}&view=detail`
+                        }
                       />
                     )}
                     {exchange.receiving_club && (
                       <InfoItem
                         label="Receiving Club"
                         value={`${exchange.receiving_club.name} - ${exchange.receiving_club.country}, District ${exchange.receiving_club.district}`}
-                        linkPath={`/clubs?id=${exchange.id_receiving_club}&view=detail`}
+                        linkPath={
+                          readOnly
+                            ? null
+                            : `/clubs/?id=${exchange.id_receiving_club}&view=detail`
+                        }
                       />
                     )}
                     {exchange.counsellor && (
                       <InfoItem
                         label="Counsellor"
                         value={exchange.counsellor}
-                        linkPath={`/staff?id=${exchange.id_counsellor}&view=detail`}
+                        linkPath={
+                          readOnly
+                            ? null
+                            : `/staff/?id=${exchange.id_counsellor}&view=detail`
+                        }
                       />
                     )}
                     {exchange.kwm_officer && (
                       <InfoItem
                         label="KWM Officer"
                         value={exchange.kwm_officer}
-                        linkPath={`/staff?id=${exchange.id_kwm_officer}&view=detail`}
+                        linkPath={
+                          readOnly
+                            ? null
+                            : `/staff/?id=${exchange.id_kwm_officer}&view=detail`
+                        }
                       />
                     )}
                   </Grid>
 
-                  <EditableExchangeFamilies exchangeId={exchange.id} id_receiving_club={exchange.id_receiving_club} readOnly={readOnly} />
+                  <EditableExchangeFamilies
+                    exchangeId={exchange.id}
+                    id_receiving_club={exchange.id_receiving_club}
+                    readOnly={readOnly}
+                  />
                 </Paper>
               ))}
             </Stack>
