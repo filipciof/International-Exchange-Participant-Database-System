@@ -34,9 +34,21 @@ from rest_framework.status import (
 )
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
-
-get_allowed_groups = ["admin", "correspondent", "club_officer", "kwm_officer", "staff"]
-crud_allowed_groups = ["admin", "correspondent"]
+from config.permissions.policy_permissions import (
+    ClubPermission,
+    DocumentPermission,
+    ExchangeFamilyPermission,
+    ExchangePermission,
+    FamilyMemberPermission,
+    FamilyPermission,
+)
+from config.selectors.club import club_queryset_for
+from config.selectors.document import document_queryset_for
+from config.selectors.exchange_family import exchange_family_queryset_for
+from config.selectors.exchange import exchange_queryset_for
+from config.selectors.family_member import family_member_queryset_for
+from config.selectors.family import family_queryset_for
+from django.shortcuts import get_object_or_404
 
 
 def not_found_view(request):
@@ -71,17 +83,10 @@ class DistrictView(APIView):
 
 
 class ClubView(APIView):
+    permission_classes = [ClubPermission]
+
     def get(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(get_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        clubs = Club.objects.order_by("-id")
-        clubs = clubs.filter(is_active=True)
+        clubs = club_queryset_for(request.user).order_by("-id")
 
         id = request.query_params.get("id")
         if id:
@@ -120,14 +125,6 @@ class ClubView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
         data = request.data.copy()
         serializer = ClubSerializer(data=data)
 
@@ -138,18 +135,8 @@ class ClubView(APIView):
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     def patch(self, request, pk=None):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        try:
-            club = Club.objects.get(pk=pk, is_active=True)
-        except Club.DoesNotExist:
-            return Response({"message": "Club not found."}, status=HTTP_404_NOT_FOUND)
+        club = get_object_or_404(Club, pk=pk, is_active=True)
+        self.check_object_permissions(request, club)
 
         data = request.data.copy()
         serializer = ClubSerializer(club, data=data, partial=True)
@@ -161,24 +148,18 @@ class ClubView(APIView):
         return Response(serializer.data)
 
     def delete(self, request, pk=None):
-        updated = Club.objects.filter(id=pk).update(is_active=False)
-        if updated == 0:
-            return Response({"error": "Club not found"}, status=HTTP_404_NOT_FOUND)
+        club = get_object_or_404(Club, pk=pk, is_active=True)
+        self.check_object_permissions(request, club)
+        club.is_active = False
+        club.save(update_fields=["is_active"])
         return Response(status=HTTP_204_NO_CONTENT)
 
 
 class FamilyView(APIView):
+    permission_classes = [FamilyPermission]
+
     def get(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(get_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        families = Family.objects.order_by("-id")
-        families = families.filter(is_active=True)
+        families = family_queryset_for(request.user).order_by("-id")
 
         id = request.query_params.get("id")
         if id:
@@ -218,14 +199,6 @@ class FamilyView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
         data = request.data.copy()
         serializer = FamilySerializer(data=data)
 
@@ -236,18 +209,8 @@ class FamilyView(APIView):
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     def patch(self, request, pk=None):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        try:
-            family = Family.objects.get(pk=pk, is_active=True)
-        except Family.DoesNotExist:
-            return Response({"message": "Family not found."}, status=HTTP_404_NOT_FOUND)
+        family = get_object_or_404(Family, pk=pk, is_active=True)
+        self.check_object_permissions(request, family)
 
         data = request.data.copy()
         serializer = FamilySerializer(family, data=data, partial=True)
@@ -259,24 +222,18 @@ class FamilyView(APIView):
         return Response(serializer.data)
 
     def delete(self, request, pk=None):
-        updated = Family.objects.filter(id=pk).update(is_active=False)
-        if updated == 0:
-            return Response({"error": "Family not found"}, status=HTTP_404_NOT_FOUND)
+        family = get_object_or_404(Family, pk=pk, is_active=True)
+        self.check_object_permissions(request, family)
+        family.is_active = False
+        family.save(update_fields=["is_active"])
         return Response(status=HTTP_204_NO_CONTENT)
 
 
 class FamilyMemberView(APIView):
+    permission_classes = [FamilyMemberPermission]
+
     def get(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(get_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        family_members = FamilyMember.objects.order_by("-id")
-        family_members = family_members.filter(is_active=True)
+        family_members = family_member_queryset_for(request.user).order_by("-id")
 
         id = request.query_params.get("id")
         if id:
@@ -323,16 +280,8 @@ class FamilyMemberView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
         data = request.data.copy()
-        serializer = FamilySerializer(data=data)
+        serializer = FamilyMemberSerializer(data=data)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -341,32 +290,23 @@ class FamilyMemberView(APIView):
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     def patch(self, request, pk=None):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        try:
-            family = Family.objects.get(pk=pk, is_active=True)
-        except Family.DoesNotExist:
-            return Response({"message": "Family not found."}, status=HTTP_404_NOT_FOUND)
+        family_member = get_object_or_404(FamilyMember, pk=pk, is_active=True)
+        self.check_object_permissions(request, family_member)
 
         data = request.data.copy()
-        serializer = FamilySerializer(family, data=data, partial=True)
+        serializer = FamilyMemberSerializer(family_member, data=data, partial=True)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        family = serializer.save()
+        family_member = serializer.save()
         return Response(serializer.data)
 
     def delete(self, request, pk=None):
-        updated = Family.objects.filter(id=pk).update(is_active=False)
-        if updated == 0:
-            return Response({"error": "Family not found"}, status=HTTP_404_NOT_FOUND)
+        family_member = get_object_or_404(FamilyMember, pk=pk, is_active=True)
+        self.check_object_permissions(request, family_member)
+        family_member.is_active = False
+        family_member.save(update_fields=["is_active"])
         return Response(status=HTTP_204_NO_CONTENT)
 
 
@@ -378,34 +318,15 @@ class ExchangeTypeView(APIView):
 
 
 class ExchangeView(APIView):
+    permission_classes = [ExchangePermission]
+
     def get(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-        is_student = "student" in user_groups
+        exchanges = exchange_queryset_for(request.user).order_by("-id")
 
-        if not is_student and not set(user_groups).intersection(get_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        exchanges = Exchange.objects.order_by("-id")
-        exchanges = exchanges.filter(is_active=True)
-
-        # If user is a student, only allow them to see their own exchanges
-        if is_student:
-            try:
-                student = Student.objects.get(id_user=request.user, is_active=True)
-                exchanges = exchanges.filter(id_student=student.id)
-            except Student.DoesNotExist:
-                return Response(
-                    {"message": "Student profile not found for this user."},
-                    status=HTTP_404_NOT_FOUND,
-                )
-        else:
-            # For staff/admin users, allow filtering by id_student
-            id_student = request.query_params.get("id_student")
-            if id_student:
-                exchanges = exchanges.filter(id_student=id_student)
+        # Allow filtering by id_student
+        id_student = request.query_params.get("id_student")
+        if id_student:
+            exchanges = exchanges.filter(id_student=id_student)
 
         page = request.query_params.get("page")
         if page:
@@ -421,14 +342,6 @@ class ExchangeView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
         data = request.data.copy()
         serializer = ExchangeSerializer(data=data)
 
@@ -438,27 +351,9 @@ class ExchangeView(APIView):
         serializer.save()
         return Response(serializer.data, status=HTTP_201_CREATED)
 
-    def delete(self, request, pk=None):
-        updated = Exchange.objects.filter(id=pk).update(is_active=False)
-        if updated == 0:
-            return Response({"error": "Exchange not found"}, status=HTTP_404_NOT_FOUND)
-        return Response(status=HTTP_204_NO_CONTENT)
-
     def patch(self, request, pk=None):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        try:
-            exchange = Exchange.objects.get(pk=pk, is_active=True)
-        except Exchange.DoesNotExist:
-            return Response(
-                {"message": "Exchange not found."}, status=HTTP_404_NOT_FOUND
-            )
+        exchange = get_object_or_404(Exchange, pk=pk, is_active=True)
+        self.check_object_permissions(request, exchange)
 
         data = request.data.copy()
         serializer = ExchangeSerializer(exchange, data=data, partial=True)
@@ -469,33 +364,19 @@ class ExchangeView(APIView):
         exchange = serializer.save()
         return Response(serializer.data)
 
+    def delete(self, request, pk=None):
+        exchange = get_object_or_404(Exchange, pk=pk, is_active=True)
+        self.check_object_permissions(request, exchange)
+        exchange.is_active = False
+        exchange.save(update_fields=["is_active"])
+        return Response(status=HTTP_204_NO_CONTENT)
+
 
 class ExchangeFamilyView(APIView):
+    permission_classes = [ExchangeFamilyPermission]
+
     def get(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-        is_student = "student" in user_groups
-
-        if not is_student and not set(user_groups).intersection(get_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        exchange_families = ExchangeFamily.objects.order_by("-id")
-        exchange_families = exchange_families.filter(is_active=True)
-
-        # If user is a student, only allow them to see exchange families related to their exchanges
-        if is_student:
-            try:
-                student = Student.objects.get(id_user=request.user, is_active=True)
-                exchange_families = exchange_families.filter(
-                    id_exchange__id_student=student.id
-                )
-            except Student.DoesNotExist:
-                return Response(
-                    {"message": "Student profile not found for this user."},
-                    status=HTTP_404_NOT_FOUND,
-                )
+        exchange_families = exchange_family_queryset_for(request.user).order_by("-id")
 
         id_exchange = request.query_params.get("id_exchange")
         if id_exchange:
@@ -541,14 +422,6 @@ class ExchangeFamilyView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
         data = request.data.copy()
         serializer = ExchangeFamilySerializer(data=data)
 
@@ -559,20 +432,8 @@ class ExchangeFamilyView(APIView):
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     def patch(self, request, pk=None):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        try:
-            exchange_family = ExchangeFamily.objects.get(pk=pk, is_active=True)
-        except ExchangeFamily.DoesNotExist:
-            return Response(
-                {"message": "ExchangeFamily not found."}, status=HTTP_404_NOT_FOUND
-            )
+        exchange_family = get_object_or_404(ExchangeFamily, pk=pk, is_active=True)
+        self.check_object_permissions(request, exchange_family)
 
         data = request.data.copy()
         serializer = ExchangeFamilySerializer(exchange_family, data=data, partial=True)
@@ -584,37 +445,18 @@ class ExchangeFamilyView(APIView):
         return Response(serializer.data)
 
     def delete(self, request, pk=None):
-        updated = ExchangeFamily.objects.filter(id=pk).update(is_active=False)
-        if updated == 0:
-            return Response(
-                {"error": "ExchangeFamily not found"}, status=HTTP_404_NOT_FOUND
-            )
+        exchange_family = get_object_or_404(ExchangeFamily, pk=pk, is_active=True)
+        self.check_object_permissions(request, exchange_family)
+        exchange_family.is_active = False
+        exchange_family.save(update_fields=["is_active"])
         return Response(status=HTTP_204_NO_CONTENT)
 
 
 class DocumentView(APIView):
+    permission_classes = [DocumentPermission]
+
     def get(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-        is_student = "student" in user_groups
-
-        if not is_student and not set(user_groups).intersection(get_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        documents = Document.objects.order_by("-id")
-        documents = documents.filter(is_active=True)
-
-        if is_student:
-            try:
-                student = Student.objects.get(id_user=request.user, is_active=True)
-                documents = documents.filter(id_student=student.id)
-            except Student.DoesNotExist:
-                return Response(
-                    {"message": "Student profile not found for this user."},
-                    status=HTTP_404_NOT_FOUND,
-                )
+        documents = document_queryset_for(request.user).order_by("-id")
 
         id = request.query_params.get("id")
         if id:
@@ -656,26 +498,7 @@ class DocumentView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-        is_student = "student" in user_groups
-
-        if not is_student and not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
         data = request.data.copy()
-        if is_student:
-            data.update(
-                {
-                    "id_student": request.user.id_student.id,
-                    "id_staff": None,
-                    "id_club": None,
-                    "id_family": None,
-                    "id_district": None,
-                }
-            )
 
         serializer = DocumentSerializer(data=data)
 
@@ -686,42 +509,11 @@ class DocumentView(APIView):
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     def patch(self, request, pk=None):
-        user_groups = request.user.groups.values_list("name", flat=True)
-        is_student = "student" in user_groups
-
-        if not is_student and not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        try:
-            document = Document.objects.get(pk=pk, is_active=True)
-        except Document.DoesNotExist:
-            return Response(
-                {"message": "Document not found."}, status=HTTP_404_NOT_FOUND
-            )
-
-        if is_student and document.id_student != request.user.id_student.id:
-            return Response(
-                {"message": "You can only edit your own documents."},
-                status=HTTP_403_FORBIDDEN,
-            )
+        document = get_object_or_404(Document, pk=pk)
+        self.check_object_permissions(request, document)
 
         data = request.data.copy()
-        if is_student:
-            data.update(
-                {
-                    "id_student": request.user.id_student.id,
-                    "id_staff": None,
-                    "id_club": None,
-                    "id_family": None,
-                    "id_district": None,
-                }
-            )
-
         serializer = DocumentSerializer(document, data=data, partial=True)
-
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
@@ -729,7 +521,8 @@ class DocumentView(APIView):
         return Response(serializer.data)
 
     def delete(self, request, pk=None):
-        updated = Document.objects.filter(id=pk).update(is_active=False)
-        if updated == 0:
-            return Response({"error": "Document not found"}, status=HTTP_404_NOT_FOUND)
+        document = get_object_or_404(Document, pk=pk)
+        self.check_object_permissions(request, document)
+        document.is_active = False
+        document.save(update_fields=["is_active"])
         return Response(status=HTTP_204_NO_CONTENT)

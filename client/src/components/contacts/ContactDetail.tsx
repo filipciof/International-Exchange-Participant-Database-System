@@ -178,7 +178,7 @@ export default function ContactDetail({
                   Districts
                 </Typography>
                 <Stack direction="row" spacing={1} flexWrap="wrap" gap={1} sx={{ mt: 1 }}>
-                  {contact.districts.map((district) => (
+                  {contact.districts.map((district: number) => (
                     <Chip
                       key={district}
                       label={district}

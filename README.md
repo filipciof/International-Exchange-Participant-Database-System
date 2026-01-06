@@ -49,21 +49,15 @@ exchangeFamily: 299 751
 
 TODO:
 
-- Individual role based pages.
-  - Admin:
-    - Creating new users (either students or staff) (for existing students and staff or for nonexistent).
-    - Changing passwords/emails.
-    - Fully unrestricted access.
-  - Student:
-    - Adjusting your own personal information.
-    - Uploading monthly/biweekly reports.
-    - Can see his host families but cannot edit them.
-  - Correspondent/KWM officer:
-    - Basically admin except cannot create new users or change them.
-  - Club officer:
-    - Can see everything but can only modify data related to his club.
-  - Allow students to see detail pages of entities related to them without ability to edit.
+- Fix the role mess.
+  - Student: can edit themselves. Can see their club, their families their exchanges but cannot edit them. Can see documents, can edit documents and delete documents unless they have a flag that the admin can set. Can edit their users email and password, cannot change their roles.
+  - Club officer: can do everything but it's all filtered by their club.
+  - Admin: can do literally everything.
+- Email Confirmation.
+- Translation.
+
 ---
+
 - How to add a unique indentifier for these lists in React?
   - This is important both in terms of the error that happens in the console and the UX.
 - Regenerate the database with the academic year set for exchanges.

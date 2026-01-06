@@ -12,6 +12,7 @@ import EditableContactInfo from "../components/staff/sections/EditableContactInf
 import EditableClubInfo from "../components/staff/sections/EditableClubInfo";
 import EditableNotes from "../components/staff/sections/EditableNotes";
 import EditableUserAccount from "../components/staff/sections/EditableUserAccount";
+import EditableDocuments from "../components/EditableDocuments";
 
 type StaffProfileProps = {};
 
@@ -102,6 +103,7 @@ export default function StaffProfile({}: StaffProfileProps) {
           <Tab label="Club" />
           <Tab label="Contact" />
           <Tab label="Account" />
+          <Tab label="Documents" />
           <Tab label="Notes" />
         </Tabs>
       </Box>
@@ -125,8 +127,13 @@ export default function StaffProfile({}: StaffProfileProps) {
       {/* User Account */}
       {activeTab === 3 && <EditableUserAccount staff={staff} readOnly />}
 
+      {/* Documents */}
+      {activeTab === 4 && (
+        <EditableDocuments ownerType="staff" ownerId={staff.id} />
+      )}
+
       {/* Notes */}
-      {activeTab === 4 && <EditableNotes staff={staff} />}
+      {activeTab === 5 && <EditableNotes staff={staff} />}
     </Box>
   );
 }
