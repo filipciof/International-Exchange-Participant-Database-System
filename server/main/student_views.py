@@ -5,7 +5,11 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from typing import Any, Generator
 from django.http.response import HttpResponse, StreamingHttpResponse
 from .models import Student, GENDER_MAP, LANG_PROF_MAP
-from .serializers import StudentSerializer
+from .serializers import (
+    StudentSerializer,
+    StudentUserAccountCreateSerializer,
+    StudentUserAccountUpdateSerializer,
+)
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.http import HttpResponse, StreamingHttpResponse
@@ -19,16 +23,17 @@ from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from rest_framework.status import (
-    HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
     HTTP_204_NO_CONTENT,
 )
+from config.permissions.policy_permissions import StudentPermission
+from config.selectors.student import student_queryset_for
+from config.permissions.base import is_student
+from django.shortcuts import get_object_or_404
 
 User = get_user_model()
-get_allowed_groups = ["admin", "correspondent", "club_officer", "kwm_officer", "student"]
-crud_allowed_groups = ["admin", "correspondent"]
 
 
 class Echo:
@@ -42,6 +47,8 @@ class Echo:
 
 
 class StudentView(APIView):
+    permission_classes = [StudentPermission]
+
     STUDENT_EXPORT_HEADERS = [
         "First name",
         "Middle name",
@@ -122,8 +129,7 @@ class StudentView(APIView):
         ]
 
     def __get_filtered_students(self, request):
-        students = Student.objects.order_by("-id")
-        students = students.filter(is_active=True)
+        students = student_queryset_for(request.user).order_by("-id")
         exchange_start_year = request.query_params.get("start_year")
 
         if exchange_start_year:
@@ -344,24 +350,18 @@ class StudentView(APIView):
         return response
 
     def get(self, request) -> Response | StreamingHttpResponse:
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(get_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
+        students = self.__get_filtered_students(request)
 
         id = request.query_params.get("id")
         if id:
-            student = Student.objects.get(id=id, is_active=True)
+            student = students.get(id=id, is_active=True)
             serializer = StudentSerializer(student)
             return Response(serializer.data)
-        
+
         me = request.query_params.get("me")
         if me and me.lower() in ("true", "1"):
             try:
-                student = Student.objects.get(id_user=request.user, is_active=True)
+                student = students.get(id_user=request.user, is_active=True)
                 serializer = StudentSerializer(student)
                 return Response(serializer.data)
             except Student.DoesNotExist:
@@ -370,7 +370,6 @@ class StudentView(APIView):
                     status=HTTP_404_NOT_FOUND,
                 )
 
-        students = self.__get_filtered_students(request)
         export_format = request.query_params.get("export_format")
 
         if export_format == "csv":
@@ -385,18 +384,7 @@ class StudentView(APIView):
         return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-        is_student_user = "student" in user_groups
-        is_admin_user = bool(set(user_groups).intersection(crud_allowed_groups))
-
-        if not is_student_user and not is_admin_user:
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        # If student user, check if they already have a student profile
-        if is_student_user:
+        if is_student(request.user):
             existing_student = Student.objects.filter(
                 id_user=request.user, is_active=True
             ).first()
@@ -408,8 +396,7 @@ class StudentView(APIView):
 
         data = request.data.copy()
 
-        # Auto-assign id_user for student users
-        if is_student_user:
+        if is_student(request.user):
             data["id_user"] = request.user.id
 
         photo = request.FILES.get("photo")
@@ -430,41 +417,22 @@ class StudentView(APIView):
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     def delete(self, request, pk=None):
-        updated = Student.objects.filter(id=pk).update(is_active=False)
-        if updated == 0:
-            return Response({"error": "Student not found"}, status=HTTP_404_NOT_FOUND)
+        student = get_object_or_404(Student, pk=pk, is_active=True)
+        self.check_object_permissions(request, student)
+
+        if student.id_user:
+            student.id_user.is_active = False
+            student.id_user.save(update_fields=["is_active"])
+
+        student.is_active = False
+        student.save(update_fields=["is_active"])
         return Response(status=HTTP_204_NO_CONTENT)
 
     def patch(self, request, pk=None):
-        user_groups = request.user.groups.values_list("name", flat=True)
-        is_student_user = "student" in user_groups
-        is_admin_user = bool(set(user_groups).intersection(crud_allowed_groups))
-
-        if not is_student_user and not is_admin_user:
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        try:
-            student = Student.objects.get(pk=pk, is_active=True)
-        except Student.DoesNotExist:
-            return Response(
-                {"message": "Student not found."}, status=HTTP_404_NOT_FOUND
-            )
-
-        # If student user, verify they can only edit their own profile
-        if is_student_user and student.id_user != request.user:
-            return Response(
-                {"message": "You can only edit your own student profile."},
-                status=HTTP_403_FORBIDDEN,
-            )
+        student = get_object_or_404(Student, pk=pk, is_active=True)
+        self.check_object_permissions(request, student)
 
         data = request.data.copy()
-
-        # Prevent student users from changing id_user
-        if is_student_user and "id_user" in data:
-            del data["id_user"]
 
         photo = request.FILES.get("photo")
         if photo:
@@ -489,15 +457,9 @@ class StudentView(APIView):
 
 
 class StudentPhotoView(APIView):
+    permission_classes = [StudentPermission]
+
     def get(self, request) -> Response | HttpResponse:
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(get_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
         photo_name = request.query_params.get("photo_name", None)
 
         if not photo_name:
@@ -525,61 +487,34 @@ class StudentPhotoView(APIView):
 
 
 class StudentUserAccountView(APIView):
-    """View for managing student user accounts (create/update)"""
+    permission_classes = [StudentPermission]
 
     def post(self, request, pk=None):
-        """Create a user account for a student"""
-        user_groups = request.user.groups.values_list("name", flat=True)
+        student = get_object_or_404(Student, pk=pk, is_active=True)
 
-        if not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        try:
-            student = Student.objects.get(pk=pk, is_active=True)
-        except Student.DoesNotExist:
-            return Response(
-                {"message": "Student not found."}, status=HTTP_404_NOT_FOUND
-            )
-
-        # Check if student already has a user account
         if student.id_user:
             return Response(
                 {"message": "Student already has a user account."},
                 status=HTTP_400_BAD_REQUEST,
             )
 
-        email = request.data.get("email")
-        password = request.data.get("password")
+        serializer = StudentUserAccountCreateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        if not email or not password:
-            return Response(
-                {"message": "Email and password are required."},
-                status=HTTP_400_BAD_REQUEST,
-            )
+        email = serializer.validated_data["email"]
+        password = serializer.validated_data["password"]
 
-        # Check if email is already in use
-        if User.objects.filter(email=email).exists():
-            return Response(
-                {"message": "Email is already in use."},
-                status=HTTP_400_BAD_REQUEST,
-            )
-
-        # Create user
         user = User.objects.create_user(
             email=email,
             password=password,
         )
 
-        # Add user to student group
-        student_group, _ = Group.objects.get_or_create(name="student")
+        student_group = Group.objects.get(name="student")
         user.groups.add(student_group)
 
-        # Link user to student
         student.id_user = user
-        student.save()
+        student.save(update_fields=["id_user"])
 
         return Response(
             {"message": "User account created successfully.", "email": user.email},
@@ -587,23 +522,8 @@ class StudentUserAccountView(APIView):
         )
 
     def patch(self, request, pk=None):
-        """Update a student's user account (email/password)"""
-        user_groups = request.user.groups.values_list("name", flat=True)
-        is_student_user = "student" in user_groups
-        is_admin_user = bool(set(user_groups).intersection(crud_allowed_groups))
-
-        if not is_student_user and not is_admin_user:
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        try:
-            student = Student.objects.get(pk=pk, is_active=True)
-        except Student.DoesNotExist:
-            return Response(
-                {"message": "Student not found."}, status=HTTP_404_NOT_FOUND
-            )
+        student = get_object_or_404(Student, pk=pk, is_active=True)
+        self.check_object_permissions(request, student)
 
         if not student.id_user:
             return Response(
@@ -611,29 +531,22 @@ class StudentUserAccountView(APIView):
                 status=HTTP_404_NOT_FOUND,
             )
 
-        # If student user, verify they can only edit their own account
-        if is_student_user and student.id_user != request.user:
-            return Response(
-                {"message": "You can only edit your own user account."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
         user = student.id_user
-        email = request.data.get("email")
-        password = request.data.get("password")
 
-        # Update email if provided
+        serializer = StudentUserAccountUpdateSerializer(
+            data=request.data,
+            context={"user": user},
+        )
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        email = serializer.validated_data.get("email")
+        password = serializer.validated_data.get("password")
+
         if email and email != user.email:
-            # Check if new email is already in use
-            if User.objects.filter(email=email).exclude(pk=user.pk).exists():
-                return Response(
-                    {"message": "Email is already in use."},
-                    status=HTTP_400_BAD_REQUEST,
-                )
             user.email = email
             user.username = email
 
-        # Update password if provided
         if password:
             user.set_password(password)
 

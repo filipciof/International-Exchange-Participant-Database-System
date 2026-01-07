@@ -16,21 +16,15 @@ from uuid import uuid4
 from django.core.files.storage import default_storage
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
-
-get_allowed_groups = ["admin", "correspondent", "club_officer", "kwm_officer"]
-crud_allowed_groups = ["admin", "correspondent"]
+from config.permissions.policy_permissions import ContactPermission
+from config.selectors.contact import contact_queryset_for
+from django.shortcuts import get_object_or_404
 
 
 class ContactPhotoView(APIView):
+    permission_classes = [ContactPermission]
+
     def get(self, request, format=None):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(get_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
         photo_name = request.query_params.get("photo_name", None)
 
         if not photo_name:
@@ -58,17 +52,10 @@ class ContactPhotoView(APIView):
 
 
 class ContactView(APIView):
+    permission_classes = [ContactPermission]
+
     def get(self, request, format=None):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(get_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        contacts = Contact.objects.order_by("-id")
-        contacts = contacts.filter(is_active=True)
+        contacts = contact_queryset_for(request.user).order_by("-id")
 
         id = request.query_params.get("id")
         if id:
@@ -123,14 +110,6 @@ class ContactView(APIView):
         return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
         data = request.data.copy()
 
         photo = request.FILES.get("photo")
@@ -156,20 +135,8 @@ class ContactView(APIView):
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     def patch(self, request, pk=None):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        try:
-            contact = Contact.objects.get(pk=pk, is_active=True)
-        except Contact.DoesNotExist:
-            return Response(
-                {"message": "Contact not found."}, status=HTTP_404_NOT_FOUND
-            )
+        contact = get_object_or_404(Contact, pk=pk, is_active=True)
+        self.check_object_permissions(request, contact)
 
         data = request.data.copy()
 
@@ -205,7 +172,8 @@ class ContactView(APIView):
         return Response(serializer.data)
 
     def delete(self, request, pk=None):
-        updated = Contact.objects.filter(id=pk).update(is_active=False)
-        if updated == 0:
-            return Response({"error": "Contact not found"}, status=HTTP_404_NOT_FOUND)
+        contact = get_object_or_404(Contact, pk=pk, is_active=True)
+        self.check_object_permissions(request, contact)
+        contact.is_active = False
+        contact.save(update_fields=["is_active"])
         return Response(status=HTTP_204_NO_CONTENT)

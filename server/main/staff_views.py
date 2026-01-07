@@ -1,12 +1,15 @@
 from .models import Staff
-from .serializers import StaffSerializer
+from .serializers import (
+    StaffSerializer,
+    StaffUserAccountCreateSerializer,
+    StaffUserAccountUpdateSerializer,
+)
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import (
-    HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
@@ -15,28 +18,21 @@ from rest_framework.status import (
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from config.settings import MEDIA_ROOT
+from config.permissions.policy_permissions import StaffPermission
+from config.selectors.staff import staff_queryset_for
+from django.shortcuts import get_object_or_404
 import os
 from uuid import uuid4
 from django.core.files.storage import default_storage
 
 User = get_user_model()
 
-get_allowed_groups = ["admin", "correspondent", "club_officer", "kwm_officer"]
-crud_allowed_groups = ["admin", "correspondent"]
-
 
 class StaffView(APIView):
+    permission_classes = [StaffPermission]
+
     def get(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(get_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        staff = Staff.objects.order_by("-id")
-        staff = staff.filter(is_active=True)
+        staff = staff_queryset_for(request.user).order_by("-id")
 
         id = request.query_params.get("id")
         if id:
@@ -86,20 +82,9 @@ class StaffView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        user_groups = request.user.groups.values_list("name", flat=True)
-        is_admin_user = bool(set(user_groups).intersection(crud_allowed_groups))
-        is_staff_user = bool(set(user_groups).intersection(get_allowed_groups))
         me = request.query_params.get("me")
 
-        # Check if user is creating their own profile
         if me and me.lower() in ("true", "1"):
-            if not is_staff_user:
-                return Response(
-                    {"message": "You are not authorized to do this."},
-                    status=HTTP_403_FORBIDDEN,
-                )
-
-            # Check if they already have a staff profile
             existing_staff = Staff.objects.filter(
                 id_user=request.user, is_active=True
             ).first()
@@ -110,17 +95,8 @@ class StaffView(APIView):
                 )
 
             data = request.data.copy()
-            # Auto-assign id_user
             data["id_user"] = request.user.id
-
         else:
-            # Creating another staff member's profile - admin only
-            if not is_admin_user:
-                return Response(
-                    {"message": "You are not authorized to do this."},
-                    status=HTTP_403_FORBIDDEN,
-                )
-
             data = request.data.copy()
 
         photo = request.FILES.get("photo")
@@ -140,20 +116,9 @@ class StaffView(APIView):
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     def patch(self, request, pk=None):
-        user_groups = request.user.groups.values_list("name", flat=True)
-        is_admin_user = bool(set(user_groups).intersection(crud_allowed_groups))
-        is_staff_user = bool(set(user_groups).intersection(get_allowed_groups))
         me = request.query_params.get("me")
 
-        # Check if user is updating their own profile
         if me and me.lower() in ("true", "1"):
-            if not is_staff_user:
-                return Response(
-                    {"message": "You are not authorized to do this."},
-                    status=HTTP_403_FORBIDDEN,
-                )
-
-            # Get their own staff profile
             try:
                 staff = Staff.objects.get(id_user=request.user, is_active=True)
             except Staff.DoesNotExist:
@@ -161,26 +126,11 @@ class StaffView(APIView):
                     {"message": "Staff profile not found for this user."},
                     status=HTTP_404_NOT_FOUND,
                 )
-
-            data = request.data.copy()
-            # Prevent changing id_user
-            if "id_user" in data:
-                del data["id_user"]
-
         else:
-            # Updating another staff member's profile - admin only
-            if not is_admin_user:
-                return Response(
-                    {"message": "You are not authorized to do this."},
-                    status=HTTP_403_FORBIDDEN,
-                )
+            staff = get_object_or_404(Staff, pk=pk, is_active=True)
 
-            try:
-                staff = Staff.objects.get(pk=pk, is_active=True)
-            except Staff.DoesNotExist:
-                return Response({"message": "Staff not found."}, status=HTTP_404_NOT_FOUND)
-
-            data = request.data.copy()
+        self.check_object_permissions(request, staff)
+        data = request.data.copy()
 
         photo = request.FILES.get("photo")
         if photo:
@@ -204,22 +154,22 @@ class StaffView(APIView):
         return Response(serializer.data)
 
     def delete(self, request, pk=None):
-        updated = Staff.objects.filter(id=pk).update(is_active=False)
-        if updated == 0:
-            return Response({"error": "Staff not found"}, status=HTTP_404_NOT_FOUND)
+        staff = get_object_or_404(Staff, pk=pk, is_active=True)
+        self.check_object_permissions(request, staff)
+
+        if staff.id_user:
+            staff.id_user.is_active = False
+            staff.id_user.save(update_fields=["is_active"])
+
+        staff.is_active = False
+        staff.save(update_fields=["is_active"])
         return Response(status=HTTP_204_NO_CONTENT)
 
 
 class StaffPhotoView(APIView):
+    permission_classes = [StaffPermission]
+
     def get(self, request) -> Response | HttpResponse:
-        user_groups = request.user.groups.values_list("name", flat=True)
-
-        if not set(user_groups).intersection(get_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
         photo_name = request.query_params.get("photo_name", None)
 
         if not photo_name:
@@ -247,70 +197,35 @@ class StaffPhotoView(APIView):
 
 
 class StaffUserAccountView(APIView):
-    """View for managing staff user accounts (create/update)"""
+    permission_classes = [StaffPermission]
 
     def post(self, request, pk=None):
-        """Create a user account for a staff member"""
-        user_groups = request.user.groups.values_list("name", flat=True)
+        staff = get_object_or_404(Staff, pk=pk, is_active=True)
 
-        if not set(user_groups).intersection(crud_allowed_groups):
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        try:
-            staff = Staff.objects.get(pk=pk, is_active=True)
-        except Staff.DoesNotExist:
-            return Response(
-                {"message": "Staff not found."}, status=HTTP_404_NOT_FOUND
-            )
-
-        # Check if staff already has a user account
         if staff.id_user:
             return Response(
                 {"message": "Staff member already has a user account."},
                 status=HTTP_400_BAD_REQUEST,
             )
 
-        email = request.data.get("email")
-        password = request.data.get("password")
-        group_name = request.data.get("group")
+        serializer = StaffUserAccountCreateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        if not email or not password or not group_name:
-            return Response(
-                {"message": "Email, password, and group are required."},
-                status=HTTP_400_BAD_REQUEST,
-            )
+        email = serializer.validated_data["email"]
+        password = serializer.validated_data["password"]
+        group_name = serializer.validated_data["group"]
 
-        # Check if email is already in use
-        if User.objects.filter(email=email).exists():
-            return Response(
-                {"message": "Email is already in use."},
-                status=HTTP_400_BAD_REQUEST,
-            )
-
-        # Validate group
-        valid_groups = ["admin", "correspondent", "club_officer", "kwm_officer"]
-        if group_name not in valid_groups:
-            return Response(
-                {"message": f"Invalid group. Must be one of: {', '.join(valid_groups)}"},
-                status=HTTP_400_BAD_REQUEST,
-            )
-
-        # Create user
         user = User.objects.create_user(
             email=email,
             password=password,
         )
 
-        # Add user to selected group
-        staff_group, _ = Group.objects.get_or_create(name=group_name)
-        user.groups.add(staff_group)
+        group = Group.objects.get(name=group_name)
+        user.groups.add(group)
 
-        # Link user to staff
         staff.id_user = user
-        staff.save()
+        staff.save(update_fields=["id_user"])
 
         return Response(
             {"message": "User account created successfully.", "email": user.email},
@@ -318,23 +233,8 @@ class StaffUserAccountView(APIView):
         )
 
     def patch(self, request, pk=None):
-        """Update a staff member's user account (email/password/group)"""
-        user_groups = request.user.groups.values_list("name", flat=True)
-        is_staff_user = bool(set(user_groups).intersection(get_allowed_groups))
-        is_admin_user = bool(set(user_groups).intersection(crud_allowed_groups))
-
-        if not is_staff_user and not is_admin_user:
-            return Response(
-                {"message": "You are not authorized to do this."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
-        try:
-            staff = Staff.objects.get(pk=pk, is_active=True)
-        except Staff.DoesNotExist:
-            return Response(
-                {"message": "Staff not found."}, status=HTTP_404_NOT_FOUND
-            )
+        staff = get_object_or_404(Staff, pk=pk, is_active=True)
+        self.check_object_permissions(request, staff)
 
         if not staff.id_user:
             return Response(
@@ -342,51 +242,27 @@ class StaffUserAccountView(APIView):
                 status=HTTP_404_NOT_FOUND,
             )
 
-        # If staff user (non-admin), verify they can only edit their own account
-        if is_staff_user and not is_admin_user and staff.id_user != request.user:
-            return Response(
-                {"message": "You can only edit your own user account."},
-                status=HTTP_403_FORBIDDEN,
-            )
-
         user = staff.id_user
-        email = request.data.get("email")
-        password = request.data.get("password")
-        group_name = request.data.get("group")
 
-        # Only admins can update groups
+        serializer = StaffUserAccountUpdateSerializer(
+            data=request.data,
+            context={"user": user},
+        )
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        email = serializer.validated_data.get("email")
+        password = serializer.validated_data.get("password")
+        group_name = serializer.validated_data.get("group")
+
         if group_name:
-            if not is_admin_user:
-                return Response(
-                    {"message": "Only admins can update user groups."},
-                    status=HTTP_403_FORBIDDEN,
-                )
-
-            # Validate group
-            valid_groups = ["admin", "correspondent", "club_officer", "kwm_officer"]
-            if group_name not in valid_groups:
-                return Response(
-                    {"message": f"Invalid group. Must be one of: {', '.join(valid_groups)}"},
-                    status=HTTP_400_BAD_REQUEST,
-                )
-
-            # Update user's groups
             user.groups.clear()
-            new_group, _ = Group.objects.get_or_create(name=group_name)
-            user.groups.add(new_group)
+            group = Group.objects.get(name=group_name)
+            user.groups.add(group)
 
-        # Update email if provided
         if email and email != user.email:
-            # Check if new email is already in use
-            if User.objects.filter(email=email).exclude(pk=user.pk).exists():
-                return Response(
-                    {"message": "Email is already in use."},
-                    status=HTTP_400_BAD_REQUEST,
-                )
             user.email = email
-            user.username = email
 
-        # Update password if provided
         if password:
             user.set_password(password)
 

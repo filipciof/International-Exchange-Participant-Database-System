@@ -47,23 +47,32 @@ exchangeType: 3
 exchange: 99 987
 exchangeFamily: 299 751
 
+High level description of the system.
+
+The system is designed for managing international student exchanges for a country level branch of an international organization. The country of this branch of the organization is further referred to as the "home" country. The organization works in different countries. Each country can be further split into districts. Within those districts there are clubs. At the beginning of the lifecycle of the system there will be the home country, its districts and clubs. Only admins should be able to add or modify those. For now, let's assume that there will be a fixed set of foreign countries and districts. Foreign clubs might need to be added as the system grows.
+
+There are four distinct roles in the system: admins, correspondents, club officers and students. Admins, correspondents and club officers are collectively referred to as staff. Admins should have unrestricted access. They should be the only ones capable of creating new staff members. There are two major kinds of students: inbound and outbound. Inbound students are coming to the home country. Outbound students are coming to foreign countries.
+
+Inbound students are created by correspondent. When correspondent creates the inbound student he provides the following information: name, surname, country, district and club they are coming from (sending). The country, district and club information is provided in a cascading pattern (first country, then district, finally club). Correspondent should be automatically assigned to the student he created. Finally, correspondent provides student's email and creates an account. An email with one time login link is sent to the student's inbox. When the student uses the link he is redirected to the website where he is forced to set up a password. Now, after logging in the student is capable of filling in and possibly modifying remaining information. Student should also be capable of uploading document files (docx, pdf) and a profile picture. Correspondent may also upload document files to student account. Student should also be able to change his own password and email address (with email confirmation). When the correspondent sets the club the student is coming to (receiving), that's when the student becomes visible to that club's club officer. Club officer is the one who assigns families to students. Students may be assigned to many families in consecutive time periods.
+
+Outbound students are created by club officers. When club officer creates the outbound student he provides the following information: name and surname. The country, district and club are automatically assigned based on club officers information. Then the club officer provides the student's email address and the student account is created in much the same way like with correspondents and inbound students. At that point the student can already be viewed by the correspondent and he can set the receiving club for the student.
+
+Correspondents are capable of creating foreign clubs (because they may have to send a student to a club which does not yet exist or receive a student from a club which does not yet exist).
+Both club officers and correspondents can only be from a club from the home country.
+Club officers have no need to view or modify any clubs.
+When admins create staff members provide pretty much the same information: name, surname, group(role), district and club (since staff can only be from the home country). This should be the default not a rule because admins should be able to bypass any rule. Then admins provide an email and an account is created in much the same way like students.
+
 TODO:
 
-- Individual role based pages.
-  - Admin:
-    - Creating new users (either students or staff) (for existing students and staff or for nonexistent).
-    - Changing passwords/emails.
-    - Fully unrestricted access.
-  - Student:
-    - Adjusting your own personal information.
-    - Uploading monthly/biweekly reports.
-    - Can see his host families but cannot edit them.
-  - Correspondent/KWM officer:
-    - Basically admin except cannot create new users or change them.
-  - Club officer:
-    - Can see everything but can only modify data related to his club.
-  - Allow students to see detail pages of entities related to them without ability to edit.
+- Fix the role mess.
+  - Student: can edit themselves. Can see their club, their families their exchanges but cannot edit them. Can see documents, can edit documents and delete documents unless they have a flag that the admin can set. Can edit their users email and password, cannot change their roles.
+  - Club officer: can do everything but it's all filtered by their club.
+  - Admin: can do literally everything.
+- Email Confirmation.
+- Translation.
+
 ---
+
 - How to add a unique indentifier for these lists in React?
   - This is important both in terms of the error that happens in the console and the UX.
 - Regenerate the database with the academic year set for exchanges.

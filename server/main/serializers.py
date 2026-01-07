@@ -14,6 +14,9 @@ from .models import (
     Exchange,
     Staff,
 )
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -82,6 +85,12 @@ class StudentSerializer(serializers.ModelSerializer):
         fields = "__all__"
         extra_kwargs = {"is_active": {"required": False, "default": True}}
 
+    def validate(self, attrs):
+        if self.instance and self.instance.id_user is not None:
+            attrs.pop("id_user", None)
+
+        return attrs
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
 
@@ -110,6 +119,32 @@ class StudentSerializer(serializers.ModelSerializer):
         )
 
         return representation
+
+
+class StudentUserAccountCreateSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True, min_length=5)
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email is already in use.")
+        return value
+
+
+class StudentUserAccountUpdateSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=False)
+    password = serializers.CharField(required=False, write_only=True, min_length=5)
+
+    def validate_email(self, value):
+        user = self.context.get("user")
+        if user and User.objects.filter(email=value).exclude(pk=user.pk).exists():
+            raise serializers.ValidationError("Email is already in use.")
+        return value
+
+    def validate(self, attrs):
+        if not attrs:
+            raise serializers.ValidationError("No data provided.")
+        return attrs
 
 
 class ExchangeTypeSerializer(serializers.ModelSerializer):
@@ -231,6 +266,12 @@ class StaffSerializer(serializers.ModelSerializer):
         fields = "__all__"
         extra_kwargs = {"is_active": {"required": False, "default": True}}
 
+    def validate(self, attrs):
+        if self.instance and self.instance.id_user is not None:
+            attrs.pop("id_user", None)
+
+        return attrs
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation["gender_name"] = GENDER_MAP.get(instance.gender, "unknown")
@@ -243,6 +284,39 @@ class StaffSerializer(serializers.ModelSerializer):
             else []
         )
         return representation
+
+
+class StaffUserAccountCreateSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True, min_length=5)
+    group = serializers.ChoiceField(
+        choices=["admin", "correspondent", "club_officer", "kwm_officer"]
+    )
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email is already in use.")
+        return value
+
+
+class StaffUserAccountUpdateSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=False)
+    password = serializers.CharField(required=False, write_only=True, min_length=5)
+    group = serializers.ChoiceField(
+        choices=["admin", "correspondent", "club_officer", "kwm_officer"],
+        required=False,
+    )
+
+    def validate_email(self, value):
+        user = self.context.get("user")
+        if user and User.objects.filter(email=value).exclude(pk=user.pk).exists():
+            raise serializers.ValidationError("Email is already in use.")
+        return value
+
+    def validate(self, attrs):
+        if not attrs:
+            raise serializers.ValidationError("No data provided.")
+        return attrs
 
 
 class DocumentSerializer(serializers.ModelSerializer):
