@@ -9,6 +9,7 @@ User = get_user_model()
 class Country(models.Model):
     name = models.CharField(max_length=60)
     code = models.CharField(max_length=2, unique=True)
+    is_home_country = models.BooleanField(default=False)
 
     class Meta:
         db_table = "country"
@@ -182,6 +183,9 @@ class Student(models.Model):
     insurance_serial_number = models.CharField(max_length=20, blank=True, default="")
     insurance_amount = models.DecimalField(max_digits=12, decimal_places=2, null=True)
 
+    # Inbound/Outbound
+    is_inbound = models.BooleanField(default=True)
+
     # Extras
     photo = models.ImageField(upload_to="student_photos/", blank=True, default="")
     notes = models.TextField(blank=True, default="")
@@ -278,7 +282,6 @@ class Exchange(models.Model):
         blank=True,
         default="",
     )
-    is_inbound = models.BooleanField(default=True)
 
     is_active = models.BooleanField(default=True)
 

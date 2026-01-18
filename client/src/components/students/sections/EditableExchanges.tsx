@@ -26,6 +26,7 @@ import EditableExchangeFamilies from "./EditableExchangeFamilies";
 
 type EditableExchangesProps = {
   studentId: number;
+  isInbound: boolean;
   readOnly?: boolean;
 };
 
@@ -49,6 +50,7 @@ const getCurrentAcademicYear = (): string => {
 
 export default function EditableExchanges({
   studentId,
+  isInbound,
   readOnly = false,
 }: EditableExchangesProps) {
   const [dialogOpen, setDialogOpen] = useState<
@@ -61,7 +63,6 @@ export default function EditableExchanges({
   const [formData, setFormData] = useState<ExchangeFormData>({
     id_student: studentId,
     year: "",
-    is_inbound: false,
     id_type: null,
     start_date: "",
     end_date: "",
@@ -133,7 +134,6 @@ export default function EditableExchanges({
     setFormData({
       id_student: studentId,
       year: getCurrentAcademicYear(),
-      is_inbound: false,
       id_type: null,
       start_date: "",
       end_date: "",
@@ -150,7 +150,6 @@ export default function EditableExchanges({
     setFormData({
       id_student: studentId,
       year: exchange.year,
-      is_inbound: exchange.is_inbound,
       id_type: exchange.id_type,
       start_date: exchange.start_date || "",
       end_date: exchange.end_date || "",
@@ -224,11 +223,11 @@ export default function EditableExchanges({
                   elevation={0}
                   sx={{
                     p: 2.5,
-                    bgcolor: exchange.is_inbound
+                    bgcolor: isInbound
                       ? "success.lighter"
                       : "info.lighter",
                     border: "1px solid",
-                    borderColor: exchange.is_inbound
+                    borderColor: isInbound
                       ? "success.light"
                       : "info.light",
                     borderRadius: 1,
@@ -250,9 +249,9 @@ export default function EditableExchanges({
                         {exchange.type || "Exchange"}
                       </Typography>
                       <Chip
-                        label={exchange.is_inbound ? "Inbound" : "Outbound"}
+                        label={isInbound ? "Inbound" : "Outbound"}
                         size="small"
-                        color={exchange.is_inbound ? "success" : "info"}
+                        color={isInbound ? "success" : "info"}
                         sx={{ fontWeight: 500 }}
                       />
                     </Box>

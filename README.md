@@ -65,11 +65,10 @@ When admins create staff members provide pretty much the same information: name,
 TODO:
 
 - Fix the role mess.
-  - Student: can edit themselves. Can see their club, their families their exchanges but cannot edit them. Can see documents, can edit documents and delete documents unless they have a flag that the admin can set. Can edit their users email and password, cannot change their roles.
-  - Club officer: can do everything but it's all filtered by their club.
-  - Admin: can do literally everything.
-- Email Confirmation.
+  - Load the data from the message (home clubs).
+  - Change the forms and filters to match new requirements.
 - Translation.
+- Email Confirmation.
 
 ---
 

@@ -16,6 +16,7 @@ export type Country = {
   id: number;
   name: string;
   code: string;
+  is_home_country: boolean;
 };
 
 export type District = {
@@ -165,6 +166,7 @@ export type Student = {
   photo: string;
   notes: string;
   user_email: string;
+  is_inbound: boolean;
 };
 
 export type Club = {
@@ -201,13 +203,11 @@ export type Exchange = {
   start_date: string;
   end_date: string;
   year: string;
-  is_inbound: boolean;
 };
 
 export type ExchangeFormData = {
   id_student: number;
   year: string;
-  is_inbound: boolean;
   id_type: number | null;
   start_date: string;
   end_date: string;

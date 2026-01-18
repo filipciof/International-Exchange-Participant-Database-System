@@ -1,12 +1,10 @@
 import {
   Autocomplete,
   Button,
-  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControlLabel,
   Stack,
   TextField,
   Typography,
@@ -188,17 +186,6 @@ export default function AddEditExchangeDialog({
               })
             }
             helperText="Format: YYYY/YY (e.g., 2024/25)"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={formData.is_inbound}
-                onChange={(e) =>
-                  setFormData({ ...formData, is_inbound: e.target.checked })
-                }
-              />
-            }
-            label="Inbound Exchange"
           />
           <DatePicker
             label="Start Date"

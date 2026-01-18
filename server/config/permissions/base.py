@@ -78,3 +78,10 @@ def student_has_exchange_with_family(student, family) -> bool:
             exchangefamily__id_family=family,
         )
     ).exists()
+
+
+def is_club_from_home_country(club) -> bool:
+    """Check if a club belongs to the home country"""
+    if not club or not club.id_district or not club.id_district.id_country:
+        return False
+    return club.id_district.id_country.is_home_country

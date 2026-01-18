@@ -104,6 +104,7 @@ def generate_student(students_to_create):
         id_country_of_passport=id_country_of_passport,
         passport_number=fake.numerify("#########"),
         passport_expiration_date=fake.date_between(start_date="+6m", end_date="+2y"),
+        is_inbound=choice([True, False]),
     )
     students_to_create.append(student)
 

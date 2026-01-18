@@ -48,6 +48,13 @@ export default function ClubForm({
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [selectedCountry, setSelectedCountry] = useState<number | null>(null);
 
+  // Check if user is admin - non-admins cannot create home country clubs
+  const userGroups = JSON.parse(localStorage.getItem("userGroups") || "[]");
+  const isAdmin = userGroups.includes("admin");
+  const availableCountries = isAdmin
+    ? countries
+    : countries.filter((c) => !c.is_home_country);
+
   const {
     control,
     handleSubmit,
@@ -137,13 +144,13 @@ export default function ClubForm({
             />
             <Stack direction={isMobile ? "column" : "row"} spacing={2}>
               <Autocomplete
-                value={countries.find((c) => c.id === selectedCountry) || null}
+                value={availableCountries.find((c) => c.id === selectedCountry) || null}
                 onChange={(_event, newValue) => {
                   setSelectedCountry(newValue?.id || null);
                   // Clear district selection when country changes
                   setValue("id_district", undefined);
                 }}
-                options={countries}
+                options={availableCountries}
                 getOptionLabel={(option) => option.name}
                 fullWidth
                 renderInput={(params) => (

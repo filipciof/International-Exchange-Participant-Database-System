@@ -30,7 +30,7 @@ from rest_framework.status import (
 )
 from config.permissions.policy_permissions import StudentPermission
 from config.selectors.student import student_queryset_for
-from config.permissions.base import is_student
+from config.permissions.base import is_student, is_correspondent, is_kwm_officer, is_club_officer
 from django.shortcuts import get_object_or_404
 
 User = get_user_model()
@@ -145,15 +145,11 @@ class StudentView(APIView):
 
         if is_inbound is not None:
             if is_inbound.lower() in ("true", "1"):
-                students = students.filter(
-                    exchange__is_inbound=True, exchange__is_active=True
-                )
+                students = students.filter(is_inbound=True)
             elif is_inbound.lower() in ("false", "0"):
-                students = students.filter(
-                    exchange__is_inbound=False, exchange__is_active=True
-                )
+                students = students.filter(is_inbound=False)
 
-        if exchange_start_year or is_inbound is not None:
+        if exchange_start_year:
             students = students.distinct()
 
         search = request.query_params.get("search")
@@ -384,6 +380,8 @@ class StudentView(APIView):
         return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
+        from .models import Exchange
+
         if is_student(request.user):
             existing_student = Student.objects.filter(
                 id_user=request.user, is_active=True
@@ -399,6 +397,12 @@ class StudentView(APIView):
         if is_student(request.user):
             data["id_user"] = request.user.id
 
+        # Auto-set is_inbound based on creator role
+        if is_correspondent(request.user) or is_kwm_officer(request.user):
+            data["is_inbound"] = True
+        elif is_club_officer(request.user):
+            data["is_inbound"] = False
+
         photo = request.FILES.get("photo")
 
         if photo:
@@ -413,7 +417,22 @@ class StudentView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        serializer.save()
+        student = serializer.save()
+
+        # Auto-create exchange for correspondent/kwm_officer/club_officer
+        if is_correspondent(request.user) or is_kwm_officer(request.user):
+            Exchange.objects.create(
+                id_student=student,
+                id_counsellor=request.user.id_staff,
+                is_active=True,
+            )
+        elif is_club_officer(request.user):
+            Exchange.objects.create(
+                id_student=student,
+                id_sending_club=request.user.id_staff.id_club,
+                is_active=True,
+            )
+
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     def delete(self, request, pk=None):

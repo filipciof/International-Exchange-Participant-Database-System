@@ -48,33 +48,19 @@ def process_student_chunk(students: list[Student]):
     exchanges_to_create = []
 
     for student in students:
-        # id_country_of_departure = student.id_country_of_departure
-        # id_country_of_birth = student.id_country_of_birth
         base_date = fake.date_between("-1000d", "+1000d")
         date_ranges = generate_date_ranges(base_date)
 
-        # sending_club = choice(
-        #     Club.objects.filter(id_district__id_country=id_country_of_departure)
-        # )
-
-        sending_club = choice(clubs)
+        # If inbound: receiving_club from home country, sending_club from foreign
+        # If outbound: sending_club from home country, receiving_club from foreign
+        if student.is_inbound:
+            sending_club = choice(foreign_clubs) if foreign_clubs else choice(clubs)
+            receiving_club = choice(home_country_clubs) if home_country_clubs else choice(clubs)
+        else:
+            sending_club = choice(home_country_clubs) if home_country_clubs else choice(clubs)
+            receiving_club = choice(foreign_clubs) if foreign_clubs else choice(clubs)
 
         for date_range in date_ranges:
-
-            # receiving_club = choice(
-            #     Club.objects.exclude(
-            #         id_district__id_country__in=[
-            #             id_country_of_departure,
-            #             id_country_of_birth,
-            #         ]
-            #     )
-            # )
-
-            receiving_club = choice(clubs)
-
-            # id_counsellor = choice(Staff.objects.filter(id_club=receiving_club))
-            # id_kwm_officer = choice(Staff.objects.filter(id_club=sending_club))
-
             id_counsellor = choice(staff)
             id_kwm_officer = choice(staff)
 
@@ -87,7 +73,6 @@ def process_student_chunk(students: list[Student]):
                 start_date=date_range["start_date"],
                 end_date=date_range["end_date"],
                 id_type=date_range["type"],
-                is_inbound=choice([True, False]),
             )
 
             exchanges_to_create.append(exchange)
@@ -99,9 +84,11 @@ def process_student_chunk(students: list[Student]):
 
 
 fake = Faker()
-exchange_types = ExchangeType.objects.all()
-staff = Staff.objects.all()
-clubs = Club.objects.all()
+exchange_types = list(ExchangeType.objects.all())
+staff = list(Staff.objects.all())
+clubs = list(Club.objects.all())
+home_country_clubs = list(Club.objects.filter(id_district__id_country__is_home_country=True))
+foreign_clubs = list(Club.objects.filter(id_district__id_country__is_home_country=False))
 
 
 class Command(BaseCommand):

@@ -15,7 +15,11 @@ class Command(BaseCommand):
                     "No countries found in database. Please create countries first."
                 )
             )
-        
+
+        # Set Poland as home country
+        Country.objects.filter(code="PL").update(is_home_country=True)
+        self.stdout.write(self.style.SUCCESS("Set Poland as home country"))
+
         all_codes = [f'{i:04d}' for i in range(1, 10000)]
         selected_codes = sample(all_codes, 600)
 

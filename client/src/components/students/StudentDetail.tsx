@@ -118,7 +118,7 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
           <EditableParentInfo student={student} />
           <EditableInsurance student={student} />
           <EditableUserAccount student={student} />
-          <EditableExchanges studentId={student.id} />
+          <EditableExchanges studentId={student.id} isInbound={student.is_inbound} />
           <EditableDocuments ownerType="student" ownerId={student.id} />
           <EditableNotes student={student} />
         </>
@@ -147,7 +147,7 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
       {activeTab === 6 && <EditableUserAccount student={student} />}
 
       {/* Exchange History */}
-      {activeTab === 7 && <EditableExchanges studentId={student.id} />}
+      {activeTab === 7 && <EditableExchanges studentId={student.id} isInbound={student.is_inbound} />}
 
       {/* Documents */}
       {activeTab === 8 && (

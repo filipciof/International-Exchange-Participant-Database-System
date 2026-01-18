@@ -6,6 +6,7 @@ from config.permissions.base import (
     is_staff,
     is_student,
     student_has_exchange_with_staff,
+    is_club_from_home_country,
 )
 from config.policies.fail_closed import fail_closed
 
@@ -47,15 +48,16 @@ def can_delete(user, staff) -> bool:
 
 @fail_closed()
 def can_create(user, data=None) -> bool:
-    if not is_staff(user):
+    # ONLY admins can create staff members
+    if not is_admin(user):
         return False
 
-    if data and "group" in data:
-        return (
-            is_admin(user)
-            or is_correspondent(user)
-            or is_kwm_officer(user)
-            or (is_club_officer(user) and data.get("group") == "club_officer")
-        )
+    # Validate: Staff must be from home country
+    if data and "id_club" in data:
+        from main.models import Club
+
+        club = Club.objects.filter(id=data["id_club"]).first()
+        if club and not is_club_from_home_country(club):
+            return False
 
     return True

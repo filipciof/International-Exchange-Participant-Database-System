@@ -138,7 +138,7 @@ export default function StudentProfile({}: StudentProfileProps) {
           <EditableParentInfo student={student} />
           <EditableInsurance student={student} />
           <EditableUserAccount student={student} readOnly />
-          <EditableExchanges studentId={student.id} readOnly />
+          <EditableExchanges studentId={student.id} isInbound={student.is_inbound} readOnly />
           <EditableDocuments
             ownerType="student"
             ownerId={student.id}
@@ -171,7 +171,7 @@ export default function StudentProfile({}: StudentProfileProps) {
       {activeTab === 6 && <EditableUserAccount student={student} readOnly />}
 
       {/* Exchange History */}
-      {activeTab === 7 && <EditableExchanges studentId={student.id} readOnly />}
+      {activeTab === 7 && <EditableExchanges studentId={student.id} isInbound={student.is_inbound} readOnly />}
 
       {/* Documents */}
       {activeTab === 8 && (

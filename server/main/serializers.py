@@ -177,7 +177,6 @@ class ExchangeSerializer(serializers.ModelSerializer):
         fields = "__all__"
         extra_kwargs = {
             "is_active": {"required": False, "default": True},
-            "is_inbound": {"required": False, "default": True},
         }
 
     def to_representation(self, instance):

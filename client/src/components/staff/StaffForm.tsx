@@ -238,7 +238,7 @@ export default function StaffForm({
                 setDistrict(null);
                 setValue("id_club", undefined);
               }}
-              options={countries}
+              options={countries.filter((c: Country) => c.is_home_country)}
               getOptionLabel={(option) => option.name}
               fullWidth
               renderInput={(params) => (
