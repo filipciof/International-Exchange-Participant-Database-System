@@ -1,29 +1,33 @@
 import { useState } from "react";
+import { Box, Typography, IconButton, TextField, Paper } from "@mui/material";
 import {
-  Box,
-  Typography,
-  IconButton,
-  TextField,
-  Paper,
-} from "@mui/material";
-import { Edit as EditIcon, Save, Close, StickyNote2 } from "@mui/icons-material";
+  Edit as EditIcon,
+  Save,
+  Close,
+  StickyNote2,
+} from "@mui/icons-material";
 import type { Student } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
 import Section from "../../Section";
+import { useTranslation } from "react-i18next";
 
 type EditableNotesProps = {
   student: Student;
 };
 
 export default function EditableNotes({ student }: EditableNotesProps) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [notes, setNotes] = useState(student.notes || "");
 
   const updateMutation = useMutation({
     mutationFn: async (data: { notes: string }) => {
-      const response = await axiosClient.patch(`/students/${student.id}/`, data);
+      const response = await axiosClient.patch(
+        `/students/${student.id}/`,
+        data,
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -66,7 +70,11 @@ export default function EditableNotes({ student }: EditableNotesProps) {
   );
 
   return (
-    <Section title="Additional Notes" icon={<StickyNote2 />} actions={actions}>
+    <Section
+      title={t("studentForm.steps.additionalInfo")}
+      icon={<StickyNote2 />}
+      actions={actions}
+    >
       {!isEditing ? (
         <Paper
           elevation={0}
@@ -83,7 +91,7 @@ export default function EditableNotes({ student }: EditableNotesProps) {
             sx={{ whiteSpace: "pre-wrap" }}
             color={notes ? "text.primary" : "text.secondary"}
           >
-            {notes || "No notes"}
+            {notes || t("notes.noNotes")}
           </Typography>
         </Paper>
       ) : (
@@ -93,7 +101,7 @@ export default function EditableNotes({ student }: EditableNotesProps) {
           rows={6}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="Add notes about the student..."
+          placeholder={t("notes.addStudentNotes")}
         />
       )}
     </Section>

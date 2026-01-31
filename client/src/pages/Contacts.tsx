@@ -31,8 +31,10 @@ import {
   parseAsString,
   parseAsArrayOf,
 } from "nuqs";
+import { useTranslation } from "react-i18next";
 
 export default function Contacts() {
+  const { t } = useTranslation();
   const [currentView, setCurrentView] = useQueryState(
     "view",
     parseAsStringLiteral([
@@ -165,7 +167,7 @@ export default function Contacts() {
   if (error && currentView === "list")
     return (
       <Typography sx={{ color: "error.main" }}>
-        Error: {error.message}
+        {t("common.error", { message: error.message })}
       </Typography>
     );
 
@@ -210,7 +212,7 @@ export default function Contacts() {
           startIcon={<AddIcon />}
           onClick={handleAddOpen}
         >
-          New contact
+          {t("contacts.newContact")}
         </Button>
 
         <ToggleButtonGroup
@@ -219,10 +221,10 @@ export default function Contacts() {
           onChange={handleViewModeChange}
           aria-label="view mode"
         >
-          <ToggleButton value="card" aria-label="card view">
+          <ToggleButton value="card" aria-label={t("common.cardView")}>
             <ViewModuleIcon />
           </ToggleButton>
-          <ToggleButton value="list" aria-label="table view">
+          <ToggleButton value="list" aria-label={t("common.tableView")}>
             <ViewListIcon />
           </ToggleButton>
         </ToggleButtonGroup>

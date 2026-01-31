@@ -19,8 +19,10 @@ import {
   parseAsString,
   parseAsArrayOf,
 } from "nuqs";
+import { useTranslation } from "react-i18next";
 
 export default function Students() {
+  const { t } = useTranslation();
   const [currentView, setCurrentView] = useQueryState(
     "view",
     parseAsStringLiteral([
@@ -146,7 +148,7 @@ export default function Students() {
   if (error)
     return (
       <Typography sx={{ color: "error.main" }}>
-        Error: {error.message}
+        {t("common.error", { message: error.message })}
       </Typography>
     );
 
@@ -232,7 +234,7 @@ export default function Students() {
           startIcon={<AddIcon />}
           onClick={handleAddOpen}
         >
-          New student
+          {t("students.newStudent")}
         </Button>
 
         <Box>
@@ -248,10 +250,10 @@ export default function Students() {
             onClick={() => exportStudentsMutation.mutate("csv")}
             disabled={exportStudentsMutation.isPending}
           >
-            {exportStudentsMutation.isPending ? "Exporting..." : "Export as CSV"}
+            {exportStudentsMutation.isPending ? t("common.exporting") : t("common.export")}
           </Button>
 
-          <Button
+          {/* <Button
             variant="outlined"
             startIcon={
               exportStudentsMutation.isPending ? (
@@ -264,7 +266,7 @@ export default function Students() {
             disabled={exportStudentsMutation.isPending}
           >
             {exportStudentsMutation.isPending ? "Exporting..." : "Export as PDF"}
-          </Button>
+          </Button> */}
         </Box>
       </Box>
 

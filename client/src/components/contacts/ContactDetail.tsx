@@ -22,16 +22,16 @@ import axiosClient from "../../utils/axiosClient";
 import Section from "../Section";
 import InfoItem from "../InfoItem";
 import Loading from "../Loading";
+import { useTranslation } from "react-i18next";
 
 type ContactDetailProps = {
   id: number;
   handleClose: () => void;
 };
 
-export default function ContactDetail({
-  id,
-  handleClose,
-}: ContactDetailProps) {
+export default function ContactDetail({ id, handleClose }: ContactDetailProps) {
+  const { t } = useTranslation();
+
   const { data: contact, isLoading: isContactLoading } = useQuery({
     queryKey: ["contacts", id],
     queryFn: async () => {
@@ -39,13 +39,14 @@ export default function ContactDetail({
       return response.data;
     },
   });
+
   const { data: imageUrl, isLoading } = useQuery({
     queryKey: ["contactPhoto", contact?.photo],
     queryFn: async () => {
       const photoName = contact.photo.split("/")[3];
       const response = await axiosClient.get(
         `/contacts/photos/?photo_name=${photoName}`,
-        { responseType: "blob" }
+        { responseType: "blob" },
       );
       return URL.createObjectURL(response.data);
     },
@@ -69,7 +70,7 @@ export default function ContactDetail({
           <ArrowBack />
         </IconButton>
         <Typography variant="h5" component="h1">
-          Contact Details
+          {t("contacts.profile")}
         </Typography>
       </Stack>
 
@@ -121,7 +122,7 @@ export default function ContactDetail({
               <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                 {contact.is_longterm && (
                   <Chip
-                    label="Long Term"
+                    label={t("contacts.longterm")}
                     size="small"
                     sx={{
                       backgroundColor: "rgba(255,255,255,0.2)",
@@ -131,7 +132,7 @@ export default function ContactDetail({
                 )}
                 {contact.is_family_to_family && (
                   <Chip
-                    label="Family to Family"
+                    label={t("contacts.family-to-family")}
                     size="small"
                     sx={{
                       backgroundColor: "rgba(255,255,255,0.2)",
@@ -141,7 +142,7 @@ export default function ContactDetail({
                 )}
                 {contact.is_camp && (
                   <Chip
-                    label="Camp"
+                    label={t("contacts.camp")}
                     size="small"
                     sx={{
                       backgroundColor: "rgba(255,255,255,0.2)",
@@ -156,17 +157,21 @@ export default function ContactDetail({
       </Card>
 
       {/* Contact Information */}
-      <Section title="Contact Information" icon={<ContactPhone />}>
+      <Section title={t("contacts.steps.contact")} icon={<ContactPhone />}>
         <Grid container spacing={3}>
-          <InfoItem label="Email" value={contact.email} fullWidth />
-          <InfoItem label="Phone" value={contact.phone} />
+          <InfoItem
+            label={t("contactForm.email")}
+            value={contact.email}
+            fullWidth
+          />
+          <InfoItem label={t("contactForm.phone")} value={contact.phone} />
         </Grid>
       </Section>
 
       {/* Location Information */}
-      <Section title="Location" icon={<LocationOn />}>
+      <Section title={t("contacts.steps.location")} icon={<LocationOn />}>
         <Grid container spacing={3}>
-          <InfoItem label="Country" value={contact.country} />
+          <InfoItem label={t("clubForm.country")} value={contact.country} />
           {contact.districts.length > 0 && (
             <Grid size={{ xs: 12 }}>
               <Box>
@@ -175,9 +180,15 @@ export default function ContactDetail({
                   color="text.secondary"
                   sx={{ fontWeight: 600 }}
                 >
-                  Districts
+                  {t("contactForm.districts")}
                 </Typography>
-                <Stack direction="row" spacing={1} flexWrap="wrap" gap={1} sx={{ mt: 1 }}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  flexWrap="wrap"
+                  gap={1}
+                  sx={{ mt: 1 }}
+                >
                   {contact.districts.map((district: number) => (
                     <Chip
                       key={district}
@@ -194,29 +205,37 @@ export default function ContactDetail({
       </Section>
 
       {/* Program Participation */}
-      <Section title="Program Participation" icon={<School />}>
+      <Section title={t("contacts.steps.program")} icon={<School />}>
         <Grid container spacing={3}>
           <Grid size={{ xs: 12 }}>
             <Box sx={{ p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
               <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
                 {contact.is_longterm && (
-                  <Chip label="Long Term" color="primary" size="medium" />
+                  <Chip
+                    label={t("contacts.longterm")}
+                    color="primary"
+                    size="medium"
+                  />
                 )}
                 {contact.is_family_to_family && (
                   <Chip
-                    label="Family to Family"
+                    label={t("contacts.family-to-family")}
                     color="secondary"
                     size="medium"
                   />
                 )}
                 {contact.is_camp && (
-                  <Chip label="Camp" color="success" size="medium" />
+                  <Chip
+                    label={t("contacts.camp")}
+                    color="success"
+                    size="medium"
+                  />
                 )}
                 {!contact.is_longterm &&
                   !contact.is_family_to_family &&
                   !contact.is_camp && (
                     <Typography variant="body2" color="text.secondary">
-                      No programs assigned
+                      {t("contacts.noPrograms")}
                     </Typography>
                   )}
               </Stack>
@@ -227,7 +246,7 @@ export default function ContactDetail({
 
       {/* Notes */}
       {contact.notes && (
-        <Section title="Additional Notes" icon={<StickyNote2 />}>
+        <Section title={t("contacts.steps.additionalInfo")} icon={<StickyNote2 />}>
           <Paper
             elevation={0}
             sx={{

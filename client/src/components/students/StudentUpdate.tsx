@@ -1,11 +1,9 @@
 import StudentForm from "./StudentForm";
-import type {
-  StudentFormData,
-  Country,
-} from "../../utils/types";
+import type { StudentFormData, Country } from "../../utils/types";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import Loading from "../Loading";
+import { useTranslation } from "react-i18next";
 
 type UpdateStudentProps = {
   handleClose: () => void;
@@ -26,6 +24,8 @@ export default function UpdateStudent({
   countries,
   id,
 }: UpdateStudentProps) {
+  const { t } = useTranslation();
+
   const { data: student, isLoading: isStudentLoading } = useQuery({
     queryKey: ["students", id],
     queryFn: async () => {
@@ -33,12 +33,14 @@ export default function UpdateStudent({
       return response.data;
     },
   });
+
   if (isStudentLoading) {
     return <Loading />;
   }
+
   return (
     <StudentForm
-      title="Update Student"
+      title={t("students.updateStudent")}
       handleClose={handleClose}
       handleSubmit={handleUpdateStudent}
       isLoading={isLoading}
@@ -46,7 +48,7 @@ export default function UpdateStudent({
       error={error}
       countries={countries}
       initialData={student}
-      submitButtonText="Update"
+      submitButtonText={t("common.update")}
     />
   );
 }

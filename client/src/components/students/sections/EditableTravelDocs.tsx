@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Box,
-  Grid,
-  IconButton,
-  TextField,
-  Autocomplete,
-} from "@mui/material";
+import { Box, Grid, IconButton, TextField, Autocomplete } from "@mui/material";
 import { Edit as EditIcon, Save, Close, Flight } from "@mui/icons-material";
 import type { Student, Country } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
@@ -15,6 +9,7 @@ import Section from "../../Section";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import InfoItem from "../../InfoItem";
+import { useTranslation } from "react-i18next";
 
 type EditableTravelDocsProps = {
   student: Student;
@@ -25,7 +20,9 @@ export default function EditableTravelDocs({
   student,
   countries,
 }: EditableTravelDocsProps) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
+
   const [formData, setFormData] = useState({
     id_country_of_departure: student.id_country_of_departure || null,
     id_country_of_passport: student.id_country_of_passport || null,
@@ -91,20 +88,27 @@ export default function EditableTravelDocs({
   );
 
   return (
-    <Section title="Travel Documents" icon={<Flight />} actions={actions}>
+    <Section
+      title={t("studentForm.steps.travelDocuments")}
+      icon={<Flight />}
+      actions={actions}
+    >
       {!isEditing ? (
         <Grid container spacing={3}>
           <InfoItem
-            label="Country of Departure"
+            label={t("studentForm.labels.countryOfDeparture")}
             value={student.country_of_departure}
           />
           <InfoItem
-            label="Country of Passport"
+            label={t("studentForm.labels.countryOfPassport")}
             value={student.country_of_passport}
           />
-          <InfoItem label="Passport Number" value={student.passport_number} />
           <InfoItem
-            label="Passport Expiration"
+            label={t("students.searchFields.passportNumber")}
+            value={student.passport_number}
+          />
+          <InfoItem
+            label={t("students.searchFields.passportExpiration")}
             value={student.passport_expiration_date}
           />
         </Grid>
@@ -123,7 +127,10 @@ export default function EditableTravelDocs({
               options={countries}
               getOptionLabel={(option) => option.name}
               renderInput={(params) => (
-                <TextField {...params} label="Country of Departure" />
+                <TextField
+                  {...params}
+                  label={t("studentForm.labels.countryOfDeparture")}
+                />
               )}
             />
           </Grid>
@@ -140,7 +147,10 @@ export default function EditableTravelDocs({
               options={countries}
               getOptionLabel={(option) => option.name}
               renderInput={(params) => (
-                <TextField {...params} label="Country of Passport" />
+                <TextField
+                  {...params}
+                  label={t("studentForm.labels.countryOfPassport")}
+                />
               )}
             />
           </Grid>
@@ -148,7 +158,7 @@ export default function EditableTravelDocs({
             <TextField
               fullWidth
               size="small"
-              label="Passport Number"
+              label={t("students.searchFields.passportNumber")}
               value={formData.passport_number}
               onChange={(e) =>
                 setFormData({ ...formData, passport_number: e.target.value })
@@ -157,7 +167,7 @@ export default function EditableTravelDocs({
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <DatePicker
-              label="Passport Expiration Date"
+              label={t("students.searchFields.passportExpiration")}
               format="YYYY-MM-DD"
               value={
                 formData.passport_expiration_date

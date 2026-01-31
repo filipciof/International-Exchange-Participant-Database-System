@@ -3,6 +3,7 @@ import type { ClubFormData, Country } from "../../utils/types";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import Loading from "../Loading";
+import { useTranslation } from "react-i18next";
 
 type UpdateClubProps = {
   handleClose: () => void;
@@ -23,6 +24,8 @@ export default function UpdateClub({
   countries,
   id,
 }: UpdateClubProps) {
+  const { t } = useTranslation();
+
   const { data: club, isLoading: isClubLoading } = useQuery({
     queryKey: ["clubs", id],
     queryFn: async () => {
@@ -30,12 +33,14 @@ export default function UpdateClub({
       return response.data;
     },
   });
+
   if (isClubLoading) {
     return <Loading />;
   }
+
   return (
     <ClubForm
-      title="Update Club"
+      title={t("clubs.updateClub")}
       handleClose={handleClose}
       handleSubmit={handleUpdateClub}
       isLoading={isLoading}
@@ -43,7 +48,7 @@ export default function UpdateClub({
       error={error}
       countries={countries}
       initialData={club}
-      submitButtonText="Update"
+      submitButtonText={t("common.update")}
     />
   );
 }

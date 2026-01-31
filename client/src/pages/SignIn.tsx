@@ -16,6 +16,7 @@ import ForgotPassword from "../components/ForgotPassword";
 import axiosClient from "../utils/axiosClient";
 import { Navigate, useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
+import { useTranslation } from "react-i18next";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -61,17 +62,19 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 
 type LoginErrorMessageProps = {
   isError: boolean;
+  message: string;
 };
 
-function LoginErrorMessage({ isError }: LoginErrorMessageProps) {
+function LoginErrorMessage({ isError, message }: LoginErrorMessageProps) {
   if (isError) {
-    return <Typography sx={{ color: "error.main" }}>Invalid credentials</Typography>;
+    return <Typography sx={{ color: "error.main" }}>{message}</Typography>;
   }
 
   return null;
 }
 
 export default function SignIn() {
+  const { t } = useTranslation();
   const [emailError, setEmailError] = useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const [passwordError, setPasswordError] = useState(false);
@@ -135,7 +138,7 @@ export default function SignIn() {
 
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
-      setEmailErrorMessage("Please enter a valid email address.");
+      setEmailErrorMessage(t("auth.emailError"));
       isValid = false;
     } else {
       setEmailError(false);
@@ -144,7 +147,7 @@ export default function SignIn() {
 
     if (!password.value || password.value.length < 4) {
       setPasswordError(true);
-      setPasswordErrorMessage("Password must be at least 5 characters long.");
+      setPasswordErrorMessage(t("auth.passwordError"));
       isValid = false;
     } else {
       setPasswordError(false);
@@ -168,7 +171,7 @@ export default function SignIn() {
             variant="h4"
             sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
           >
-            Sign in
+            {t("auth.signIn")}
           </Typography>
           <Box
             component="form"
@@ -182,14 +185,14 @@ export default function SignIn() {
             }}
           >
             <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
+              <FormLabel htmlFor="email">{t("auth.email")}</FormLabel>
               <TextField
                 error={emailError}
                 helperText={emailErrorMessage}
                 id="email"
                 type="email"
                 name="email"
-                placeholder="your@email.com"
+                placeholder={t("auth.emailPlaceholder")}
                 autoComplete="email"
                 autoFocus
                 required
@@ -199,12 +202,12 @@ export default function SignIn() {
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="password">Password</FormLabel>
+              <FormLabel htmlFor="password">{t("auth.password")}</FormLabel>
               <TextField
                 error={passwordError}
                 helperText={passwordErrorMessage}
                 name="password"
-                placeholder="••••••"
+                placeholder={t("auth.passwordPlaceholder")}
                 type="password"
                 id="password"
                 autoComplete="current-password"
@@ -217,7 +220,7 @@ export default function SignIn() {
             </FormControl>
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
+              label={t("auth.rememberMe")}
             />
             <ForgotPassword open={open} handleClose={handleClose} />
             <Button
@@ -226,7 +229,7 @@ export default function SignIn() {
               variant="contained"
               onClick={validateInputs}
             >
-              Sign in
+              {t("auth.signIn")}
             </Button>
             <Link
               component="button"
@@ -235,10 +238,10 @@ export default function SignIn() {
               variant="body2"
               sx={{ alignSelf: "center" }}
             >
-              Forgot your password?
+              {t("auth.forgotPassword")}
             </Link>
           </Box>
-          <LoginErrorMessage isError={loginError} />
+          <LoginErrorMessage isError={loginError} message={t("auth.invalidCredentials")} />
         </Card>
       </SignInContainer>
     </>

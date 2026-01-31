@@ -17,8 +17,10 @@ import StaffAdd from "../components/staff/StaffAdd";
 import StaffUpdate from "../components/staff/StaffUpdate";
 import StaffDetail from "../components/staff/StaffDetail";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
+import { useTranslation } from "react-i18next";
 
 export default function Staff() {
+  const { t } = useTranslation();
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [pageSize, setPageSize] = useQueryState(
     "pageSize",
@@ -107,7 +109,7 @@ export default function Staff() {
   if (error && currentView === "list") {
     return (
       <Typography sx={{ color: "error.main" }}>
-        Error: {error.message}
+        {t("common.error", { message: error.message })}
       </Typography>
     );
   }
@@ -165,7 +167,7 @@ export default function Staff() {
           startIcon={<AddIcon />}
           onClick={handleAddOpen}
         >
-          New staff
+          {t("staff.newStaff")}
         </Button>
       </Box>
 

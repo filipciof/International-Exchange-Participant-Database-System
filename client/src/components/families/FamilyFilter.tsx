@@ -1,5 +1,6 @@
 import SearchInput from "../SearchInput";
 import type { PaginationModel } from "../../utils/types";
+import { useTranslation } from "react-i18next";
 
 type FamilyFilterProps = {
   searchInput: string;
@@ -14,6 +15,8 @@ export default function FamilyFilter({
   paginationModel,
   setPaginationModel,
 }: FamilyFilterProps) {
+  const { t } = useTranslation();
+
   return (
     <>
       <SearchInput
@@ -22,7 +25,7 @@ export default function FamilyFilter({
           setPaginationModel({ ...paginationModel, page: 1 });
           setSearchInput(newSearchInput);
         }}
-        placeholder="Search families..."
+        placeholder={t("families.searchPlaceholder")}
       />
     </>
   );

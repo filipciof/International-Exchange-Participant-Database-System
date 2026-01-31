@@ -27,6 +27,7 @@ import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import { handleValidationErrors } from "../../../utils/handleValidationErrors";
 import MyAutocomplete from "../../MyAutocomplete";
+import { useTranslation } from "react-i18next";
 
 type AddEditExchangeDialogProps = {
   dialogOpen: boolean;
@@ -51,6 +52,7 @@ export default function AddEditExchangeDialog({
   isSuccess = false,
   error = null,
 }: AddEditExchangeDialogProps) {
+  const { t } = useTranslation();
   const [sendingCountry, setSendingCountry] = useState<number | null>(null);
   const [sendingDistrict, setSendingDistrict] = useState<number | null>(null);
   const [receivingCountry, setReceivingCountry] = useState<number | null>(null);
@@ -146,7 +148,9 @@ export default function AddEditExchangeDialog({
       fullWidth
     >
       <DialogTitle>
-        {editingExchange ? "Edit Exchange" : "Add New Exchange"}
+        {editingExchange
+          ? t("exchanges.editExchange")
+          : t("exchanges.addExchange")}
       </DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
@@ -167,7 +171,7 @@ export default function AddEditExchangeDialog({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Exchange Type"
+                label={t("exchanges.exchangeType")}
                 variant="outlined"
                 fullWidth
               />
@@ -176,7 +180,7 @@ export default function AddEditExchangeDialog({
           <TextField
             fullWidth
             size="small"
-            label="Year"
+            label={t("exchanges.year")}
             placeholder="YYYY/YY"
             value={formData.year || ""}
             onChange={(e) =>
@@ -188,7 +192,7 @@ export default function AddEditExchangeDialog({
             helperText="Format: YYYY/YY (e.g., 2024/25)"
           />
           <DatePicker
-            label="Start Date"
+            label={t("studentForm.labels.startDate")}
             format="YYYY-MM-DD"
             value={formData.start_date ? dayjs(formData.start_date) : null}
             onChange={(date) => {
@@ -199,7 +203,7 @@ export default function AddEditExchangeDialog({
             }}
           />
           <DatePicker
-            label="End Date"
+            label={t("studentForm.labels.endDate")}
             format="YYYY-MM-DD"
             value={formData.end_date ? dayjs(formData.end_date) : null}
             onChange={(date) => {
@@ -210,7 +214,9 @@ export default function AddEditExchangeDialog({
             }}
           />
 
-          <Divider sx={{ my: 1 }}>Sending Club</Divider>
+          <Divider sx={{ my: 1 }}>
+            {t("studentForm.labels.sendingClub")}
+          </Divider>
 
           <Autocomplete
             value={
@@ -227,8 +233,8 @@ export default function AddEditExchangeDialog({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Sending Country"
-                placeholder="Select country"
+                label={t("studentForm.labels.sendingCountry")}
+                placeholder={t("common.selectCountry")}
               />
             )}
           />
@@ -251,8 +257,8 @@ export default function AddEditExchangeDialog({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Sending District"
-                placeholder="Select district"
+                label={t("studentForm.labels.sendingDistrict")}
+                placeholder={t("common.selectDistrict")}
                 slotProps={{
                   input: {
                     ...params.InputProps,
@@ -290,8 +296,8 @@ export default function AddEditExchangeDialog({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Sending Club"
-                placeholder="Select club"
+                label={t("studentForm.labels.sendingClub")}
+                placeholder={t("common.selectClub")}
                 slotProps={{
                   input: {
                     ...params.InputProps,
@@ -309,7 +315,9 @@ export default function AddEditExchangeDialog({
             )}
           />
 
-          <Divider sx={{ my: 1 }}>Receiving Club</Divider>
+          <Divider sx={{ my: 1 }}>
+            {t("studentForm.labels.receivingClub")}
+          </Divider>
 
           <Autocomplete
             value={
@@ -326,8 +334,8 @@ export default function AddEditExchangeDialog({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Receiving Country"
-                placeholder="Select country"
+                label={t("studentForm.labels.receivingCountry")}
+                placeholder={t("common.selectCountry")}
               />
             )}
           />
@@ -350,8 +358,8 @@ export default function AddEditExchangeDialog({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Receiving District"
-                placeholder="Select district"
+                label={t("studentForm.labels.receivingDistrict")}
+                placeholder={t("common.selectDistrict")}
                 slotProps={{
                   input: {
                     ...params.InputProps,
@@ -389,8 +397,8 @@ export default function AddEditExchangeDialog({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Receiving Club"
-                placeholder="Select club"
+                label={t("studentForm.labels.receivingClub")}
+                placeholder={t("common.selectClub")}
                 slotProps={{
                   input: {
                     ...params.InputProps,
@@ -408,14 +416,14 @@ export default function AddEditExchangeDialog({
             )}
           />
 
-          <Divider sx={{ my: 1 }}>Staff</Divider>
+          <Divider sx={{ my: 1 }}>{t("navigation.staff")}</Divider>
 
           <MyAutocomplete
             initialId={formData.id_counsellor}
             handleChange={(staff: Staff) => {
               setFormData({ ...formData, id_counsellor: staff.id });
             }}
-            label="Counsellor"
+            label={t("studentForm.labels.counsellor")}
             endpoint="staff"
             getOptionLabel={(item: Staff) =>
               `${item.first_name} ${item.last_name}`
@@ -427,7 +435,7 @@ export default function AddEditExchangeDialog({
             handleChange={(staff: Staff) => {
               setFormData({ ...formData, id_kwm_officer: staff.id });
             }}
-            label="KWM Officer"
+            label={t("studentForm.labels.kwmOfficer")}
             endpoint="staff"
             getOptionLabel={(item: Staff) =>
               `${item.first_name} ${item.last_name}`
@@ -439,7 +447,7 @@ export default function AddEditExchangeDialog({
         <Stack spacing={2} sx={{ p: 2, width: "100%" }}>
           <Stack direction="row" spacing={2} justifyContent="space-between">
             <Button onClick={handleCloseDialog} disabled={isLoading}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={handleSave}
@@ -448,11 +456,11 @@ export default function AddEditExchangeDialog({
             >
               {isLoading
                 ? editingExchange
-                  ? "Updating..."
-                  : "Adding..."
+                  ? t("common.updating")
+                  : t("common.adding")
                 : editingExchange
-                  ? "Update"
-                  : "Add"}
+                  ? t("common.update")
+                  : t("common.add")}
             </Button>
           </Stack>
           {error && (
@@ -469,8 +477,8 @@ export default function AddEditExchangeDialog({
           {isSuccess && (
             <Typography sx={{ color: "success.main" }}>
               {editingExchange
-                ? "Exchange updated successfully!"
-                : "Exchange added successfully!"}
+                ? t("exchanges.updateSuccess")
+                : t("exchanges.addSuccess")}
             </Typography>
           )}
         </Stack>

@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import type { ChipProps } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 type ActionAreaCardProps = {
   imageUrl: string;
@@ -35,6 +36,7 @@ export default function ActionAreaCard({
   onEdit,
   onDelete,
 }: ActionAreaCardProps) {
+  const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -101,8 +103,12 @@ export default function ActionAreaCard({
             },
           }}
         >
-          {onEdit && <MenuItem onClick={handleEdit}>Edit</MenuItem>}
-          {onDelete && <MenuItem onClick={handleDelete}>Delete</MenuItem>}
+          {onEdit && (
+            <MenuItem onClick={handleEdit}>{t("common.edit")}</MenuItem>
+          )}
+          {onDelete && (
+            <MenuItem onClick={handleDelete}>{t("common.delete")}</MenuItem>
+          )}
         </Menu>
         <CardActionArea onClick={onClick}>
           <Box position="relative">

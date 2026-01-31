@@ -1,8 +1,10 @@
 import { type GridColDef, DataGrid } from "@mui/x-data-grid";
-import type { PaginatedData, Staff, PaginationModel} from "../../utils/types";
+import type { PaginatedData, Staff, PaginationModel } from "../../utils/types";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useTranslation } from "react-i18next";
+import useDataGridLocale from "../../hooks/useDataGridLocale";
 
 type StaffListProps = {
   staff: PaginatedData<Staff>;
@@ -23,64 +25,68 @@ export default function StaffList({
   onDelete,
   onRowClick,
 }: StaffListProps) {
+  const { t } = useTranslation();
+  const localeText = useDataGridLocale();
+
   const columns: GridColDef<Staff>[] = [
     {
       field: "first_name",
-      headerName: "First name",
+      headerName: t("staffForm.firstName"),
       width: 100,
     },
     {
       field: "middle_name",
-      headerName: "Middle name",
+      headerName: t("staffForm.middleName"),
       width: 100,
       hideable: true,
     },
     {
       field: "last_name",
-      headerName: "Last name",
+      headerName: t("staffForm.lastName"),
       width: 100,
     },
     {
       field: "country",
-      headerName: "Country",
+      headerName: t("clubForm.country"),
       width: 150,
       valueGetter: (_, row) => row.club?.country || "",
     },
     {
       field: "district",
-      headerName: "District",
+      headerName: t("clubForm.district"),
       width: 120,
       valueGetter: (_, row) => row.club?.district || "",
     },
     {
       field: "club_name",
-      headerName: "Club",
+      headerName: t("staffForm.club"),
       width: 150,
       valueGetter: (_, row) => row.club?.name || "",
     },
     {
       field: "gender_name",
-      headerName: "Gender",
+      headerName: t("staffForm.gender"),
       width: 100,
+      valueGetter: (_, row) => t(`gender.${row.gender_name}`),
     },
     {
       field: "email",
-      headerName: "Email",
+      headerName: t("staffForm.email"),
       width: 150,
     },
     {
       field: "phone",
-      headerName: "Phone number",
+      headerName: t("staffForm.phone"),
       width: 150,
     },
     {
       field: "notes",
-      headerName: "Notes",
+      headerName: t("staffForm.Notes"),
       width: 100,
     },
     {
       field: "actions",
-      headerName: "Actions",
+      headerName: t("common.actions"),
       width: 100,
       sortable: false,
       filterable: false,
@@ -90,7 +96,7 @@ export default function StaffList({
           sx={{ display: "flex", gap: 1, alignItems: "center", height: "100%" }}
           onClick={(e) => e.stopPropagation()}
         >
-          <Tooltip title="Edit">
+          <Tooltip title={t("common.edit")}>
             <IconButton
               size="small"
               onClick={() => onEdit?.(params.row.id)}
@@ -99,7 +105,7 @@ export default function StaffList({
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title={t("common.delete")}>
             <IconButton
               size="small"
               onClick={() => onDelete?.(params.row.id)}
@@ -137,6 +143,7 @@ export default function StaffList({
         pageSizeOptions={[10, 25, 50, 100]}
         hideFooter
         loading={isLoading}
+        localeText={localeText}
         initialState={{
           columns: {
             columnVisibilityModel: {

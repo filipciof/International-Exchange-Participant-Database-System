@@ -9,6 +9,7 @@ import queryClient from "./utils/queryClient.ts";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { NuqsAdapter } from "nuqs/adapters/react";
+import "./i18n";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

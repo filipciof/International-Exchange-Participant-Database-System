@@ -13,12 +13,10 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import type {
-  FamilyMember,
-  FamilyMemberFormData,
-} from "../../../utils/types";
+import type { FamilyMember, FamilyMemberFormData } from "../../../utils/types";
 import { Gender } from "../../../utils/types";
 import { handleValidationErrors } from "../../../utils/handleValidationErrors";
+import { useTranslation } from "react-i18next";
 
 type AddEditFamilyMemberDialogProps = {
   dialogOpen: boolean;
@@ -43,6 +41,8 @@ export default function AddEditFamilyMemberDialog({
   isSuccess = false,
   error = null,
 }: AddEditFamilyMemberDialogProps) {
+  const { t } = useTranslation();
+
   return (
     <Dialog
       open={dialogOpen}
@@ -51,13 +51,13 @@ export default function AddEditFamilyMemberDialog({
       fullWidth
     >
       <DialogTitle>
-        {editingMember ? "Edit Family Member" : "Add New Family Member"}
+        {editingMember ? t("families.editFamilyMember") : t("families.addFamilyMember")}
       </DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           <TextField
             fullWidth
-            label="First Name"
+            label={t("contactForm.firstName")}
             value={formData.first_name || ""}
             onChange={(e) =>
               setFormData({
@@ -68,7 +68,7 @@ export default function AddEditFamilyMemberDialog({
           />
           <TextField
             fullWidth
-            label="Middle Name"
+            label={t("contactForm.middleName")}
             value={formData.middle_name || ""}
             onChange={(e) =>
               setFormData({
@@ -79,7 +79,7 @@ export default function AddEditFamilyMemberDialog({
           />
           <TextField
             fullWidth
-            label="Last Name"
+            label={t("contactForm.lastName")}
             value={formData.last_name || ""}
             onChange={(e) =>
               setFormData({
@@ -91,9 +91,7 @@ export default function AddEditFamilyMemberDialog({
           <Autocomplete
             options={Gender}
             getOptionLabel={(option) => option.label}
-            value={
-              Gender.find((g) => g.value === formData.gender) || null
-            }
+            value={Gender.find((g) => g.value === formData.gender) || null}
             onChange={(_, newValue) => {
               setFormData({
                 ...formData,
@@ -103,16 +101,18 @@ export default function AddEditFamilyMemberDialog({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Gender"
+                label={t("gender.gender")}
                 variant="outlined"
                 fullWidth
               />
             )}
           />
           <DatePicker
-            label="Date of Birth"
+            label={t("families.dateOfBirth")}
             format="YYYY-MM-DD"
-            value={formData.date_of_birth ? dayjs(formData.date_of_birth) : null}
+            value={
+              formData.date_of_birth ? dayjs(formData.date_of_birth) : null
+            }
             onChange={(date) => {
               setFormData({
                 ...formData,
@@ -122,7 +122,7 @@ export default function AddEditFamilyMemberDialog({
           />
           <TextField
             fullWidth
-            label="Email"
+            label={t("families.email")}
             type="email"
             value={formData.email || ""}
             onChange={(e) =>
@@ -134,7 +134,7 @@ export default function AddEditFamilyMemberDialog({
           />
           <TextField
             fullWidth
-            label="Phone"
+            label={t("families.phone")}
             value={formData.phone || ""}
             onChange={(e) =>
               setFormData({
@@ -145,7 +145,7 @@ export default function AddEditFamilyMemberDialog({
           />
           <TextField
             fullWidth
-            label="Occupation"
+            label={t("families.occupation")}
             value={formData.occupation || ""}
             onChange={(e) =>
               setFormData({
@@ -159,11 +159,14 @@ export default function AddEditFamilyMemberDialog({
               <Checkbox
                 checked={formData.is_head_of_family}
                 onChange={(e) =>
-                  setFormData({ ...formData, is_head_of_family: e.target.checked })
+                  setFormData({
+                    ...formData,
+                    is_head_of_family: e.target.checked,
+                  })
                 }
               />
             }
-            label="Head of Family"
+            label={t("families.head")}
           />
         </Stack>
       </DialogContent>
@@ -171,7 +174,7 @@ export default function AddEditFamilyMemberDialog({
         <Stack spacing={2} sx={{ p: 2, width: "100%" }}>
           <Stack direction="row" spacing={2} justifyContent="space-between">
             <Button onClick={handleCloseDialog} disabled={isLoading}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={handleSave}
@@ -180,11 +183,11 @@ export default function AddEditFamilyMemberDialog({
             >
               {isLoading
                 ? editingMember
-                  ? "Updating..."
-                  : "Adding..."
+                  ? t("common.updating")
+                  : t("common.adding")
                 : editingMember
-                  ? "Update"
-                  : "Add"}
+                  ? t("common.update")
+                  : t("common.add")}
             </Button>
           </Stack>
           {error && (
@@ -192,7 +195,7 @@ export default function AddEditFamilyMemberDialog({
               {handleValidationErrors(error.response?.data).map(
                 (message: string, index: number) => (
                   <Typography key={index} sx={{ color: "error.main" }}>
-                    {message}
+                    {t("common.error", message)}
                   </Typography>
                 ),
               )}
@@ -201,8 +204,8 @@ export default function AddEditFamilyMemberDialog({
           {isSuccess && (
             <Typography sx={{ color: "success.main" }}>
               {editingMember
-                ? "Family member updated successfully!"
-                : "Family member added successfully!"}
+                ? t("families.familyMemberUpdateSuccess")
+                : t("families.familyMemberAddSuccess")}
             </Typography>
           )}
         </Stack>

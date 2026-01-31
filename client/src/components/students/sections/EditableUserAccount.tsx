@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Box,
-  Grid,
-  IconButton,
-  TextField,
-  Button,
-  Alert,
-} from "@mui/material";
+import { Box, Grid, IconButton, TextField, Button, Alert } from "@mui/material";
 import {
   Edit as EditIcon,
   Save,
@@ -20,6 +13,7 @@ import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
 import Section from "../../Section";
 import InfoItem from "../../InfoItem";
+import { useTranslation } from "react-i18next";
 
 type EditableUserAccountProps = {
   student: Student;
@@ -30,7 +24,9 @@ export default function EditableUserAccount({
   student,
   readOnly = false,
 }: EditableUserAccountProps) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -133,10 +129,16 @@ export default function EditableUserAccount({
   );
 
   return (
-    <Section title="User Account" icon={<AccountCircle />} actions={actions}>
+    <Section
+      title={t("studentForm.steps.account")}
+      icon={<AccountCircle />}
+      actions={actions}
+    >
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          {error instanceof Error ? error.message : "An error occurred"}
+          {error instanceof Error
+            ? t("common.error", { message: error.message })
+            : t("common.unknownError")}
         </Alert>
       )}
 
@@ -144,7 +146,10 @@ export default function EditableUserAccount({
         <>
           {hasUserAccount ? (
             <Grid container spacing={3}>
-              <InfoItem label="Email" value={student.user_email} />
+              <InfoItem
+                label={t("studentForm.labels.email")}
+                value={student.user_email}
+              />
             </Grid>
           ) : (
             <Box
@@ -159,19 +164,19 @@ export default function EditableUserAccount({
             >
               {readOnly ? (
                 <Box sx={{ color: "text.secondary" }}>
-                  No user account created
+                  {t("account.noUser")}
                 </Box>
               ) : (
                 <>
                   <Box sx={{ mb: 2, color: "text.secondary" }}>
-                    No user account created
+                    {t("account.noUser")}
                   </Box>
                   <Button
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={handleCreate}
                   >
-                    Create User Account
+                    {t("account.createUser")}
                   </Button>
                 </>
               )}
@@ -181,7 +186,7 @@ export default function EditableUserAccount({
       ) : (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
           <TextField
-            label="Email"
+            label={t("studentForm.labels.email")}
             fullWidth
             value={formData.email}
             onChange={(e) =>
@@ -192,12 +197,13 @@ export default function EditableUserAccount({
             type="email"
             helperText={
               hasUserAccount
-                ? "Leave blank to keep current email"
-                : "Email is required"
+                ? // ? t("account.leaveBlankEmail")
+                  ""
+                : t("account.requiredEmail")
             }
           />
           <TextField
-            label="Password"
+            label={t("account.password")}
             fullWidth
             type="password"
             value={formData.password}
@@ -208,8 +214,8 @@ export default function EditableUserAccount({
             required={!hasUserAccount}
             helperText={
               hasUserAccount
-                ? "Leave blank to keep current password"
-                : "Password is required"
+                ? t("account.leaveBlankPassword")
+                : t("account.requiredPassword")
             }
           />
         </Box>

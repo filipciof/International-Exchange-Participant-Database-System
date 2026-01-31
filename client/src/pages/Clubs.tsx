@@ -17,8 +17,10 @@ import ClubAdd from "../components/clubs/ClubAdd";
 import ClubUpdate from "../components/clubs/ClubUpdate";
 import ClubDetail from "../components/clubs/ClubDetail";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
+import { useTranslation } from "react-i18next";
 
 export default function Clubs() {
+  const { t } = useTranslation();
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [pageSize, setPageSize] = useQueryState(
     "pageSize",
@@ -107,7 +109,7 @@ export default function Clubs() {
   if (error && currentView === "list") {
     return (
       <Typography sx={{ color: "error.main" }}>
-        Error: {error.message}
+        {t("common.error", { message: error.message })}
       </Typography>
     );
   }
@@ -167,7 +169,7 @@ export default function Clubs() {
           startIcon={<AddIcon />}
           onClick={handleAddOpen}
         >
-          New club
+          {t("clubs.newClub")}
         </Button>
       </Box>
 

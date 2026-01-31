@@ -3,6 +3,7 @@ import type { ContactFormData, Country } from "../../utils/types";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import Loading from "../Loading";
+import { useTranslation } from "react-i18next";
 
 type UpdateContactProps = {
   handleClose: () => void;
@@ -23,6 +24,8 @@ export default function UpdateContact({
   countries,
   id,
 }: UpdateContactProps) {
+  const { t } = useTranslation();
+
   const { data: contact, isLoading: isContactLoading } = useQuery({
     queryKey: ["contacts", id],
     queryFn: async () => {
@@ -30,12 +33,14 @@ export default function UpdateContact({
       return response.data;
     },
   });
+
   if (isContactLoading) {
     return <Loading />;
   }
+
   return (
     <ContactForm
-      title="Update Contact"
+      title={t("conatcts.updateContact")}
       handleClose={handleClose}
       handleSubmit={handleUpdateContact}
       isLoading={isLoading}
@@ -43,7 +48,7 @@ export default function UpdateContact({
       error={error}
       countries={countries}
       initialData={contact}
-      submitButtonText="Update"
+      submitButtonText={t("common.update")}
     />
   );
 }

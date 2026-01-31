@@ -1,5 +1,6 @@
 import ContactForm from "./ContactForm";
 import type { ContactFormData, Country } from "../../utils/types";
+import { useTranslation } from "react-i18next";
 
 type ContactAddProps = {
   handleClose: () => void;
@@ -18,16 +19,18 @@ export default function ContactAdd({
   error,
   countries,
 }: ContactAddProps) {
+  const { t } = useTranslation();
+
   return (
     <ContactForm
-      title="New Contact"
+      title={t("contacts.newContact")}
       handleClose={handleClose}
       handleSubmit={handleAddContact}
       isLoading={isLoading}
       isSuccess={isSuccess}
       error={error}
       countries={countries}
-      submitButtonText="Add"
+      submitButtonText={t("common.add")}
     />
   );
 }

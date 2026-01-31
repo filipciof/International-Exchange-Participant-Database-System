@@ -12,6 +12,7 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import PersonIcon from "@mui/icons-material/Person";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const allowedGroups = ["admin", "correspondent", "club_officer", "kwm_officer"];
 
@@ -23,6 +24,7 @@ interface MenuItem {
 
 export default function SideBarList() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const getMenuItems = (): MenuItem[] => {
     const userGroupsWrapper = localStorage.getItem("userGroups");
@@ -35,17 +37,17 @@ export default function SideBarList() {
     for (let group of userGroups) {
       if (allowedGroups.includes(group)) {
         return [
-          { text: "Home", icon: <PersonIcon />, path: "/" },
-          { text: "Students", icon: <SchoolIcon />, path: "/students" },
-          { text: "Staff", icon: <WorkIcon />, path: "/staff" },
-          { text: "Clubs", icon: <GroupsIcon />, path: "/clubs" },
-          { text: "Families", icon: <HouseIcon />, path: "/families" },
-          { text: "Contacts", icon: <ContactPageIcon />, path: "/contacts" },
+          { text: t("navigation.home"), icon: <PersonIcon />, path: "/" },
+          { text: t("navigation.students"), icon: <SchoolIcon />, path: "/students" },
+          { text: t("navigation.staff"), icon: <WorkIcon />, path: "/staff" },
+          { text: t("navigation.clubs"), icon: <GroupsIcon />, path: "/clubs" },
+          { text: t("navigation.families"), icon: <HouseIcon />, path: "/families" },
+          { text: t("navigation.contacts"), icon: <ContactPageIcon />, path: "/contacts" },
         ];
       }
     }
 
-    return [{ text: "Home", icon: <PersonIcon />, path: "/" }];
+    return [{ text: t("navigation.home"), icon: <PersonIcon />, path: "/" }];
   };
 
   return (

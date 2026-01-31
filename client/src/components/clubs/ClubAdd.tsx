@@ -1,5 +1,6 @@
 import ClubForm from "./ClubForm";
 import type { ClubFormData, Country } from "../../utils/types";
+import { useTranslation } from "react-i18next";
 
 type ClubAddProps = {
   handleClose: () => void;
@@ -18,16 +19,18 @@ export default function ClubAdd({
   error,
   countries,
 }: ClubAddProps) {
+  const { t } = useTranslation();
+
   return (
     <ClubForm
-      title="New Club"
+      title={t("clubs.newClub")}
       handleClose={handleClose}
       handleSubmit={handleAddClub}
       isLoading={isLoading}
       isSuccess={isSuccess}
       error={error}
       countries={countries}
-      submitButtonText="Add"
+      submitButtonText={t("common.add")}
     />
   );
 }

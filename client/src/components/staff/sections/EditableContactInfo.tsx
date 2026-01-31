@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { Box, Grid, IconButton, TextField } from "@mui/material";
-import { Edit as EditIcon, Save, Close, ContactPhone } from "@mui/icons-material";
+import {
+  Edit as EditIcon,
+  Save,
+  Close,
+  ContactPhone,
+} from "@mui/icons-material";
 import type { Staff } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
 import Section from "../../Section";
 import InfoItem from "../../InfoItem";
+import { useTranslation } from "react-i18next";
 
 type EditableContactInfoProps = {
   staff: Staff;
@@ -17,7 +23,9 @@ export default function EditableContactInfo({
   staff,
   staffId,
 }: EditableContactInfoProps) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
+
   const [formData, setFormData] = useState({
     email: staff.email || "",
     phone: staff.phone || "",
@@ -72,11 +80,15 @@ export default function EditableContactInfo({
   );
 
   return (
-    <Section title="Contact Information" icon={<ContactPhone />} actions={actions}>
+    <Section
+      title={t("staff.steps.contact")}
+      icon={<ContactPhone />}
+      actions={actions}
+    >
       {!isEditing ? (
         <Grid container spacing={3}>
-          <InfoItem label="Email" value={staff.email} fullWidth />
-          <InfoItem label="Phone" value={staff.phone} />
+          <InfoItem label={t("staffForm.email")} value={staff.email} fullWidth />
+          <InfoItem label={t("staffForm.phone")} value={staff.phone} />
         </Grid>
       ) : (
         <Grid container spacing={2}>
@@ -84,7 +96,7 @@ export default function EditableContactInfo({
             <TextField
               fullWidth
               size="small"
-              label="Email"
+              label={t("staffForm.email")}
               type="email"
               value={formData.email}
               onChange={(e) =>
@@ -96,7 +108,7 @@ export default function EditableContactInfo({
             <TextField
               fullWidth
               size="small"
-              label="Phone"
+              label={t("staffForm.phone")}
               value={formData.phone}
               onChange={(e) =>
                 setFormData({ ...formData, phone: e.target.value })

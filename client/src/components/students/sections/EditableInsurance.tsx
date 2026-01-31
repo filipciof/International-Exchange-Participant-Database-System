@@ -1,24 +1,27 @@
 import { useState } from "react";
+import { Box, Grid, IconButton, TextField } from "@mui/material";
 import {
-  Box,
-  Grid,
-  IconButton,
-  TextField,
-} from "@mui/material";
-import { Edit as EditIcon, Save, Close, HealthAndSafety } from "@mui/icons-material";
+  Edit as EditIcon,
+  Save,
+  Close,
+  HealthAndSafety,
+} from "@mui/icons-material";
 import type { Student } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
 import Section from "../../Section";
 import InfoItem from "../../InfoItem";
+import { useTranslation } from "react-i18next";
 
 type EditableInsuranceProps = {
   student: Student;
 };
 
 export default function EditableInsurance({ student }: EditableInsuranceProps) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
+
   const [formData, setFormData] = useState({
     insurance_company: student.insurance_company || "",
     insurance_type: student.insurance_type || "",
@@ -28,7 +31,10 @@ export default function EditableInsurance({ student }: EditableInsuranceProps) {
 
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await axiosClient.patch(`/students/${student.id}/`, data);
+      const response = await axiosClient.patch(
+        `/students/${student.id}/`,
+        data,
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -76,20 +82,27 @@ export default function EditableInsurance({ student }: EditableInsuranceProps) {
   );
 
   return (
-    <Section title="Insurance Information" icon={<HealthAndSafety />} actions={actions}>
+    <Section
+      title={t("studentForm.steps.insurance")}
+      icon={<HealthAndSafety />}
+      actions={actions}
+    >
       {!isEditing ? (
         <Grid container spacing={3}>
           <InfoItem
-            label="Insurance Company"
+            label={t("students.searchFields.insuranceCompany")}
             value={student.insurance_company}
           />
-          <InfoItem label="Insurance Type" value={student.insurance_type} />
           <InfoItem
-            label="Serial Number"
+            label={t("students.searchFields.insuranceType")}
+            value={student.insurance_type}
+          />
+          <InfoItem
+            label={t("students.searchFields.insuranceSerialNumber")}
             value={student.insurance_serial_number}
           />
           <InfoItem
-            label="Coverage Amount"
+            label={t("studentForm.labels.insuranceCoverage")}
             value={
               student.insurance_amount
                 ? `$${student.insurance_amount.toLocaleString()}`
@@ -103,7 +116,7 @@ export default function EditableInsurance({ student }: EditableInsuranceProps) {
             <TextField
               fullWidth
               size="small"
-              label="Insurance Company"
+              label={t("students.searchFields.insuranceCompany")}
               value={formData.insurance_company}
               onChange={(e) =>
                 setFormData({
@@ -117,7 +130,7 @@ export default function EditableInsurance({ student }: EditableInsuranceProps) {
             <TextField
               fullWidth
               size="small"
-              label="Insurance Type"
+              label={t("students.searchFields.insuranceType")}
               value={formData.insurance_type}
               onChange={(e) =>
                 setFormData({ ...formData, insurance_type: e.target.value })
@@ -128,7 +141,7 @@ export default function EditableInsurance({ student }: EditableInsuranceProps) {
             <TextField
               fullWidth
               size="small"
-              label="Serial Number"
+              label={t("students.searchFields.insuranceSerialNumber")}
               value={formData.insurance_serial_number}
               onChange={(e) =>
                 setFormData({
@@ -142,7 +155,7 @@ export default function EditableInsurance({ student }: EditableInsuranceProps) {
             <TextField
               fullWidth
               size="small"
-              label="Coverage Amount"
+              label={t("studentForm.labels.insuranceCoverage")}
               value={formData.insurance_amount}
               onChange={(e) =>
                 setFormData({

@@ -1,7 +1,6 @@
 import {
   Box,
   AppBar,
-  Button,
   Toolbar,
   IconButton,
   Typography,
@@ -10,32 +9,17 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
 import SideBarList from "../components/SideBarList";
-import { Outlet, useNavigate } from "react-router-dom";
-import axiosClient from "../utils/axiosClient";
+import { Outlet } from "react-router-dom";
 import { appBarHeight, drawerWidth } from "../utils/constants";
 import Loading from "../components/Loading";
+import AccountMenu from "../components/AccountMenu";
 
 export default function MainPage() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
-  };
-
-  const handleLogout = async () => {
-    setLoading(true);
-    try {
-      await axiosClient.post("/auth/logout/");
-      localStorage.clear();
-      navigate("/sign-in");
-    } catch (err) {
-      setLoading(false);
-      console.error(err);
-      localStorage.clear();
-      navigate("/sign-in");
-    }
   };
 
   const userGroups = localStorage.getItem("userGroups");
@@ -63,9 +47,8 @@ export default function MainPage() {
               IEPDS
             </Typography>
 
-            <Button color="inherit" onClick={handleLogout}>
-              Logout
-            </Button>
+            <AccountMenu setLoading={setLoading} />
+
           </Toolbar>
         </AppBar>
       </Box>

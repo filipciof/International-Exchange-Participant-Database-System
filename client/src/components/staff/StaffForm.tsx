@@ -22,6 +22,7 @@ import type { StaffFormData, StaffFormInputs, Club, Country, District, Staff } f
 import { staffSchema, Gender } from "../../utils/types";
 import axiosClient from "../../utils/axiosClient";
 import { handleValidationErrors } from "../../utils/handleValidationErrors";
+import { useTranslation } from "react-i18next";
 
 type StaffFormProps = {
   title?: string;
@@ -42,9 +43,11 @@ export default function StaffForm({
   isSuccess,
   error,
   initialData,
-  submitButtonText = "Submit",
+  submitButtonText,
 }: StaffFormProps) {
+  const { t } = useTranslation();
   const [photo, setPhoto] = useState<File | null>(null);
+  const defaultSubmitButtonText = submitButtonText || t("common.submit");
   const [country, setCountry] = useState<number | null>(null);
   const [district, setDistrict] = useState<number | null>(null);
   const theme = useTheme();
@@ -172,7 +175,7 @@ export default function StaffForm({
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="First Name"
+                    label={t("staffForm.firstName")}
                     variant="outlined"
                     fullWidth
                     error={!!errors.first_name}
@@ -187,7 +190,7 @@ export default function StaffForm({
                   <TextField
                     {...field}
                     value={field.value || ""}
-                    label="Middle Name"
+                    label={t("staffForm.middleName")}
                     variant="outlined"
                     fullWidth
                     error={!!errors.middle_name}
@@ -202,7 +205,7 @@ export default function StaffForm({
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Last Name"
+                  label={t("staffForm.lastName")}
                   variant="outlined"
                   fullWidth
                   error={!!errors.last_name}
@@ -217,7 +220,7 @@ export default function StaffForm({
                 <TextField
                   {...field}
                   select
-                  label="Gender"
+                  label={t("staffForm.gender")}
                   variant="outlined"
                   fullWidth
                   error={!!errors.gender}
@@ -244,8 +247,8 @@ export default function StaffForm({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Country"
-                  placeholder="Select country"
+                  label={t("clubForm.country")}
+                  placeholder={t("common.selectCountry")}
                 />
               )}
             />
@@ -264,8 +267,8 @@ export default function StaffForm({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="District"
-                  placeholder="Select district"
+                  label={t("clubForm.district")}
+                  placeholder={t("common.selectDistrict")}
                   slotProps={{
                     input: {
                       ...params.InputProps,
@@ -300,8 +303,8 @@ export default function StaffForm({
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Club"
-                      placeholder="Select club"
+                      label={t("staffForm.club")}
+                      placeholder={t("common.selectClub")}
                       error={!!errors.id_club}
                       helperText={errors.id_club?.message}
                       slotProps={{
@@ -329,7 +332,7 @@ export default function StaffForm({
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="Email"
+                    label={t("staffForm.email")}
                     variant="outlined"
                     fullWidth
                     type="email"
@@ -345,7 +348,7 @@ export default function StaffForm({
                   <TextField
                     {...field}
                     value={field.value || ""}
-                    label="Phone Number"
+                    label={t("staffForm.phone")}
                     variant="outlined"
                     fullWidth
                     error={!!errors.phone}
@@ -361,7 +364,7 @@ export default function StaffForm({
                 <TextField
                   {...field}
                   value={field.value || ""}
-                  label="Notes"
+                  label={t("staffForm.notes")}
                   variant="outlined"
                   fullWidth
                   multiline
@@ -373,7 +376,7 @@ export default function StaffForm({
             />
             <SingleFileUpload
               uploadService={handlePhotoUpload}
-              body={<FileDropzoneInputBody title="Upload photo" />}
+              body={<FileDropzoneInputBody title={t("common.uploadPhoto")} />}
             />
             <Stack
               direction="row"
@@ -385,21 +388,21 @@ export default function StaffForm({
                 <CircularProgress sx={{ color: "secondary.main" }} />
               ) : (
                 <Button variant="contained" type="submit" size="large">
-                  {submitButtonText}
+                  {defaultSubmitButtonText}
                 </Button>
               )}
               {handleClose && (
                 <Button variant="outlined" onClick={onClose} size="large">
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
               )}
             </Stack>
             {error && (
               <Stack spacing={1}>
                 {handleValidationErrors(error.response?.data).map(
-                  (message: string, index: number) => (
+                  (errorMessage: string, index: number) => (
                     <Typography key={index} sx={{ color: "error.main" }}>
-                      {message}
+                      {errorMessage}
                     </Typography>
                   ),
                 )}
@@ -407,7 +410,7 @@ export default function StaffForm({
             )}
             {isSuccess && (
               <Typography sx={{ color: "success.main" }}>
-                Operation completed successfully!
+                {t("common.success")}
               </Typography>
             )}
           </Stack>

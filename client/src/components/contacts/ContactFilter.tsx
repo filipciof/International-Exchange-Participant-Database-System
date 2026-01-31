@@ -4,10 +4,10 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
-  Typography,
 } from "@mui/material";
 import SearchInput from "../SearchInput";
 import type { Country, PaginationModel } from "../../utils/types";
+import { useTranslation } from "react-i18next";
 
 type ContactFilterProps = {
   searchInput: string;
@@ -30,8 +30,10 @@ export default function ContactFilter({
   setSelectedCountry,
   countries,
   selectedGroups,
-  setSelectedGroups, 
+  setSelectedGroups,
 }: ContactFilterProps) {
+  const { t } = useTranslation();
+
   return (
     <>
       <SearchInput
@@ -40,7 +42,7 @@ export default function ContactFilter({
           setPaginationModel({ ...paginationModel, page: 1 });
           setSearchInput(newSearchInput);
         }}
-        placeholder="Search contacts..."
+        placeholder={t("contacts.searchPlaceholder")}
       />
       <Box
         sx={{
@@ -59,12 +61,6 @@ export default function ContactFilter({
             flexWrap: "wrap",
           }}
         >
-          <Typography
-            variant="body2"
-            sx={{ color: "text.secondary", minWidth: "fit-content" }}
-          >
-            Filter by country:
-          </Typography>
           <Autocomplete
             value={selectedCountry}
             onChange={(_event, newValue) => {
@@ -77,7 +73,7 @@ export default function ContactFilter({
             renderInput={(params) => (
               <TextField
                 {...params}
-                placeholder="Select country"
+                placeholder={t("common.selectCountry")}
                 size="small"
               />
             )}
@@ -91,12 +87,6 @@ export default function ContactFilter({
             gap: 2,
           }}
         >
-          <Typography
-            variant="body2"
-            sx={{ color: "text.secondary", minWidth: "fit-content" }}
-          >
-            Filter by group:
-          </Typography>
           <ToggleButtonGroup
             value={selectedGroups}
             onChange={(_event, newGroups) => {
@@ -121,16 +111,16 @@ export default function ContactFilter({
             }}
           >
             <ToggleButton value="lt" aria-label="group 1">
-              longterm
+              {t("contacts.longterm")}
             </ToggleButton>
             <ToggleButton value="f2f" aria-label="group 2">
-              family-to-family
+              {t("contacts.family-to-family")}
             </ToggleButton>
             <ToggleButton value="camp" aria-label="group 3">
-              camp
+              {t("contacts.camp")}
             </ToggleButton>
             <ToggleButton value="none" aria-label="unassigned">
-              unassigned
+              {t("contacts.unassigned")}
             </ToggleButton>
           </ToggleButtonGroup>
         </Box>

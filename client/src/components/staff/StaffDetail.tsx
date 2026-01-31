@@ -1,15 +1,6 @@
 import { useState } from "react";
-import {
-  Box,
-  Typography,
-  IconButton,
-  Stack,
-  Tabs,
-  Tab,
-} from "@mui/material";
-import {
-  ArrowBack,
-} from "@mui/icons-material";
+import { Box, Typography, IconButton, Stack, Tabs, Tab } from "@mui/material";
+import { ArrowBack } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import Loading from "../Loading";
@@ -19,6 +10,7 @@ import EditableClubInfo from "./sections/EditableClubInfo";
 import EditableNotes from "./sections/EditableNotes";
 import EditableUserAccount from "./sections/EditableUserAccount";
 import EditableDocuments from "../EditableDocuments";
+import { useTranslation } from "react-i18next";
 
 type StaffDetailProps = {
   id: number;
@@ -26,14 +18,21 @@ type StaffDetailProps = {
 };
 
 export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
-  const { data: staff, isLoading: isStaffLoading, error: staffError } = useQuery({
+
+  const {
+    data: staff,
+    isLoading: isStaffLoading,
+    error: staffError,
+  } = useQuery({
     queryKey: ["staff", id],
     queryFn: async () => {
       const response = await axiosClient.get(`/staff/?id=${id}`);
       return response.data;
     },
   });
+
   const { data: imageUrl, isLoading } = useQuery({
     queryKey: ["staffPhoto", staff?.photo],
     queryFn: async () => {
@@ -51,11 +50,11 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
   if (isStaffLoading) {
     return <Loading />;
   }
-  
+
   if (staffError) {
     return (
       <Typography sx={{ color: "error.main" }}>
-        Error: {staffError.message}
+        {t("common.error", staffError.message)}
       </Typography>
     );
   }
@@ -68,7 +67,7 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
           <ArrowBack />
         </IconButton>
         <Typography variant="h5" component="h1">
-          Staff Details
+          {t("staff.profile")}
         </Typography>
       </Stack>
 
@@ -88,12 +87,12 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
           variant="scrollable"
           scrollButtons="auto"
         >
-          <Tab label="All" />
-          <Tab label="Club" />
-          <Tab label="Contact" />
-          <Tab label="Account" />
-          <Tab label="Documents" />
-          <Tab label="Notes" />
+          <Tab label={t("staff.tabs.all")} />
+          <Tab label={t("staff.tabs.club")} />
+          <Tab label={t("staff.tabs.contact")} />
+          <Tab label={t("staff.tabs.account")}/>
+          <Tab label={t("staff.tabs.documents")} />
+          <Tab label={t("staff.tabs.notes")} />
         </Tabs>
       </Box>
 

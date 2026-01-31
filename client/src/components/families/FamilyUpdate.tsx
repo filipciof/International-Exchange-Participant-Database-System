@@ -3,6 +3,7 @@ import type { FamilyFormData } from "../../utils/types";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import Loading from "../Loading";
+import { useTranslation } from "react-i18next";
 
 type UpdateFamilyProps = {
   handleClose: () => void;
@@ -21,6 +22,8 @@ export default function UpdateFamily({
   error,
   id,
 }: UpdateFamilyProps) {
+  const { t } = useTranslation();
+
   const { data: family, isLoading: isFamilyLoading } = useQuery({
     queryKey: ["families", id],
     queryFn: async () => {
@@ -28,19 +31,21 @@ export default function UpdateFamily({
       return response.data;
     },
   });
+
   if (isFamilyLoading) {
     return <Loading />;
   }
+
   return (
     <FamilyForm
-      title="Update Family"
+      title={t("families.updateFamily")}
       handleClose={handleClose}
       handleSubmit={handleUpdateFamily}
       isLoading={isLoading}
       isSuccess={isSuccess}
       error={error}
       initialData={family}
-      submitButtonText="Update"
+      submitButtonText={t("common.update")}
     />
   );
 }

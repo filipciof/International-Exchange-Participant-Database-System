@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Box,
-  Grid,
-  IconButton,
-  TextField,
-  MenuItem,
-} from "@mui/material";
+import { Box, Grid, IconButton, TextField, MenuItem } from "@mui/material";
 import { Edit as EditIcon, Save, Close, Language } from "@mui/icons-material";
 import type { Student } from "../../../utils/types";
 import { LanguageProficiency } from "../../../utils/types";
@@ -14,13 +8,16 @@ import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
 import Section from "../../Section";
 import InfoItem from "../../InfoItem";
+import { useTranslation } from "react-i18next";
 
 type EditableLanguagesProps = {
   student: Student;
 };
 
 export default function EditableLanguages({ student }: EditableLanguagesProps) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
+
   const [formData, setFormData] = useState<{
     first_language: string;
     second_language: string;
@@ -37,7 +34,10 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
 
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await axiosClient.patch(`/students/${student.id}/`, data);
+      const response = await axiosClient.patch(
+        `/students/${student.id}/`,
+        data,
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -86,19 +86,44 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
   );
 
   return (
-    <Section title="Languages" icon={<Language />} actions={actions}>
+    <Section
+      title={t("studentForm.steps.languages")}
+      icon={<Language />}
+      actions={actions}
+    >
       {!isEditing ? (
         <Grid container spacing={3}>
-          <InfoItem label="First Language" value={student.first_language} />
-          <InfoItem label="Second Language" value={student.second_language} />
           <InfoItem
-            label="Second Language Proficiency"
-            value={student.second_language_proficiency_name}
+            label={t("students.searchFields.firstLanguage")}
+            value={student.first_language}
           />
-          <InfoItem label="Third Language" value={student.third_language} />
           <InfoItem
-            label="Third Language Proficiency"
-            value={student.third_langugae_proficiency_name}
+            label={t("students.searchFields.secondLanguage")}
+            value={student.second_language}
+          />
+          <InfoItem
+            label={t("studentForm.labels.secondLanguageProficiency")}
+            value={
+              student.second_language_proficiency_name
+                ? t(
+                    `languageProficiency.${student.second_language_proficiency_name}`,
+                  )
+                : "—"
+            }
+          />
+          <InfoItem
+            label={t("students.searchFields.thirdLanguage")}
+            value={student.third_language}
+          />
+          <InfoItem
+            label={t("studentForm.labels.thirdLanguageProficiency")}
+            value={
+              student.third_language_proficiency_name
+                ? t(
+                    `languageProficiency.${student.third_language_proficiency_name}`,
+                  )
+                : "—"
+            }
           />
         </Grid>
       ) : (
@@ -107,7 +132,7 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
             <TextField
               fullWidth
               size="small"
-              label="First Language"
+              label={t("students.searchFields.firstLanguage")}
               value={formData.first_language}
               onChange={(e) =>
                 setFormData({ ...formData, first_language: e.target.value })
@@ -118,7 +143,7 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
             <TextField
               fullWidth
               size="small"
-              label="Second Language"
+              label={t("students.searchFields.secondLanguage")}
               value={formData.second_language}
               onChange={(e) =>
                 setFormData({ ...formData, second_language: e.target.value })
@@ -130,7 +155,7 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
               fullWidth
               size="small"
               select
-              label="Second Language Proficiency"
+              label={t("studentForm.labels.secondLanguageProficiency")}
               value={formData.second_language_proficiency ?? ""}
               onChange={(e) =>
                 setFormData({
@@ -141,11 +166,11 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
               }
             >
               <MenuItem value="">
-                <em>None</em>
+                <em>—</em>
               </MenuItem>
               {LanguageProficiency.map((level) => (
                 <MenuItem key={level.value} value={level.value}>
-                  {level.label}
+                  {t(`languageProficiency.${level.label}`)}
                 </MenuItem>
               ))}
             </TextField>
@@ -154,7 +179,7 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
             <TextField
               fullWidth
               size="small"
-              label="Third Language"
+              label={t("students.searchFields.thirdLanguage")}
               value={formData.third_language}
               onChange={(e) =>
                 setFormData({ ...formData, third_language: e.target.value })
@@ -166,7 +191,7 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
               fullWidth
               size="small"
               select
-              label="Third Language Proficiency"
+              label={t("studentForm.labels.thirdLanguageProficiency")}
               value={formData.third_language_proficiency ?? ""}
               onChange={(e) =>
                 setFormData({
@@ -177,11 +202,11 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
               }
             >
               <MenuItem value="">
-                <em>None</em>
+                <em>—</em>
               </MenuItem>
               {LanguageProficiency.map((level) => (
                 <MenuItem key={level.value} value={level.value}>
-                  {level.label}
+                  {t(`languageProficiency.${level.label}`)}
                 </MenuItem>
               ))}
             </TextField>

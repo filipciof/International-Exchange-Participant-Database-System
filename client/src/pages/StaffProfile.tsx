@@ -13,10 +13,12 @@ import EditableClubInfo from "../components/staff/sections/EditableClubInfo";
 import EditableNotes from "../components/staff/sections/EditableNotes";
 import EditableUserAccount from "../components/staff/sections/EditableUserAccount";
 import EditableDocuments from "../components/EditableDocuments";
+import { useTranslation } from "react-i18next";
 
 type StaffProfileProps = {};
 
 export default function StaffProfile({}: StaffProfileProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
   const {
     data: staff,
@@ -57,20 +59,20 @@ export default function StaffProfile({}: StaffProfileProps) {
     if (is404) {
       return (
         <StaffForm
-          title="Create Profile"
+          title={t("staff.createProfile")}
           handleSubmit={(staff: StaffFormData) => {
             addMyStaffProfileMutation.mutate(staff);
           }}
           isLoading={addMyStaffProfileMutation.isPending}
           isSuccess={addMyStaffProfileMutation.isSuccess}
           error={addMyStaffProfileMutation.error}
-          submitButtonText="Create Profile"
+          submitButtonText={t("staff.createProfile")}
         />
       );
     }
     return (
       <Typography sx={{ color: "error.main" }}>
-        Error: {staffError.message}
+        {t("common.error", { message: staffError.message })}
       </Typography>
     );
   }
@@ -80,7 +82,7 @@ export default function StaffProfile({}: StaffProfileProps) {
       {/* Header with back button */}
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
         <Typography variant="h5" component="h1">
-          Staff Profile
+          {t("staff.profile")}
         </Typography>
       </Stack>
 
@@ -99,12 +101,12 @@ export default function StaffProfile({}: StaffProfileProps) {
           variant="scrollable"
           scrollButtons="auto"
         >
-          <Tab label="All" />
-          <Tab label="Club" />
-          <Tab label="Contact" />
-          <Tab label="Account" />
-          <Tab label="Documents" />
-          <Tab label="Notes" />
+          <Tab label={t("staff.tabs.all")} />
+          <Tab label={t("staff.tabs.club")} />
+          <Tab label={t("staff.tabs.contact")} />
+          <Tab label={t("staff.tabs.account")} />
+          <Tab label={t("staff.tabs.documents")} />
+          <Tab label={t("staff.tabs.notes")} />
         </Tabs>
       </Box>
 

@@ -35,6 +35,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { documentSchema } from "../utils/types";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 type EditableDocumentsProps = {
   ownerType: "student" | "staff" | "club" | "family" | "district";
@@ -47,6 +48,7 @@ export default function EditableDocuments({
   ownerId,
   readOnly = false,
 }: EditableDocumentsProps) {
+  const { t } = useTranslation();
   const ownerField = `id_${ownerType}` as const;
 
   const [dialogOpen, setDialogOpen] = useState<
@@ -214,16 +216,18 @@ export default function EditableDocuments({
   );
 
   return (
-    <Section title="Documents" icon={<DescriptionIcon />} actions={actions}>
+    <Section title={t("students.tabs.documents")} icon={<DescriptionIcon />} actions={actions}>
       {isLoading && (
         <Typography variant="body2" color="text.secondary">
-          Loading documents...
+          {/* Loading documents... */}
+          {t("common.loading")}
         </Typography>
       )}
 
       {error && (
         <Typography variant="body2" color="error.main">
-          Error loading documents
+          {/* Error loading documents */}
+          {t("common.error", error.message)}
         </Typography>
       )}
 
@@ -241,7 +245,7 @@ export default function EditableDocuments({
               }}
             >
               <Typography variant="body2" color="text.secondary">
-                No documents uploaded yet
+                {t("studentForm.labels.noDocuments")}
               </Typography>
             </Paper>
           ) : (
@@ -249,10 +253,10 @@ export default function EditableDocuments({
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Description</TableCell>
-                    <TableCell>Uploaded</TableCell>
-                    <TableCell align="right">Actions</TableCell>
+                    <TableCell>{t("documents.name")}</TableCell>
+                    <TableCell>{t("documents.description")}</TableCell>
+                    <TableCell>{t("documents.uploaded")}</TableCell>
+                    <TableCell align="right">{t("common.actions")}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -318,7 +322,9 @@ export default function EditableDocuments({
         fullWidth
       >
         <DialogTitle>
-          {editingDocument ? "Edit Document" : "Add Document"}
+          {editingDocument
+            ? t("documents.editDocument")
+            : t("documents.addDocument")}
         </DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogContent>
@@ -329,7 +335,7 @@ export default function EditableDocuments({
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="Document Name"
+                    label={t("documents.documentName")}
                     fullWidth
                     required
                     error={!!errors.name}
@@ -343,7 +349,7 @@ export default function EditableDocuments({
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="Description"
+                    label={t("documents.description")}
                     fullWidth
                     multiline
                     rows={3}
@@ -361,8 +367,8 @@ export default function EditableDocuments({
                 {selectedFile
                   ? selectedFile.name
                   : editingDocument
-                    ? "Replace File"
-                    : "Upload File"}
+                    ? t("documents.replaceFile")
+                    : t("documents.uploadFile")}
                 <input
                   type="file"
                   hidden
@@ -375,7 +381,7 @@ export default function EditableDocuments({
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button onClick={handleCloseDialog}>{t("common.cancel")}</Button>
             <Button
               type="submit"
               variant="contained"
@@ -384,9 +390,9 @@ export default function EditableDocuments({
               {createMutation.isPending || updateMutation.isPending ? (
                 <CircularProgress size={24} />
               ) : editingDocument ? (
-                "Update"
+                t("common.update")
               ) : (
-                "Add"
+                t("common.add")
               )}
             </Button>
           </DialogActions>

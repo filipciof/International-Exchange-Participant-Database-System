@@ -16,6 +16,7 @@ import queryClient from "../../../utils/queryClient";
 import AddEditExchangeFamilyDialog from "./AddEditExchangeFamilyDialog";
 import DeleteConfirmationDialog from "../../DeleteConfirmationDialog";
 import InfoItem from "../../InfoItem";
+import { useTranslation } from "react-i18next";
 
 type EditableExchangeFamiliesProps = {
   exchangeId: number;
@@ -28,6 +29,7 @@ export default function EditableExchangeFamilies({
   id_receiving_club,
   readOnly = false,
 }: EditableExchangeFamiliesProps) {
+  const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState<
     null | "update" | "add" | "delete"
   >(null);
@@ -35,6 +37,7 @@ export default function EditableExchangeFamilies({
     useState<ExchangeFamily | null>(null);
   const [deletingExchangeFamily, setDeletingExchangeFamily] =
     useState<ExchangeFamily | null>(null);
+
   const [formData, setFormData] = useState<ExchangeFamilyFormData>({
     id_exchange: exchangeId,
     id_family: null,
@@ -154,7 +157,7 @@ export default function EditableExchangeFamilies({
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <HomeIcon fontSize="small" color="action" />
           <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-            Host Families
+            {t("studentForm.labels.hostFamilies")}
           </Typography>
         </Box>
         {!readOnly && (
@@ -170,7 +173,8 @@ export default function EditableExchangeFamilies({
           color="text.secondary"
           sx={{ fontSize: "0.875rem" }}
         >
-          Loading host families...
+          {/* Loading host families... */}
+          {t("common.loading")}
         </Typography>
       )}
 
@@ -180,7 +184,8 @@ export default function EditableExchangeFamilies({
           color="error.main"
           sx={{ fontSize: "0.875rem" }}
         >
-          Error loading host families
+          {/* Error loading host families */}
+          {t("common.error", error.message)}
         </Typography>
       )}
 
@@ -205,7 +210,7 @@ export default function EditableExchangeFamilies({
                   color="text.secondary"
                   sx={{ fontSize: "0.875rem" }}
                 >
-                  No host families recorded
+                  {t("studentForm.labels.noHostFamilies")}
                 </Typography>
               </Paper>
             ) : (
@@ -232,21 +237,25 @@ export default function EditableExchangeFamilies({
                       <Box sx={{ flex: 1 }}>
                         <Grid container spacing={2}>
                           <InfoItem
-                            label="Family"
+                            label={t("studentForm.labels.family")}
                             value={
                               exchangeFamily.family_name || "Unknown Family"
                             }
-                            linkPath={readOnly ? null : `/families/?id=${exchangeFamily.id_family}&view=detail`}
+                            linkPath={
+                              readOnly
+                                ? null
+                                : `/families/?id=${exchangeFamily.id_family}&view=detail`
+                            }
                           />
                           {exchangeFamily.start_date && (
                             <InfoItem
-                              label="Start Date"
+                              label={t("studentForm.labels.startDate")}
                               value={exchangeFamily.start_date}
                             />
                           )}
                           {exchangeFamily.end_date && (
                             <InfoItem
-                              label="End Date"
+                              label={t("studentForm.labels.endDate")}
                               value={exchangeFamily.end_date}
                             />
                           )}

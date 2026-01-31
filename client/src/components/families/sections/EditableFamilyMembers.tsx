@@ -22,6 +22,7 @@ import Section from "../../Section";
 import DeleteConfirmationDialog from "../../DeleteConfirmationDialog";
 import AddEditFamilyMemberDialog from "./AddEditFamilyMemberDialog";
 import InfoItem from "../../InfoItem";
+import { useTranslation } from "react-i18next";
 
 type EditableFamilyMembersProps = {
   familyId: number;
@@ -32,12 +33,14 @@ export default function EditableFamilyMembers({
   familyId,
   readOnly = false,
 }: EditableFamilyMembersProps) {
+  const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState<null | "delete" | "addEdit">(
     null,
   );
   const [deletingMember, setDeletingMember] = useState<FamilyMember | null>(
     null,
   );
+
   const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
   const [formData, setFormData] = useState<FamilyMemberFormData>({
     id_family: familyId,
@@ -175,16 +178,22 @@ export default function EditableFamilyMembers({
   ) : undefined;
 
   return (
-    <Section title="Family Members" icon={<PeopleIcon />} actions={actions}>
+    <Section
+      title={t("families.familyMembers")}
+      icon={<PeopleIcon />}
+      actions={actions}
+    >
       {isLoading && (
         <Typography variant="body2" color="text.secondary">
-          Loading family members...
+          {/* Loading family members... */}
+          {t("common.loading")}
         </Typography>
       )}
 
       {error && (
         <Typography variant="body2" color="error.main">
-          Error loading family members
+          {/* Error loading family members */}
+          {t("common.error", error.message)}
         </Typography>
       )}
 
@@ -205,7 +214,7 @@ export default function EditableFamilyMembers({
                 }}
               >
                 <Typography variant="body2" color="text.secondary">
-                  No family members recorded yet
+                  {t("families.noFamilyMembers")}
                 </Typography>
               </Paper>
             ) : (
@@ -249,7 +258,7 @@ export default function EditableFamilyMembers({
                         </Typography>
                         {member.is_head_of_family && (
                           <Chip
-                            label="Head of Family"
+                            label={t("families.head")}
                             size="small"
                             color="primary"
                             sx={{ fontWeight: 500 }}
@@ -281,23 +290,26 @@ export default function EditableFamilyMembers({
 
                     <Grid container spacing={2}>
                       {member.gender_name && (
-                        <InfoItem label="Gender" value={member.gender_name} />
+                        <InfoItem
+                          label={t("gender.gender")}
+                          value={t(`gender.${member.gender_name}`)}
+                        />
                       )}
                       {member.date_of_birth && (
                         <InfoItem
-                          label="Date of Birth"
+                          label={t("families.dateOfBirth")}
                           value={member.date_of_birth}
                         />
                       )}
                       {member.email && (
-                        <InfoItem label="Email" value={member.email} />
+                        <InfoItem label={t("families.email")} value={member.email} />
                       )}
                       {member.phone && (
-                        <InfoItem label="Phone" value={member.phone} />
+                        <InfoItem label={t("families.phone")} value={member.phone} />
                       )}
                       {member.occupation && (
                         <InfoItem
-                          label="Occupation"
+                          label={t("families.occupation")}
                           value={member.occupation}
                         />
                       )}

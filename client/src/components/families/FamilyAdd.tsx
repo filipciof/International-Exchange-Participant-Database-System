@@ -1,5 +1,6 @@
 import FamilyForm from "./FamilyForm";
 import type { FamilyFormData } from "../../utils/types";
+import { useTranslation } from "react-i18next";
 
 type FamilyAddProps = {
   handleClose: () => void;
@@ -16,15 +17,17 @@ export default function FamilyAdd({
   isSuccess,
   error,
 }: FamilyAddProps) {
+  const { t } = useTranslation();
+  
   return (
     <FamilyForm
-      title="New Family"
+      title={t("families.newFamily")}
       handleClose={handleClose}
       handleSubmit={handleAddFamily}
       isLoading={isLoading}
       isSuccess={isSuccess}
       error={error}
-      submitButtonText="Add"
+      submitButtonText={t("common.add")}
     />
   );
 }

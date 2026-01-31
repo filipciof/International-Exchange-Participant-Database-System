@@ -7,6 +7,8 @@ import type {
 import { Box, IconButton, Tooltip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useTranslation } from "react-i18next";
+import useDataGridLocale from "../../hooks/useDataGridLocale";
 
 type StudentListProps = {
   students: PaginatedData<Student>;
@@ -27,76 +29,80 @@ export default function StudentList({
   onDelete,
   onRowClick,
 }: StudentListProps) {
+  const { t } = useTranslation();
+  const localeText = useDataGridLocale();
+
   const columns: GridColDef<Student>[] = [
     {
       field: "first_name",
-      headerName: "First name",
+      headerName: t("students.searchFields.firstName"),
       width: 100,
     },
     {
       field: "middle_name",
-      headerName: "Middle name",
+      headerName: t("students.searchFields.middleName"),
       width: 100,
       hideable: true,
     },
     {
       field: "last_name",
-      headerName: "Last name",
+      headerName: t("students.searchFields.lastName"),
       width: 100,
     },
     {
       field: "nick_name",
-      headerName: "Nickname",
+      headerName: t("students.searchFields.nickname"),
       width: 100,
     },
     {
       field: "gender_name",
-      headerName: "Gender",
+      headerName: t("staffForm.gender"),
       width: 100,
+      valueGetter: (_, row) => t(`gender.${row.gender_name}`),
     },
     {
       field: "date_of_birth",
-      headerName: "Date of birth",
+      headerName: t("studentForm.labels.dateOfBirth"),
       width: 100,
     },
     {
       field: "country_of_birth",
-      headerName: "Country of birth",
+      headerName: t("studentForm.labels.countryOfBirth"),
       width: 150,
     },
     {
       field: "city_of_birth",
-      headerName: "City of birth",
+      headerName: t("students.searchFields.cityOfBirth"),
       width: 150,
     },
     {
       field: "country_of_departure",
-      headerName: "Country of departure",
+      headerName: t("studentForm.labels.countryOfDeparture"),
       width: 150,
     },
     {
       field: "city_of_residence",
-      headerName: "City of residence",
+      headerName: t("students.searchFields.cityOfResidence"),
       width: 150,
     },
     {
       field: "address",
-      headerName: "Address",
+      headerName: t("students.searchFields.address"),
       width: 150,
     },
     {
       field: "first_language",
-      headerName: "First language",
+      headerName: t("students.searchFields.firstLanguage"),
       width: 150,
     },
     {
       field: "second_language",
-      headerName: "Second language",
+      headerName: t("students.searchFields.secondLanguage"),
       width: 150,
     },
     {
       field: "actions",
-      headerName: "Actions",
+      headerName: t("common.actions"),
       width: 100,
       sortable: false,
       filterable: false,
@@ -106,7 +112,7 @@ export default function StudentList({
           sx={{ display: "flex", gap: 1, alignItems: "center", height: "100%" }}
           onClick={(e) => e.stopPropagation()}
         >
-          <Tooltip title="Edit">
+          <Tooltip title={t("common.edit")}>
             <IconButton
               size="small"
               onClick={() => onEdit?.(params.row.id)}
@@ -115,7 +121,7 @@ export default function StudentList({
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title={t("common.delete")}>
             <IconButton
               size="small"
               onClick={() => onDelete?.(params.row.id)}
@@ -153,6 +159,7 @@ export default function StudentList({
         pageSizeOptions={[10, 25, 50, 100]}
         hideFooter
         loading={isLoading}
+        localeText={localeText}
         initialState={{
           columns: {
             columnVisibilityModel: {

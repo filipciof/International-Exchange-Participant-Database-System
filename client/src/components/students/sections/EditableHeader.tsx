@@ -32,6 +32,7 @@ export default function EditableHeader({
 }: EditableHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
+
   const [formData, setFormData] = useState({
     first_name: student.first_name || "",
     middle_name: student.middle_name || "",
@@ -59,7 +60,7 @@ export default function EditableHeader({
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
       return response.data;
     },
@@ -95,7 +96,11 @@ export default function EditableHeader({
     setIsEditing(false);
   };
 
-  const fullName = [formData.first_name, formData.middle_name, formData.last_name]
+  const fullName = [
+    formData.first_name,
+    formData.middle_name,
+    formData.last_name,
+  ]
     .filter(Boolean)
     .join(" ");
 

@@ -21,6 +21,7 @@ import InfoItem from "../InfoItem";
 import Loading from "../Loading";
 import EditableFamilyMembers from "./sections/EditableFamilyMembers";
 import EditableDocuments from "../EditableDocuments";
+import { useTranslation } from "react-i18next";
 
 type FamilyDetailProps = {
   id: number;
@@ -28,6 +29,8 @@ type FamilyDetailProps = {
 };
 
 export default function FamilyDetail({ id, handleClose }: FamilyDetailProps) {
+  const { t } = useTranslation();
+
   const { data: family, isLoading: isFamilyLoading } = useQuery({
     queryKey: ["families", id],
     queryFn: async () => {
@@ -48,7 +51,7 @@ export default function FamilyDetail({ id, handleClose }: FamilyDetailProps) {
           <ArrowBack />
         </IconButton>
         <Typography variant="h5" component="h1">
-          Family Details
+          {t("families.profile")}
         </Typography>
       </Stack>
 
@@ -91,12 +94,18 @@ export default function FamilyDetail({ id, handleClose }: FamilyDetailProps) {
 
       {/* Club Information */}
       {family.club && (
-        <Section title="Club Information" icon={<Business />}>
+        <Section title={t("families.steps.club")} icon={<Business />}>
           <Grid container spacing={3}>
-            <InfoItem label="Country" value={family.club.country} />
-            <InfoItem label="District" value={family.club.district} />
             <InfoItem
-              label="Club"
+              label={t("clubForm.country")}
+              value={family.club.country}
+            />
+            <InfoItem
+              label={t("clubForm.district")}
+              value={family.club.district}
+            />
+            <InfoItem
+              label={t("familyForm.club")}
               value={family.club.name}
               linkPath={`/clubs/?id=${family.club.id}&view=detail`}
               fullWidth
@@ -106,10 +115,14 @@ export default function FamilyDetail({ id, handleClose }: FamilyDetailProps) {
       )}
 
       {/* Location Information */}
-      <Section title="Location" icon={<LocationOn />}>
+      <Section title={t("families.steps.location")} icon={<LocationOn />}>
         <Grid container spacing={3}>
-          <InfoItem label="City" value={family.city} />
-          <InfoItem label="Address" value={family.address} fullWidth />
+          <InfoItem label={t("familyForm.city")} value={family.city} />
+          <InfoItem
+            label={t("familyForm.address")}
+            value={family.address}
+            fullWidth
+          />
         </Grid>
       </Section>
 
@@ -121,7 +134,7 @@ export default function FamilyDetail({ id, handleClose }: FamilyDetailProps) {
 
       {/* Notes */}
       {family.notes && (
-        <Section title="Additional Notes" icon={<StickyNote2 />}>
+        <Section title={t("families.steps.additionalInfo")} icon={<StickyNote2 />}>
           <Paper
             elevation={0}
             sx={{

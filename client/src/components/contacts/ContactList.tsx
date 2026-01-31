@@ -1,8 +1,10 @@
 import { type GridColDef, DataGrid } from "@mui/x-data-grid";
-import type { PaginatedData, Contact, PaginationModel} from "../../utils/types";
+import type { PaginatedData, Contact, PaginationModel } from "../../utils/types";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useTranslation } from "react-i18next";
+import useDataGridLocale from "../../hooks/useDataGridLocale";
 
 type ContactListProps = {
   contacts: PaginatedData<Contact>;
@@ -23,46 +25,49 @@ export default function ContactList({
   onDelete,
   onRowClick,
 }: ContactListProps) {
+  const { t } = useTranslation();
+  const localeText = useDataGridLocale();
+
   const columns: GridColDef<Contact>[] = [
     {
       field: "first_name",
-      headerName: "First name",
+      headerName: t("contactForm.firstName"),
       width: 100,
     },
     {
       field: "middle_name",
-      headerName: "Middle name",
+      headerName: t("contactForm.middleName"),
       width: 100,
       hideable: true,
     },
     {
       field: "last_name",
-      headerName: "Last name",
+      headerName: t("contactForm.lastName"),
       width: 100,
     },
     {
       field: "gender_name",
-      headerName: "Gender",
+      headerName: t("contactForm.gender"),
       width: 100,
     },
     {
       field: "email",
-      headerName: "Email",
+      headerName: t("contactForm.email"),
       width: 150,
     },
     {
       field: "phone",
-      headerName: "Phone number",
+      headerName: t("contactForm.phone"),
       width: 150,
     },
     {
       field: "country",
-      headerName: "Country",
+      headerName: t("clubForm.country"),
       width: 150,
     },
     {
       field: "districts",
-      headerName: "Districts",
+      headerName: t("contactForm.districts"),
       width: 120,
     },
     {
@@ -85,12 +90,12 @@ export default function ContactList({
     },
     {
       field: "notes",
-      headerName: "Notes",
+      headerName: t("contactForm.notes"),
       width: 100,
     },
     {
       field: "actions",
-      headerName: "Actions",
+      headerName: t("common.actions"),
       width: 100,
       sortable: false,
       filterable: false,
@@ -100,7 +105,7 @@ export default function ContactList({
           sx={{ display: "flex", gap: 1, alignItems: "center", height: "100%" }}
           onClick={(e) => e.stopPropagation()}
         >
-          <Tooltip title="Edit">
+          <Tooltip title={t("common.edit")}>
             <IconButton
               size="small"
               onClick={() => onEdit?.(params.row.id)}
@@ -109,7 +114,7 @@ export default function ContactList({
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title={t("common.delete")}>
             <IconButton
               size="small"
               onClick={() => onDelete?.(params.row.id)}
@@ -147,6 +152,7 @@ export default function ContactList({
         pageSizeOptions={[10, 25, 50, 100]}
         hideFooter
         loading={isLoading}
+        localeText={localeText}
         initialState={{
           columns: {
             columnVisibilityModel: {

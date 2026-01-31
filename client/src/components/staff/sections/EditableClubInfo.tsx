@@ -14,6 +14,7 @@ import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
 import Section from "../../Section";
 import InfoItem from "../../InfoItem";
+import { useTranslation } from "react-i18next";
 
 type EditableClubInfoProps = {
   staff: Staff;
@@ -24,9 +25,11 @@ export default function EditableClubInfo({
   staff,
   staffId,
 }: EditableClubInfoProps) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [country, setCountry] = useState<number | null>(null);
   const [district, setDistrict] = useState<number | null>(null);
+
   const [formData, setFormData] = useState({
     id_club: staff.id_club || null,
     position: staff.position || "",
@@ -41,7 +44,9 @@ export default function EditableClubInfo({
     staleTime: Infinity,
   });
 
-  const { data: districts = [], isLoading: isLoadingDistricts } = useQuery<District[]>({
+  const { data: districts = [], isLoading: isLoadingDistricts } = useQuery<
+    District[]
+  >({
     queryKey: ["districts", country],
     queryFn: async () => {
       const response = await axiosClient.get(`/districts/?country=${country}`);
@@ -122,22 +127,36 @@ export default function EditableClubInfo({
   );
 
   return (
-    <Section title="Club Information" icon={<Business />} actions={actions}>
+    <Section
+      title={t("staff.steps.club")}
+      icon={<Business />}
+      actions={actions}
+    >
       {!isEditing ? (
         <Grid container spacing={3}>
           {staff.club && (
             <>
-              <InfoItem label="Country" value={staff.club.country} />
-              <InfoItem label="District" value={staff.club.district} />
               <InfoItem
-                label="Club"
+                label={t("clubForm.country")}
+                value={staff.club.country}
+              />
+              <InfoItem
+                label={t("clubForm.district")}
+                value={staff.club.district}
+              />
+              <InfoItem
+                label={t("staffForm.club")}
                 value={staff.club.name}
                 linkPath={`/clubs/?id=${staff.club.id}&view=detail`}
                 fullWidth
               />
             </>
           )}
-          <InfoItem label="Position" value={staff.position} fullWidth />
+          <InfoItem
+            label={t("staffForm.position")}
+            value={staff.position}
+            fullWidth
+          />
         </Grid>
       ) : (
         <Grid container spacing={2}>
@@ -152,7 +171,9 @@ export default function EditableClubInfo({
               }}
               options={countries}
               getOptionLabel={(option) => option.name}
-              renderInput={(params) => <TextField {...params} label="Country" />}
+              renderInput={(params) => (
+                <TextField {...params} label={t("clubForm.country")} />
+              )}
             />
           </Grid>
           <Grid size={{ xs: 12 }}>
@@ -170,7 +191,7 @@ export default function EditableClubInfo({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="District"
+                  label={t("clubForm.district")}
                   slotProps={{
                     input: {
                       ...params.InputProps,
@@ -205,7 +226,7 @@ export default function EditableClubInfo({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Club"
+                  label={t("staffForm.club")}
                   slotProps={{
                     input: {
                       ...params.InputProps,
@@ -227,7 +248,7 @@ export default function EditableClubInfo({
             <TextField
               fullWidth
               size="small"
-              label="Position"
+              label={t("staffForm.position")}
               value={formData.position}
               onChange={(e) =>
                 setFormData({ ...formData, position: e.target.value })

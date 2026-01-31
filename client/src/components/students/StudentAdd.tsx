@@ -1,5 +1,6 @@
 import StudentForm from "./StudentForm";
 import type { StudentFormData, Country } from "../../utils/types";
+import { useTranslation } from "react-i18next";
 
 type StudentAddProps = {
   handleClose: () => void;
@@ -18,16 +19,18 @@ export default function StudentAdd({
   error,
   countries,
 }: StudentAddProps) {
+  const { t } = useTranslation();
+
   return (
     <StudentForm
-      title="New Student"
+      title={t("students.newStudent")}
       handleClose={handleClose}
       handleSubmit={handleAddStudent}
       isLoading={isLoading}
       isSuccess={isSuccess}
       error={error}
       countries={countries}
-      submitButtonText="Submit"
+      submitButtonText={t("common.add")}
     />
   );
 }

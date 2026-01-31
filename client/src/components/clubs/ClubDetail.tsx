@@ -7,16 +7,14 @@ import {
   IconButton,
   Stack,
 } from "@mui/material";
-import {
-  ArrowBack,
-  LocationOn,
-} from "@mui/icons-material";
+import { ArrowBack, LocationOn } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import Section from "../Section";
 import InfoItem from "../InfoItem";
 import Loading from "../Loading";
 import EditableDocuments from "../EditableDocuments";
+import { useTranslation } from "react-i18next";
 
 type ClubDetailProps = {
   id: number;
@@ -24,6 +22,8 @@ type ClubDetailProps = {
 };
 
 export default function ClubDetail({ id, handleClose }: ClubDetailProps) {
+  const { t } = useTranslation();
+
   const { data: club, isLoading: isClubLoading } = useQuery({
     queryKey: ["clubs", id],
     queryFn: async () => {
@@ -44,7 +44,7 @@ export default function ClubDetail({ id, handleClose }: ClubDetailProps) {
           <ArrowBack />
         </IconButton>
         <Typography variant="h5" component="h1">
-          Club Details
+          {t("clubs.profile")}
         </Typography>
       </Stack>
 
@@ -76,7 +76,7 @@ export default function ClubDetail({ id, handleClose }: ClubDetailProps) {
                 variant="h6"
                 sx={{ color: "rgba(255,255,255,0.9)", mb: 1 }}
               >
-                District {club.district}
+                {t("clubForm.district")} {club.district}
               </Typography>
             </Box>
           </Box>
@@ -84,11 +84,11 @@ export default function ClubDetail({ id, handleClose }: ClubDetailProps) {
       </Card>
 
       {/* Location Information */}
-      <Section title="Location" icon={<LocationOn />}>
+      <Section title={t("clubs.location")} icon={<LocationOn />}>
         <Grid container spacing={3}>
-          <InfoItem label="Country" value={club.country} />
-          <InfoItem label="District" value={club.district} />
-          <InfoItem label="City" value={club.city} />
+          <InfoItem label={t("clubForm.country")} value={club.country} />
+          <InfoItem label={t("clubForm.district")} value={club.district} />
+          <InfoItem label={t("clubForm.city")} value={club.city} />
         </Grid>
       </Section>
 

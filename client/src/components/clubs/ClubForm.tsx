@@ -20,6 +20,7 @@ import type { ClubFormData, Country, District } from "../../utils/types";
 import { clubSchema } from "../../utils/types";
 import axiosClient from "../../utils/axiosClient";
 import { handleValidationErrors } from "../../utils/handleValidationErrors";
+import { useTranslation } from "react-i18next";
 
 type ClubFormProps = {
   title: string;
@@ -41,10 +42,12 @@ export default function ClubForm({
   isSuccess,
   error,
   initialData,
-  submitButtonText = "Submit",
+  submitButtonText,
   countries,
 }: ClubFormProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
+  const defaultSubmitButtonText = submitButtonText || t("common.submit");
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [selectedCountry, setSelectedCountry] = useState<number | null>(null);
 
@@ -134,7 +137,7 @@ export default function ClubForm({
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Club Name"
+                  label={t("clubForm.clubName")}
                   variant="outlined"
                   fullWidth
                   error={!!errors.name}
@@ -156,8 +159,8 @@ export default function ClubForm({
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Country"
-                    placeholder="Select country"
+                    label={t("clubForm.country")}
+                    placeholder={t("common.selectCountry")}
                   />
                 )}
               />
@@ -178,8 +181,8 @@ export default function ClubForm({
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label="District"
-                        placeholder="Select district"
+                        label={t("clubForm.district")}
+                        placeholder={t("common.selectDistrict")}
                         error={!!errors.id_district}
                         helperText={errors.id_district?.message}
                         slotProps={{
@@ -208,7 +211,7 @@ export default function ClubForm({
                 <TextField
                   {...field}
                   value={field.value || ""}
-                  label="City"
+                  label={t("clubForm.city")}
                   variant="outlined"
                   fullWidth
                   error={!!errors.city}
@@ -226,19 +229,19 @@ export default function ClubForm({
                 <CircularProgress sx={{ color: "secondary.main" }} />
               ) : (
                 <Button variant="contained" type="submit" size="large">
-                  {submitButtonText}
+                  {defaultSubmitButtonText}
                 </Button>
               )}
               <Button variant="outlined" onClick={onClose} size="large">
-                Cancel
+                {t("common.cancel")}
               </Button>
             </Stack>
             {error && (
               <Stack spacing={1}>
                 {handleValidationErrors(error.response?.data).map(
-                  (message: string, index: number) => (
+                  (errorMessage: string, index: number) => (
                     <Typography key={index} sx={{ color: "error.main" }}>
-                      {message}
+                      {errorMessage}
                     </Typography>
                   ),
                 )}
@@ -246,7 +249,7 @@ export default function ClubForm({
             )}
             {isSuccess && (
               <Typography sx={{ color: "success.main" }}>
-                Operation completed successfully!
+                {t("common.success")}
               </Typography>
             )}
           </Stack>

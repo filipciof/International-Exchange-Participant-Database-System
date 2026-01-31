@@ -32,6 +32,7 @@ import {
   ShirtSize,
 } from "../../utils/types";
 import { handleValidationErrors } from "../../utils/handleValidationErrors";
+import { useTranslation } from "react-i18next";
 
 type StudentFormProps = {
   title?: string;
@@ -77,28 +78,32 @@ const QuestionField = ({
   </Box>
 );
 
-const steps = [
-  "Personal Information",
-  "Languages",
-  "Travel Documents",
-  "Parents/Guardian",
-  "Insurance",
-  "Additional Info",
+const getSteps = (t: (key: string) => string) => [
+  t("studentForm.steps.personalInfo"),
+  t("studentForm.steps.languages"),
+  t("studentForm.steps.travelDocuments"),
+  t("studentForm.steps.parentsGuardian"),
+  t("studentForm.steps.insurance"),
+  t("studentForm.steps.additionalInfo"),
 ];
 
 export default function StudentForm({
-  title = "Student Application Form",
+  title,
   handleClose,
   handleSubmit: onFormSubmit,
   countries,
   initialData,
-  submitButtonText = "Submit Application",
+  submitButtonText,
   isLoading,
   isSuccess,
   error,
 }: StudentFormProps) {
+  const { t } = useTranslation();
   const [activeStep, setActiveStep] = useState(0);
   const [photo, setPhoto] = useState<File | null>(null);
+  const steps = getSteps(t);
+  const defaultTitle = title || "Student Application Form";
+  const defaultSubmitButtonText = submitButtonText || t("students.submitApplication");
 
   const {
     control,
@@ -199,7 +204,7 @@ export default function StudentForm({
             <ArrowBack />
           </IconButton>
           <Typography variant="h5" component="h1">
-            {title}
+            {defaultTitle}
           </Typography>
         </Stack>
       )}
@@ -218,10 +223,10 @@ export default function StudentForm({
         {activeStep === 0 && (
           <>
             <Typography variant="h6" sx={{ mb: 3, color: "primary.main" }}>
-              Personal Information
+              {t("studentForm.steps.personalInfo")}
             </Typography>
 
-        <QuestionField question="What is your first name?" required>
+        <QuestionField question={t("studentForm.questions.firstName")} required>
           <Controller
             name="first_name"
             control={control}
@@ -229,7 +234,7 @@ export default function StudentForm({
               <TextField
                 {...field}
                 fullWidth
-                placeholder="Enter your first name"
+                placeholder={t("studentForm.placeholders.firstName")}
                 error={!!errors.first_name}
                 helperText={errors.first_name?.message}
               />
@@ -237,7 +242,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What is your middle name? (if applicable)">
+        <QuestionField question={t("studentForm.questions.middleName")}>
           <Controller
             name="middle_name"
             control={control}
@@ -246,7 +251,7 @@ export default function StudentForm({
                 {...field}
                 value={field.value || ""}
                 fullWidth
-                placeholder="Enter your middle name"
+                placeholder={t("studentForm.placeholders.middleName")}
                 error={!!errors.middle_name}
                 helperText={errors.middle_name?.message}
               />
@@ -254,7 +259,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What is your last name?" required>
+        <QuestionField question={t("studentForm.questions.lastName")} required>
           <Controller
             name="last_name"
             control={control}
@@ -262,7 +267,7 @@ export default function StudentForm({
               <TextField
                 {...field}
                 fullWidth
-                placeholder="Enter your last name"
+                placeholder={t("studentForm.placeholders.lastName")}
                 error={!!errors.last_name}
                 helperText={errors.last_name?.message}
               />
@@ -270,7 +275,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="Do you have a preferred nickname?">
+        <QuestionField question={t("studentForm.questions.nickname")}>
           <Controller
             name="nick_name"
             control={control}
@@ -279,7 +284,7 @@ export default function StudentForm({
                 {...field}
                 value={field.value || ""}
                 fullWidth
-                placeholder="Enter your nickname"
+                placeholder={t("studentForm.placeholders.nickname")}
                 error={!!errors.nick_name}
                 helperText={errors.nick_name?.message}
               />
@@ -287,7 +292,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What is your gender?">
+        <QuestionField question={t("studentForm.questions.gender")}>
           <Controller
             name="gender"
             control={control}
@@ -309,13 +314,13 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What is your date of birth?">
+        <QuestionField question={t("studentForm.questions.dateOfBirth")}>
           <Controller
             name="date_of_birth"
             control={control}
             render={({ field }) => (
               <DatePicker
-                label="Date of Birth"
+                label={t("studentForm.labels.dateOfBirth")}
                 format="YYYY-MM-DD"
                 value={field.value ? dayjs(field.value) : null}
                 onChange={(date) => {
@@ -333,7 +338,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What country were you born in?">
+        <QuestionField question={t("studentForm.questions.countryOfBirth")}>
           <Controller
             name="id_country_of_birth"
             control={control}
@@ -351,8 +356,8 @@ export default function StudentForm({
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Country of Birth"
-                    placeholder="Select country"
+                    label={t("studentForm.labels.countryOfBirth")}
+                    placeholder={t("common.selectCountry")}
                     error={!!errors.id_country_of_birth}
                     helperText={errors.id_country_of_birth?.message}
                   />
@@ -362,7 +367,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What city were you born in?">
+        <QuestionField question={t("studentForm.questions.cityOfBirth")}>
           <Controller
             name="city_of_birth"
             control={control}
@@ -370,7 +375,7 @@ export default function StudentForm({
               <TextField
                 {...field}
                 fullWidth
-                placeholder="Enter your city of birth"
+                placeholder={t("studentForm.placeholders.cityOfBirth")}
                 error={!!errors.city_of_birth}
                 helperText={errors.city_of_birth?.message}
               />
@@ -378,7 +383,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What city do you currently live in?">
+        <QuestionField question={t("studentForm.questions.cityOfResidence")}>
           <Controller
             name="city_of_residence"
             control={control}
@@ -386,7 +391,7 @@ export default function StudentForm({
               <TextField
                 {...field}
                 fullWidth
-                placeholder="Enter your current city"
+                placeholder={t("studentForm.placeholders.cityOfResidence")}
                 error={!!errors.city_of_residence}
                 helperText={errors.city_of_residence?.message}
               />
@@ -394,7 +399,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What is your current address?">
+        <QuestionField question={t("studentForm.questions.address")}>
           <Controller
             name="address"
             control={control}
@@ -404,7 +409,7 @@ export default function StudentForm({
                 fullWidth
                 multiline
                 rows={2}
-                placeholder="Enter your full address"
+                placeholder={t("studentForm.placeholders.address")}
                 error={!!errors.address}
                 helperText={errors.address?.message}
               />
@@ -412,7 +417,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What is your height?">
+        <QuestionField question={t("studentForm.questions.height")}>
           <Controller
             name="height"
             control={control}
@@ -422,11 +427,11 @@ export default function StudentForm({
                 value={field.value || ""}
                 fullWidth
                 type="number"
-                placeholder="Enter your height"
+                placeholder={t("studentForm.placeholders.height")}
                 slotProps={{
                   input: {
                     endAdornment: (
-                      <InputAdornment position="end">meters</InputAdornment>
+                      <InputAdornment position="end">{t("studentForm.labels.meters")}</InputAdornment>
                     ),
                   },
                   htmlInput: { step: "0.01", min: "0" },
@@ -438,7 +443,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What is your shirt size?">
+        <QuestionField question={t("studentForm.questions.shirtSize")}>
           <Controller
             name="shirt_size"
             control={control}
@@ -460,7 +465,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="Do you have any dietary restrictions or allergies?">
+        <QuestionField question={t("studentForm.questions.dietaryRestrictions")}>
           <Controller
             name="dietary_restrictions"
             control={control}
@@ -471,7 +476,7 @@ export default function StudentForm({
                 fullWidth
                 multiline
                 rows={3}
-                placeholder="Please describe any dietary restrictions or food allergies"
+                placeholder={t("studentForm.placeholders.dietaryRestrictions")}
                 error={!!errors.dietary_restrictions}
                 helperText={errors.dietary_restrictions?.message}
               />
@@ -486,10 +491,10 @@ export default function StudentForm({
         {activeStep === 1 && (
           <>
             <Typography variant="h6" sx={{ mb: 3, color: "primary.main" }}>
-              Languages
+              {t("studentForm.steps.languages")}
             </Typography>
 
-        <QuestionField question="What is your first (native) language?">
+        <QuestionField question={t("studentForm.questions.firstLanguage")}>
           <Controller
             name="first_language"
             control={control}
@@ -497,7 +502,7 @@ export default function StudentForm({
               <TextField
                 {...field}
                 fullWidth
-                placeholder="Enter your first language"
+                placeholder={t("studentForm.placeholders.firstLanguage")}
                 error={!!errors.first_language}
                 helperText={errors.first_language?.message}
               />
@@ -505,7 +510,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="Do you speak a second language?">
+        <QuestionField question={t("studentForm.questions.secondLanguage")}>
           <Controller
             name="second_language"
             control={control}
@@ -514,7 +519,7 @@ export default function StudentForm({
                 {...field}
                 value={field.value || ""}
                 fullWidth
-                placeholder="Enter your second language (if any)"
+                placeholder={t("studentForm.placeholders.secondLanguage")}
                 error={!!errors.second_language}
                 helperText={errors.second_language?.message}
               />
@@ -524,7 +529,7 @@ export default function StudentForm({
 
         {secondLanguage && (
           <QuestionField
-            question="How proficient are you in your second language?"
+            question={t("studentForm.questions.secondLanguageProficiency")}
             required
           >
             <Controller
@@ -549,7 +554,7 @@ export default function StudentForm({
           </QuestionField>
         )}
 
-        <QuestionField question="Do you speak a third language?">
+        <QuestionField question={t("studentForm.questions.thirdLanguage")}>
           <Controller
             name="third_language"
             control={control}
@@ -558,7 +563,7 @@ export default function StudentForm({
                 {...field}
                 value={field.value || ""}
                 fullWidth
-                placeholder="Enter your third language (if any)"
+                placeholder={t("studentForm.placeholders.thirdLanguage")}
                 error={!!errors.third_language}
                 helperText={errors.third_language?.message}
               />
@@ -568,7 +573,7 @@ export default function StudentForm({
 
         {thirdLanguage && (
           <QuestionField
-            question="How proficient are you in your third language?"
+            question={t("studentForm.questions.thirdLanguageProficiency")}
             required
           >
             <Controller
@@ -600,10 +605,10 @@ export default function StudentForm({
         {activeStep === 2 && (
           <>
             <Typography variant="h6" sx={{ mb: 3, color: "primary.main" }}>
-              Travel Documents
+              {t("studentForm.steps.travelDocuments")}
             </Typography>
 
-        <QuestionField question="What country will you be departing from?">
+        <QuestionField question={t("studentForm.questions.countryOfDeparture")}>
           <Controller
             name="id_country_of_departure"
             control={control}
@@ -621,8 +626,8 @@ export default function StudentForm({
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Country of Departure"
-                    placeholder="Select country"
+                    label={t("studentForm.labels.countryOfDeparture")}
+                    placeholder={t("common.selectCountry")}
                     error={!!errors.id_country_of_departure}
                     helperText={errors.id_country_of_departure?.message}
                   />
@@ -632,7 +637,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What country issued your passport?">
+        <QuestionField question={t("studentForm.questions.countryOfPassport")}>
           <Controller
             name="id_country_of_passport"
             control={control}
@@ -650,8 +655,8 @@ export default function StudentForm({
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Country of Passport"
-                    placeholder="Select country"
+                    label={t("studentForm.labels.countryOfPassport")}
+                    placeholder={t("common.selectCountry")}
                     error={!!errors.id_country_of_passport}
                     helperText={errors.id_country_of_passport?.message}
                   />
@@ -661,7 +666,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What is your passport number?">
+        <QuestionField question={t("studentForm.questions.passportNumber")}>
           <Controller
             name="passport_number"
             control={control}
@@ -669,7 +674,7 @@ export default function StudentForm({
               <TextField
                 {...field}
                 fullWidth
-                placeholder="Enter your passport number"
+                placeholder={t("studentForm.placeholders.passportNumber")}
                 error={!!errors.passport_number}
                 helperText={errors.passport_number?.message}
               />
@@ -677,13 +682,13 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="When does your passport expire?">
+        <QuestionField question={t("studentForm.questions.passportExpiration")}>
           <Controller
             name="passport_expiration_date"
             control={control}
             render={({ field }) => (
               <DatePicker
-                label="Passport Expiration Date"
+                label={t("students.filter.passportExpiration")}
                 format="YYYY-MM-DD"
                 value={field.value ? dayjs(field.value) : null}
                 onChange={(date) => {
@@ -708,10 +713,10 @@ export default function StudentForm({
         {activeStep === 3 && (
           <>
             <Typography variant="h6" sx={{ mb: 3, color: "primary.main" }}>
-              Parent/Guardian Information
+              {t("studentForm.steps.parentsGuardian")}
             </Typography>
 
-        <QuestionField question="What is the full name of your first parent/guardian?">
+        <QuestionField question={t("studentForm.questions.firstParentName")}>
           <Controller
             name="first_parent_full_name"
             control={control}
@@ -719,7 +724,7 @@ export default function StudentForm({
               <TextField
                 {...field}
                 fullWidth
-                placeholder="Enter full name"
+                placeholder={t("studentForm.placeholders.parentName")}
                 error={!!errors.first_parent_full_name}
                 helperText={errors.first_parent_full_name?.message}
               />
@@ -727,7 +732,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What is the email address of your first parent/guardian?">
+        <QuestionField question={t("studentForm.questions.firstParentEmail")}>
           <Controller
             name="first_parent_email"
             control={control}
@@ -736,7 +741,7 @@ export default function StudentForm({
                 {...field}
                 fullWidth
                 type="email"
-                placeholder="Enter email address"
+                placeholder={t("studentForm.placeholders.parentEmail")}
                 error={!!errors.first_parent_email}
                 helperText={errors.first_parent_email?.message}
               />
@@ -744,7 +749,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What is the full name of your second parent/guardian? (if applicable)">
+        <QuestionField question={t("studentForm.questions.secondParentName")}>
           <Controller
             name="second_parent_full_name"
             control={control}
@@ -753,7 +758,7 @@ export default function StudentForm({
                 {...field}
                 value={field.value || ""}
                 fullWidth
-                placeholder="Enter full name"
+                placeholder={t("studentForm.placeholders.parentName")}
                 error={!!errors.second_parent_full_name}
                 helperText={errors.second_parent_full_name?.message}
               />
@@ -762,7 +767,7 @@ export default function StudentForm({
         </QuestionField>
 
         {secondParentName && (
-          <QuestionField question="What is the email address of your second parent/guardian?">
+          <QuestionField question={t("studentForm.questions.secondParentEmail")}>
             <Controller
               name="second_parent_email"
               control={control}
@@ -772,7 +777,7 @@ export default function StudentForm({
                   value={field.value || ""}
                   fullWidth
                   type="email"
-                  placeholder="Enter email address"
+                  placeholder={t("studentForm.placeholders.parentEmail")}
                   error={!!errors.second_parent_email}
                   helperText={errors.second_parent_email?.message}
                 />
@@ -781,7 +786,7 @@ export default function StudentForm({
           </QuestionField>
         )}
 
-        <QuestionField question="What is your Polish phone number? (if applicable)">
+        <QuestionField question={t("studentForm.questions.polishPhoneNumber")}>
           <Controller
             name="polish_phone_number"
             control={control}
@@ -790,7 +795,7 @@ export default function StudentForm({
                 {...field}
                 value={field.value || ""}
                 fullWidth
-                placeholder="Enter Polish phone number"
+                placeholder={t("studentForm.placeholders.polishPhoneNumber")}
                 error={!!errors.polish_phone_number}
                 helperText={errors.polish_phone_number?.message}
               />
@@ -805,10 +810,10 @@ export default function StudentForm({
         {activeStep === 4 && (
           <>
             <Typography variant="h6" sx={{ mb: 3, color: "primary.main" }}>
-              Insurance Information
+              {t("studentForm.steps.insurance")}
             </Typography>
 
-        <QuestionField question="What is the name of your insurance company?">
+        <QuestionField question={t("studentForm.questions.insuranceCompany")}>
           <Controller
             name="insurance_company"
             control={control}
@@ -816,7 +821,7 @@ export default function StudentForm({
               <TextField
                 {...field}
                 fullWidth
-                placeholder="Enter insurance company name"
+                placeholder={t("studentForm.placeholders.insuranceCompany")}
                 error={!!errors.insurance_company}
                 helperText={errors.insurance_company?.message}
               />
@@ -824,7 +829,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What type of insurance do you have?">
+        <QuestionField question={t("studentForm.questions.insuranceType")}>
           <Controller
             name="insurance_type"
             control={control}
@@ -832,7 +837,7 @@ export default function StudentForm({
               <TextField
                 {...field}
                 fullWidth
-                placeholder="Enter insurance type"
+                placeholder={t("studentForm.placeholders.insuranceType")}
                 error={!!errors.insurance_type}
                 helperText={errors.insurance_type?.message}
               />
@@ -840,7 +845,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What is your insurance serial/policy number?">
+        <QuestionField question={t("studentForm.questions.insuranceSerialNumber")}>
           <Controller
             name="insurance_serial_number"
             control={control}
@@ -848,7 +853,7 @@ export default function StudentForm({
               <TextField
                 {...field}
                 fullWidth
-                placeholder="Enter serial/policy number"
+                placeholder={t("studentForm.placeholders.insuranceSerialNumber")}
                 error={!!errors.insurance_serial_number}
                 helperText={errors.insurance_serial_number?.message}
               />
@@ -856,7 +861,7 @@ export default function StudentForm({
           />
         </QuestionField>
 
-        <QuestionField question="What is your insurance coverage amount?">
+        <QuestionField question={t("studentForm.questions.insuranceCoverage")}>
           <Controller
             name="insurance_amount"
             control={control}
@@ -866,7 +871,7 @@ export default function StudentForm({
                 value={field.value ?? ""}
                 fullWidth
                 type="number"
-                placeholder="Enter coverage amount"
+                placeholder={t("studentForm.placeholders.insuranceCoverage")}
                 slotProps={{
                   input: {
                     startAdornment: (
@@ -927,13 +932,13 @@ export default function StudentForm({
             disabled={activeStep === 0}
             size="large"
           >
-            Back
+            {t("common.back")}
           </Button>
 
           <Stack direction="row" spacing={2}>
             {handleClose && (
               <Button onClick={onClose} variant="outlined" size="large">
-                Cancel
+                {t("common.cancel")}
               </Button>
             )}
 
@@ -942,7 +947,7 @@ export default function StudentForm({
                 <CircularProgress sx={{ color: "secondary.main" }} />
               ) : (
                 <Button variant="contained" type="submit" size="large">
-                  {submitButtonText}
+                  {defaultSubmitButtonText}
                 </Button>
               )
             ) : (
@@ -951,7 +956,7 @@ export default function StudentForm({
                 onClick={handleNext}
                 size="large"
               >
-                Next
+                {t("common.next")}
               </Button>
             )}
           </Stack>
@@ -959,9 +964,9 @@ export default function StudentForm({
         {error && (
           <Stack spacing={1}>
             {handleValidationErrors(error.response?.data).map(
-              (message: string, index: number) => (
+              (errorMessage: string, index: number) => (
                 <Typography key={index} sx={{ color: "error.main" }}>
-                  {message}
+                  {errorMessage}
                 </Typography>
               ),
             )}
@@ -969,7 +974,7 @@ export default function StudentForm({
         )}
         {isSuccess && (
           <Typography sx={{ color: "success.main" }}>
-            Operation completed successfully!
+            {t("common.success")}
           </Typography>
         )}
       </form>

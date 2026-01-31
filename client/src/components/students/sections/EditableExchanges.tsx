@@ -23,6 +23,7 @@ import AddEditExchangeDialog from "./AddEditExchangeDialog";
 import DeleteConfirmationDialog from "../../DeleteConfirmationDialog";
 import InfoItem from "../../InfoItem";
 import EditableExchangeFamilies from "./EditableExchangeFamilies";
+import { useTranslation } from "react-i18next";
 
 type EditableExchangesProps = {
   studentId: number;
@@ -53,6 +54,7 @@ export default function EditableExchanges({
   isInbound,
   readOnly = false,
 }: EditableExchangesProps) {
+  const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState<
     null | "update" | "add" | "delete"
   >(null);
@@ -60,6 +62,7 @@ export default function EditableExchanges({
   const [deletingExchange, setDeletingExchange] = useState<Exchange | null>(
     null,
   );
+
   const [formData, setFormData] = useState<ExchangeFormData>({
     id_student: studentId,
     year: "",
@@ -185,16 +188,22 @@ export default function EditableExchanges({
   ) : undefined;
 
   return (
-    <Section title="Exchange History" icon={<ExchangeIcon />} actions={actions}>
+    <Section
+      title={t("studentForm.steps.exchangeHistory")}
+      icon={<ExchangeIcon />}
+      actions={actions}
+    >
       {isLoading && (
         <Typography variant="body2" color="text.secondary">
-          Loading exchanges...
+          {/* Loading exchanges... */}
+          {t("common.loading")}
         </Typography>
       )}
 
       {error && (
         <Typography variant="body2" color="error.main">
-          Error loading exchanges
+          {/* Error loading exchanges */}
+          {t("common.error", error.message)}
         </Typography>
       )}
 
@@ -212,7 +221,7 @@ export default function EditableExchanges({
               }}
             >
               <Typography variant="body2" color="text.secondary">
-                No exchanges recorded yet
+                {t("studentForm.labels.noExchanges")}
               </Typography>
             </Paper>
           ) : (
@@ -223,13 +232,9 @@ export default function EditableExchanges({
                   elevation={0}
                   sx={{
                     p: 2.5,
-                    bgcolor: isInbound
-                      ? "success.lighter"
-                      : "info.lighter",
+                    bgcolor: isInbound ? "success.lighter" : "info.lighter",
                     border: "1px solid",
-                    borderColor: isInbound
-                      ? "success.light"
-                      : "info.light",
+                    borderColor: isInbound ? "success.light" : "info.light",
                     borderRadius: 1,
                   }}
                 >
@@ -246,10 +251,15 @@ export default function EditableExchanges({
                         variant="subtitle1"
                         sx={{ fontWeight: 600, mb: 0.5 }}
                       >
-                        {exchange.type || "Exchange"}
+                        {t(`exchangeTypes.${exchange.type}`) ||
+                          t("studentForm.labels.exchange")}
                       </Typography>
                       <Chip
-                        label={isInbound ? "Inbound" : "Outbound"}
+                        label={
+                          isInbound
+                            ? t("students.filter.inbound")
+                            : t("students.filter.outbound")
+                        }
                         size="small"
                         color={isInbound ? "success" : "info"}
                         sx={{ fontWeight: 500 }}
@@ -287,16 +297,19 @@ export default function EditableExchanges({
                   <Grid container spacing={2}>
                     {exchange.start_date && (
                       <InfoItem
-                        label="Start Date"
+                        label={t("studentForm.labels.startDate")}
                         value={exchange.start_date}
                       />
                     )}
                     {exchange.end_date && (
-                      <InfoItem label="End Date" value={exchange.end_date} />
+                      <InfoItem
+                        label={t("studentForm.labels.endDate")}
+                        value={exchange.end_date}
+                      />
                     )}
                     {exchange.sending_club && (
                       <InfoItem
-                        label="Sending Club"
+                        label={t("studentForm.labels.sendingClub")}
                         value={`${exchange.sending_club.name} - ${exchange.sending_club.country}, District ${exchange.sending_club.district}`}
                         linkPath={
                           readOnly
@@ -307,7 +320,7 @@ export default function EditableExchanges({
                     )}
                     {exchange.receiving_club && (
                       <InfoItem
-                        label="Receiving Club"
+                        label={t("studentForm.labels.receivingClub")}
                         value={`${exchange.receiving_club.name} - ${exchange.receiving_club.country}, District ${exchange.receiving_club.district}`}
                         linkPath={
                           readOnly
@@ -318,7 +331,7 @@ export default function EditableExchanges({
                     )}
                     {exchange.counsellor && (
                       <InfoItem
-                        label="Counsellor"
+                        label={t("studentForm.labels.counsellor")}
                         value={exchange.counsellor}
                         linkPath={
                           readOnly
@@ -329,7 +342,7 @@ export default function EditableExchanges({
                     )}
                     {exchange.kwm_officer && (
                       <InfoItem
-                        label="KWM Officer"
+                        label={t("studentForm.labels.kwmOfficer")}
                         value={exchange.kwm_officer}
                         linkPath={
                           readOnly

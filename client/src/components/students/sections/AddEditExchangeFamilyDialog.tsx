@@ -16,6 +16,7 @@ import type {
 } from "../../../utils/types";
 import { handleValidationErrors } from "../../../utils/handleValidationErrors";
 import MyAutocomplete from "../../MyAutocomplete";
+import { useTranslation } from "react-i18next";
 
 type AddEditExchangeFamilyDialogProps = {
   dialogOpen: boolean;
@@ -42,6 +43,8 @@ export default function AddEditExchangeFamilyDialog({
   error = null,
   id_receiving_club,
 }: AddEditExchangeFamilyDialogProps) {
+  const { t } = useTranslation();
+
   return (
     <Dialog
       open={dialogOpen}
@@ -50,7 +53,7 @@ export default function AddEditExchangeFamilyDialog({
       fullWidth
     >
       <DialogTitle>
-        {editingExchangeFamily ? "Edit Host Family" : "Add Host Family"}
+        {editingExchangeFamily ? t("families.editHost") : t("families.addHost")}
       </DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
@@ -59,13 +62,17 @@ export default function AddEditExchangeFamilyDialog({
             handleChange={(family: Family) => {
               setFormData({ ...formData, id_family: family.id });
             }}
-            label="Host Family"
+            label={t("families.host")}
             endpoint="families"
             getOptionLabel={(item: Family) => item.name}
-            params={id_receiving_club ? {id_club: id_receiving_club.toString()} : undefined}
+            params={
+              id_receiving_club
+                ? { id_club: id_receiving_club.toString() }
+                : undefined
+            }
           />
           <DatePicker
-            label="Start Date"
+            label={t("studentForm.labels.startDate")}
             format="YYYY-MM-DD"
             value={formData.start_date ? dayjs(formData.start_date) : null}
             onChange={(date) => {
@@ -76,7 +83,7 @@ export default function AddEditExchangeFamilyDialog({
             }}
           />
           <DatePicker
-            label="End Date"
+            label={t("studentForm.labels.endDate")}
             format="YYYY-MM-DD"
             value={formData.end_date ? dayjs(formData.end_date) : null}
             onChange={(date) => {
@@ -92,7 +99,7 @@ export default function AddEditExchangeFamilyDialog({
         <Stack spacing={2} sx={{ p: 2, width: "100%" }}>
           <Stack direction="row" spacing={2} justifyContent="space-between">
             <Button onClick={handleCloseDialog} disabled={isLoading}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={handleSave}
@@ -101,11 +108,11 @@ export default function AddEditExchangeFamilyDialog({
             >
               {isLoading
                 ? editingExchangeFamily
-                  ? "Updating..."
-                  : "Adding..."
+                  ? t("common.updating")
+                  : t("common.adding")
                 : editingExchangeFamily
-                  ? "Update"
-                  : "Add"}
+                  ? t("common.update")
+                  : t("common.add")}
             </Button>
           </Stack>
           {error && (
@@ -113,7 +120,7 @@ export default function AddEditExchangeFamilyDialog({
               {handleValidationErrors(error.response?.data).map(
                 (message: string, index: number) => (
                   <Typography key={index} sx={{ color: "error.main" }}>
-                    {message}
+                    {t("common.error", message)}
                   </Typography>
                 ),
               )}
@@ -122,8 +129,8 @@ export default function AddEditExchangeFamilyDialog({
           {isSuccess && (
             <Typography sx={{ color: "success.main" }}>
               {editingExchangeFamily
-                ? "Host family updated successfully!"
-                : "Host family added successfully!"}
+                ? t("families.hostUpdateSuccess")
+                : t("families.hostAddSuccess")}
             </Typography>
           )}
         </Stack>

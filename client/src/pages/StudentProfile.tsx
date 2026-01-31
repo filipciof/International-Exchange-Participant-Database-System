@@ -17,10 +17,12 @@ import StudentForm from "../components/students/StudentForm";
 import { AxiosError } from "axios";
 import { useStudentMutations } from "../hooks/useStudentMutations";
 import EditableUserAccount from "../components/students/sections/EditableUserAccount";
+import { useTranslation } from "react-i18next";
 
 type StudentProfileProps = {};
 
 export default function StudentProfile({}: StudentProfileProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
   const {
     data: student,
@@ -78,13 +80,13 @@ export default function StudentProfile({}: StudentProfileProps) {
           isSuccess={addStudentMutation.isSuccess}
           error={addStudentMutation.error}
           countries={countries}
-          submitButtonText="Create Profile"
+          submitButtonText={t("students.createProfile")}
         />
       );
     }
     return (
       <Typography sx={{ color: "error.main" }}>
-        Error: {studentError.message}
+        {t("common.error", { message: studentError.message })}
       </Typography>
     );
   }
@@ -97,7 +99,7 @@ export default function StudentProfile({}: StudentProfileProps) {
           <ArrowBack />
         </IconButton> */}
         <Typography variant="h5" component="h1">
-          Student Profile
+          {t("students.profile")}
         </Typography>
       </Stack>
 
@@ -116,16 +118,16 @@ export default function StudentProfile({}: StudentProfileProps) {
           variant="scrollable"
           scrollButtons="auto"
         >
-          <Tab label="All" />
-          <Tab label="Personal" />
-          <Tab label="Languages" />
-          <Tab label="Travel" />
-          <Tab label="Parents" />
-          <Tab label="Insurance" />
-          <Tab label="Account" />
-          <Tab label="Exchanges" />
-          <Tab label="Documents" />
-          <Tab label="Notes" />
+          <Tab label={t("students.tabs.all")} />
+          <Tab label={t("students.tabs.personal")} />
+          <Tab label={t("students.tabs.languages")} />
+          <Tab label={t("students.tabs.travel")} />
+          <Tab label={t("students.tabs.parents")} />
+          <Tab label={t("students.tabs.insurance")} />
+          <Tab label={t("students.tabs.account")} />
+          <Tab label={t("students.tabs.exchanges")} />
+          <Tab label={t("students.tabs.documents")} />
+          <Tab label={t("students.tabs.notes")} />
         </Tabs>
       </Box>
 

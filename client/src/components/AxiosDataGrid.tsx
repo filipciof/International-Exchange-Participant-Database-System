@@ -4,6 +4,7 @@ import { Typography, Box } from "@mui/material";
 import Loading from "./Loading";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import useDataGridLocale from "../hooks/useDataGridLocale";
 
 interface AxiosDataGridProps {
   columns: GridColDef[];
@@ -14,6 +15,7 @@ export default function AxiosDataGrid({
   columns,
   endpoint,
 }: AxiosDataGridProps) {
+  const localeText = useDataGridLocale();
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 25,
@@ -53,6 +55,7 @@ export default function AxiosDataGrid({
         onPaginationModelChange={setPaginationModel}
         pageSizeOptions={[10, 25, 50, 100]}
         loading={isLoading}
+        localeText={localeText}
       />
     </Box>
   );

@@ -22,6 +22,7 @@ import type {
 import { Gender, ShirtSize } from "../../utils/types";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 
 // Generate year options (from 2010 to current year + 2)
 const currentYear = new Date().getFullYear();
@@ -30,28 +31,28 @@ const YEAR_OPTIONS = Array.from(
   (_, i) => 2010 + i,
 );
 
-const SEARCHABLE_FIELDS: SearchableField[] = [
-  { value: "first_name", label: "First Name" },
-  { value: "middle_name", label: "Middle Name" },
-  { value: "last_name", label: "Last Name" },
-  { value: "nick_name", label: "Nickname" },
-  { value: "city_of_birth", label: "City of Birth" },
-  { value: "city_of_residence", label: "City of Residence" },
-  { value: "address", label: "Address" },
-  { value: "dietary_restrictions", label: "Dietary Restrictions" },
-  { value: "first_language", label: "First Language" },
-  { value: "second_language", label: "Second Language" },
-  { value: "third_language", label: "Third Language" },
-  { value: "passport_number", label: "Passport Number" },
-  { value: "first_parent_full_name", label: "First Parent Name" },
-  { value: "first_parent_email", label: "First Parent Email" },
-  { value: "second_parent_full_name", label: "Second Parent Name" },
-  { value: "second_parent_email", label: "Second Parent Email" },
-  { value: "polish_phone_number", label: "Polish Phone Number" },
-  { value: "insurance_company", label: "Insurance Company" },
-  { value: "insurance_type", label: "Insurance Type" },
-  { value: "insurance_serial_number", label: "Insurance Serial Number" },
-  { value: "notes", label: "Notes" },
+const getSearchableFields = (t: (key: string) => string): SearchableField[] => [
+  { value: "first_name", label: t("students.searchFields.firstName") },
+  { value: "middle_name", label: t("students.searchFields.middleName") },
+  { value: "last_name", label: t("students.searchFields.lastName") },
+  { value: "nick_name", label: t("students.searchFields.nickname") },
+  { value: "city_of_birth", label: t("students.searchFields.cityOfBirth") },
+  { value: "city_of_residence", label: t("students.searchFields.cityOfResidence") },
+  { value: "address", label: t("students.searchFields.address") },
+  { value: "dietary_restrictions", label: t("students.searchFields.dietaryRestrictions") },
+  { value: "first_language", label: t("students.searchFields.firstLanguage") },
+  { value: "second_language", label: t("students.searchFields.secondLanguage") },
+  { value: "third_language", label: t("students.searchFields.thirdLanguage") },
+  { value: "passport_number", label: t("students.searchFields.passportNumber") },
+  { value: "first_parent_full_name", label: t("students.searchFields.firstParentName") },
+  { value: "first_parent_email", label: t("students.searchFields.firstParentEmail") },
+  { value: "second_parent_full_name", label: t("students.searchFields.secondParentName") },
+  { value: "second_parent_email", label: t("students.searchFields.secondParentEmail") },
+  { value: "polish_phone_number", label: t("students.searchFields.polishPhoneNumber") },
+  { value: "insurance_company", label: t("students.searchFields.insuranceCompany") },
+  { value: "insurance_type", label: t("students.searchFields.insuranceType") },
+  { value: "insurance_serial_number", label: t("students.searchFields.insuranceSerialNumber") },
+  { value: "notes", label: t("students.searchFields.notes") },
 ];
 
 // Consider filtering by height as well.
@@ -118,7 +119,9 @@ export default function StudentFilter({
   setPassportExpirationDateAfter,
   countries,
 }: StudentFilterProps) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
+  const SEARCHABLE_FIELDS = getSearchableFields(t);
 
   return (
     <>
@@ -128,7 +131,7 @@ export default function StudentFilter({
           setPaginationModel({ ...paginationModel, page: 1 });
           setSearchInput(newSearchInput);
         }}
-        placeholder="Search students..."
+        placeholder={t("students.searchPlaceholder")}
       />
       <Box sx={{ my: 2 }}>
         <Autocomplete
@@ -145,7 +148,7 @@ export default function StudentFilter({
           renderInput={(params) => (
             <TextField
               {...params}
-              placeholder="Select fields to search"
+              placeholder={t("students.selectFields")}
               size="small"
             />
           )}
@@ -165,7 +168,7 @@ export default function StudentFilter({
           onClick={() => setExpanded(!expanded)}
         >
           <Typography variant="h6" sx={{ fontSize: "1rem" }}>
-            Filters
+            {t("common.filters")}
           </Typography>
           <IconButton
             size="small"
@@ -180,8 +183,8 @@ export default function StudentFilter({
         <Collapse in={expanded}>
           <CardContent
             sx={{
-              display: "flex",
-              flexDirection: "column",
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
               gap: 3,
               pt: 0,
             }}
@@ -198,7 +201,7 @@ export default function StudentFilter({
                 variant="body2"
                 sx={{ color: "text.secondary", minWidth: "fit-content" }}
               >
-                Gender:
+                {t("students.filter.gender")}
               </Typography>
               <ToggleButtonGroup
                 value={selectedGenders.map((g) => g.toString())}
@@ -229,7 +232,7 @@ export default function StudentFilter({
                     value={gender.value.toString()}
                     aria-label={gender.label}
                   >
-                    {gender.label}
+                    {t(`gender.${gender.label}`)}
                   </ToggleButton>
                 ))}
               </ToggleButtonGroup>
@@ -247,7 +250,7 @@ export default function StudentFilter({
                 variant="body2"
                 sx={{ color: "text.secondary", minWidth: "fit-content" }}
               >
-                Shirt size:
+                {t("students.filter.shirtSize")}
               </Typography>
               <ToggleButtonGroup
                 value={selectedShirtSizes}
@@ -292,7 +295,7 @@ export default function StudentFilter({
                 variant="body2"
                 sx={{ color: "text.secondary", minWidth: "fit-content" }}
               >
-                Exchange type:
+                {t("students.filter.exchangeType")}
               </Typography>
               <ToggleButtonGroup
                 value={
@@ -328,13 +331,13 @@ export default function StudentFilter({
                 }}
               >
                 <ToggleButton value="inbound" aria-label="inbound">
-                  inbound
+                  {t("students.filter.inbound")}
                 </ToggleButton>
                 <ToggleButton value="outbound" aria-label="outbound">
-                  outbound
+                  {t("students.filter.outbound")}
                 </ToggleButton>
                 <ToggleButton value="both" aria-label="both">
-                  both
+                  {t("students.filter.both")}
                 </ToggleButton>
               </ToggleButtonGroup>
             </Box>
@@ -342,16 +345,16 @@ export default function StudentFilter({
             <Box
               sx={{
                 display: "flex",
-                alignItems: "center",
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: { xs: "stretch", sm: "center" },
                 gap: 2,
-                flexWrap: "wrap",
               }}
             >
               <Typography
                 variant="body2"
-                sx={{ color: "text.secondary", minWidth: "120px" }}
+                sx={{ color: "text.secondary", minWidth: "fit-content" }}
               >
-                Start year:
+                {t("students.filter.startYear")}
               </Typography>
               <TextField
                 select
@@ -362,9 +365,9 @@ export default function StudentFilter({
                   setSelectedStartYear(value === "" ? null : Number(value));
                 }}
                 size="small"
-                sx={{ minWidth: { xs: "100%", sm: 200 } }}
+                sx={{ minWidth: 150 }}
               >
-                <MenuItem value="">All years</MenuItem>
+                <MenuItem value="">{t("common.allYears")}</MenuItem>
                 {YEAR_OPTIONS.map((year) => (
                   <MenuItem key={year} value={year}>
                     {year}
@@ -376,225 +379,228 @@ export default function StudentFilter({
             <Box
               sx={{
                 display: "flex",
-                flexDirection: "column",
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: { xs: "stretch", sm: "center" },
                 gap: 2,
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  flexWrap: "wrap",
-                }}
+              <Typography
+                variant="body2"
+                sx={{ color: "text.secondary", minWidth: "fit-content" }}
               >
-                <Typography
-                  variant="body2"
-                  sx={{ color: "text.secondary", minWidth: "120px" }}
-                >
-                  Country of birth:
-                </Typography>
-                <Autocomplete
-                  value={selectedCountryOfBirth}
-                  onChange={(_event, newValue) => {
-                    setPaginationModel({ ...paginationModel, page: 1 });
-                    setSelectedCountryOfBirth(newValue);
-                  }}
-                  options={countries}
-                  getOptionLabel={(option) => option.name}
-                  sx={{ minWidth: { xs: "100%", sm: 250 }, flex: 1 }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Select country"
-                      size="small"
-                    />
-                  )}
-                />
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  flexWrap: "wrap",
+                {t("students.filter.countryOfBirth")}
+              </Typography>
+              <Autocomplete
+                value={selectedCountryOfBirth}
+                onChange={(_event, newValue) => {
+                  setPaginationModel({ ...paginationModel, page: 1 });
+                  setSelectedCountryOfBirth(newValue);
                 }}
-              >
-                <Typography
-                  variant="body2"
-                  sx={{ color: "text.secondary", minWidth: "120px" }}
-                >
-                  Country of departure:
-                </Typography>
-                <Autocomplete
-                  value={selectedCountryOfDeparture}
-                  onChange={(_event, newValue) => {
-                    setPaginationModel({ ...paginationModel, page: 1 });
-                    setSelectedCountryOfDeparture(newValue);
-                  }}
-                  options={countries}
-                  getOptionLabel={(option) => option.name}
-                  sx={{ minWidth: { xs: "100%", sm: 250 }, flex: 1 }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Select country"
-                      size="small"
-                    />
-                  )}
-                />
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  flexWrap: "wrap",
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  sx={{ color: "text.secondary", minWidth: "120px" }}
-                >
-                  Country of passport:
-                </Typography>
-                <Autocomplete
-                  value={selectedCountryOfPassport}
-                  onChange={(_event, newValue) => {
-                    setPaginationModel({ ...paginationModel, page: 1 });
-                    setSelectedCountryOfPassport(newValue);
-                  }}
-                  options={countries}
-                  getOptionLabel={(option) => option.name}
-                  sx={{ minWidth: { xs: "100%", sm: 250 }, flex: 1 }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Select country"
-                      size="small"
-                    />
-                  )}
-                />
-              </Box>
+                options={countries}
+                getOptionLabel={(option) => option.name}
+                sx={{ minWidth: 200, flex: 1 }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder={t("common.selectCountry")}
+                    size="small"
+                  />
+                )}
+              />
             </Box>
 
             <Box
               sx={{
                 display: "flex",
-                flexDirection: "column",
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: { xs: "stretch", sm: "center" },
                 gap: 2,
               }}
             >
-              <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                Date of birth:
-              </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  flexWrap: "wrap",
-                }}
+              <Typography
+                variant="body2"
+                sx={{ color: "text.secondary", minWidth: "fit-content" }}
               >
-                <DatePicker
-                  label="After"
-                  format="YYYY-MM-DD"
-                  value={dateOfBirthAfter ? dayjs(dateOfBirthAfter) : null}
-                  onChange={(newValue) => {
-                    setPaginationModel({ ...paginationModel, page: 1 });
-                    setDateOfBirthAfter(
-                      newValue ? newValue.format("YYYY-MM-DD") : "",
-                    );
-                  }}
-                  slotProps={{
-                    textField: {
-                      size: "small",
-                      sx: { flex: 1, minWidth: 200 },
-                    },
-                  }}
-                />
-                <DatePicker
-                  label="Before"
-                  format="YYYY-MM-DD"
-                  value={dateOfBirthBefore ? dayjs(dateOfBirthBefore) : null}
-                  onChange={(newValue) => {
-                    setPaginationModel({ ...paginationModel, page: 1 });
-                    setDateOfBirthBefore(
-                      newValue ? newValue.format("YYYY-MM-DD") : "",
-                    );
-                  }}
-                  slotProps={{
-                    textField: {
-                      size: "small",
-                      sx: { flex: 1, minWidth: 200 },
-                    },
-                  }}
-                />
-              </Box>
+                {t("students.filter.countryOfDeparture")}
+              </Typography>
+              <Autocomplete
+                value={selectedCountryOfDeparture}
+                onChange={(_event, newValue) => {
+                  setPaginationModel({ ...paginationModel, page: 1 });
+                  setSelectedCountryOfDeparture(newValue);
+                }}
+                options={countries}
+                getOptionLabel={(option) => option.name}
+                sx={{ minWidth: 200, flex: 1 }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder={t("common.selectCountry")}
+                    size="small"
+                  />
+                )}
+              />
             </Box>
 
             <Box
               sx={{
                 display: "flex",
-                flexDirection: "column",
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: { xs: "stretch", sm: "center" },
                 gap: 2,
               }}
             >
-              <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                Passport expiration date:
+              <Typography
+                variant="body2"
+                sx={{ color: "text.secondary", minWidth: "fit-content" }}
+              >
+                {t("students.filter.countryOfPassport")}
               </Typography>
+              <Autocomplete
+                value={selectedCountryOfPassport}
+                onChange={(_event, newValue) => {
+                  setPaginationModel({ ...paginationModel, page: 1 });
+                  setSelectedCountryOfPassport(newValue);
+                }}
+                options={countries}
+                getOptionLabel={(option) => option.name}
+                sx={{ minWidth: 200, flex: 1 }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder={t("common.selectCountry")}
+                    size="small"
+                  />
+                )}
+              />
+            </Box>
+
+            <Box
+              sx={{
+                gridColumn: { xs: "1", lg: "1 / -1" },
+                display: "flex",
+                flexDirection: { xs: "column", lg: "row" },
+                gap: 3,
+              }}
+            >
               <Box
                 sx={{
                   display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  flexWrap: "wrap",
+                  flexDirection: "column",
+                  gap: 1,
+                  flex: 1,
                 }}
               >
-                <DatePicker
-                  label="After"
-                  format="YYYY-MM-DD"
-                  value={
-                    passportExpirationDateAfter
-                      ? dayjs(passportExpirationDateAfter)
-                      : null
-                  }
-                  onChange={(newValue) => {
-                    setPaginationModel({ ...paginationModel, page: 1 });
-                    setPassportExpirationDateAfter(
-                      newValue ? newValue.format("YYYY-MM-DD") : "",
-                    );
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  {t("students.filter.dateOfBirth")}
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    flexWrap: "wrap",
                   }}
-                  slotProps={{
-                    textField: {
-                      size: "small",
-                      sx: { flex: 1, minWidth: 200 },
-                    },
+                >
+                  <DatePicker
+                    label={t("common.after")}
+                    format="YYYY-MM-DD"
+                    value={dateOfBirthAfter ? dayjs(dateOfBirthAfter) : null}
+                    onChange={(newValue) => {
+                      setPaginationModel({ ...paginationModel, page: 1 });
+                      setDateOfBirthAfter(
+                        newValue ? newValue.format("YYYY-MM-DD") : "",
+                      );
+                    }}
+                    slotProps={{
+                      textField: {
+                        size: "small",
+                        sx: { flex: 1, minWidth: 150 },
+                      },
+                    }}
+                  />
+                  <DatePicker
+                    label={t("common.before")}
+                    format="YYYY-MM-DD"
+                    value={dateOfBirthBefore ? dayjs(dateOfBirthBefore) : null}
+                    onChange={(newValue) => {
+                      setPaginationModel({ ...paginationModel, page: 1 });
+                      setDateOfBirthBefore(
+                        newValue ? newValue.format("YYYY-MM-DD") : "",
+                      );
+                    }}
+                    slotProps={{
+                      textField: {
+                        size: "small",
+                        sx: { flex: 1, minWidth: 150 },
+                      },
+                    }}
+                  />
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1,
+                  flex: 1,
+                }}
+              >
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  {t("students.filter.passportExpiration")}
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    flexWrap: "wrap",
                   }}
-                />
-                <DatePicker
-                  label="Before"
-                  format="YYYY-MM-DD"
-                  value={
-                    passportExpirationDateBefore
-                      ? dayjs(passportExpirationDateBefore)
-                      : null
-                  }
-                  onChange={(newValue) => {
-                    setPaginationModel({ ...paginationModel, page: 1 });
-                    setPassportExpirationDateBefore(
-                      newValue ? newValue.format("YYYY-MM-DD") : "",
-                    );
-                  }}
-                  slotProps={{
-                    textField: {
-                      size: "small",
-                      sx: { flex: 1, minWidth: 200 },
-                    },
-                  }}
-                />
+                >
+                  <DatePicker
+                    label={t("common.after")}
+                    format="YYYY-MM-DD"
+                    value={
+                      passportExpirationDateAfter
+                        ? dayjs(passportExpirationDateAfter)
+                        : null
+                    }
+                    onChange={(newValue) => {
+                      setPaginationModel({ ...paginationModel, page: 1 });
+                      setPassportExpirationDateAfter(
+                        newValue ? newValue.format("YYYY-MM-DD") : "",
+                      );
+                    }}
+                    slotProps={{
+                      textField: {
+                        size: "small",
+                        sx: { flex: 1, minWidth: 150 },
+                      },
+                    }}
+                  />
+                  <DatePicker
+                    label={t("common.before")}
+                    format="YYYY-MM-DD"
+                    value={
+                      passportExpirationDateBefore
+                        ? dayjs(passportExpirationDateBefore)
+                        : null
+                    }
+                    onChange={(newValue) => {
+                      setPaginationModel({ ...paginationModel, page: 1 });
+                      setPassportExpirationDateBefore(
+                        newValue ? newValue.format("YYYY-MM-DD") : "",
+                      );
+                    }}
+                    slotProps={{
+                      textField: {
+                        size: "small",
+                        sx: { flex: 1, minWidth: 150 },
+                      },
+                    }}
+                  />
+                </Box>
               </Box>
             </Box>
           </CardContent>

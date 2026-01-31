@@ -1,5 +1,6 @@
 import StaffForm from "./StaffForm";
 import type { StaffFormData } from "../../utils/types";
+import { useTranslation } from "react-i18next";
 
 type StaffAddProps = {
   handleClose: () => void;
@@ -16,15 +17,17 @@ export default function StaffAdd({
   isSuccess,
   error,
 }: StaffAddProps) {
+  const { t } = useTranslation();
+
   return (
     <StaffForm
-      title="New Staff Member"
+      title={t("staff.newStaff")}
       handleClose={handleClose}
       handleSubmit={handleAddStaff}
       isLoading={isLoading}
       isSuccess={isSuccess}
       error={error}
-      submitButtonText="Add"
+      submitButtonText={t("common.add")}
     />
   );
 }

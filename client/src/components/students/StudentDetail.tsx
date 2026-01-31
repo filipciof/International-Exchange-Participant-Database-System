@@ -15,6 +15,7 @@ import EditableNotes from "./sections/EditableNotes";
 import EditableUserAccount from "./sections/EditableUserAccount";
 import Loading from "../Loading";
 import EditableDocuments from "../EditableDocuments";
+import { useTranslation } from "react-i18next";
 
 type StudentDetailProps = {
   id: number;
@@ -22,7 +23,9 @@ type StudentDetailProps = {
 };
 
 export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
+
   const {
     data: student,
     isLoading: isStudentLoading,
@@ -34,6 +37,7 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
       return response.data;
     },
   });
+
   const { data: imageUrl, isLoading: isImageLoading } = useQuery({
     queryKey: ["studentPhoto", student?.photo],
     queryFn: async () => {
@@ -64,7 +68,7 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
   if (studentError) {
     return (
       <Typography sx={{ color: "error.main" }}>
-        Error: {studentError.message}
+        {t("common.error", { message: studentError.message })}
       </Typography>
     );
   }
@@ -77,7 +81,7 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
           <ArrowBack />
         </IconButton>
         <Typography variant="h5" component="h1">
-          Student Details
+          {t("students.profile")}
         </Typography>
       </Stack>
 
@@ -96,16 +100,16 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
           variant="scrollable"
           scrollButtons="auto"
         >
-          <Tab label="All" />
-          <Tab label="Personal" />
-          <Tab label="Languages" />
-          <Tab label="Travel" />
-          <Tab label="Parents" />
-          <Tab label="Insurance" />
-          <Tab label="Account" />
-          <Tab label="Exchanges" />
-          <Tab label="Documents" />
-          <Tab label="Notes" />
+          <Tab label={t("students.tabs.all")} />
+          <Tab label={t("students.tabs.personal")} />
+          <Tab label={t("students.tabs.languages")} />
+          <Tab label={t("students.tabs.travel")} />
+          <Tab label={t("students.tabs.parents")} />
+          <Tab label={t("students.tabs.insurance")} />
+          <Tab label={t("students.tabs.account")} />
+          <Tab label={t("students.tabs.exchanges")} />
+          <Tab label={t("students.tabs.documents")} />
+          <Tab label={t("students.tabs.notes")} />
         </Tabs>
       </Box>
 

@@ -20,6 +20,7 @@ import type { FamilyFormData, Club, Country, District, Family } from "../../util
 import { familySchema } from "../../utils/types";
 import axiosClient from "../../utils/axiosClient";
 import { handleValidationErrors } from "../../utils/handleValidationErrors";
+import { useTranslation } from "react-i18next";
 
 type FamilyFormProps = {
   title: string;
@@ -40,9 +41,11 @@ export default function FamilyForm({
   isSuccess,
   error,
   initialData,
-  submitButtonText = "Submit",
+  submitButtonText,
 }: FamilyFormProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
+  const defaultSubmitButtonText = submitButtonText || t("common.submit");
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [selectedCountry, setSelectedCountry] = useState<number | null>(null);
   const [selectedDistrict, setSelectedDistrict] = useState<number | null>(null);
@@ -151,7 +154,7 @@ export default function FamilyForm({
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Family Name"
+                  label={t("familyForm.familyName")}
                   variant="outlined"
                   fullWidth
                   error={!!errors.name}
@@ -174,8 +177,8 @@ export default function FamilyForm({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Country"
-                  placeholder="Select country"
+                  label={t("familyForm.country")}
+                  placeholder={t("common.selectCountry")}
                   slotProps={{
                     input: {
                       ...params.InputProps,
@@ -207,8 +210,8 @@ export default function FamilyForm({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="District"
-                  placeholder="Select district"
+                  label={t("familyForm.district")}
+                  placeholder={t("common.selectDistrict")}
                   slotProps={{
                     input: {
                       ...params.InputProps,
@@ -242,8 +245,8 @@ export default function FamilyForm({
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Club"
-                      placeholder="Select club"
+                      label={t("familyForm.club")}
+                      placeholder={t("common.selectClub")}
                       error={!!errors.id_club}
                       helperText={errors.id_club?.message}
                       slotProps={{
@@ -272,7 +275,7 @@ export default function FamilyForm({
                   <TextField
                     {...field}
                     value={field.value || ""}
-                    label="City"
+                    label={t("familyForm.city")}
                     variant="outlined"
                     fullWidth
                     error={!!errors.city}
@@ -287,7 +290,7 @@ export default function FamilyForm({
                   <TextField
                     {...field}
                     value={field.value || ""}
-                    label="Address"
+                    label={t("familyForm.address")}
                     variant="outlined"
                     fullWidth
                     error={!!errors.address}
@@ -303,7 +306,7 @@ export default function FamilyForm({
                 <TextField
                   {...field}
                   value={field.value || ""}
-                  label="Notes"
+                  label={t("familyForm.notes")}
                   variant="outlined"
                   fullWidth
                   multiline
@@ -323,19 +326,19 @@ export default function FamilyForm({
                 <CircularProgress sx={{ color: "secondary.main" }} />
               ) : (
                 <Button variant="contained" type="submit" size="large">
-                  {submitButtonText}
+                  {defaultSubmitButtonText}
                 </Button>
               )}
               <Button variant="outlined" onClick={onClose} size="large">
-                Cancel
+                {t("common.cancel")}
               </Button>
             </Stack>
             {error && (
               <Stack spacing={1}>
                 {handleValidationErrors(error.response?.data).map(
-                  (message: string, index: number) => (
+                  (errorMessage: string, index: number) => (
                     <Typography key={index} sx={{ color: "error.main" }}>
-                      {message}
+                      {errorMessage}
                     </Typography>
                   ),
                 )}
@@ -343,7 +346,7 @@ export default function FamilyForm({
             )}
             {isSuccess && (
               <Typography sx={{ color: "success.main" }}>
-                Operation completed successfully!
+                {t("common.success")}
               </Typography>
             )}
           </Stack>

@@ -7,6 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import type { PaginationModel } from "../utils/types";
+import { useTranslation } from "react-i18next";
 
 type MyPaginationProps = {
   paginationModel: PaginationModel,
@@ -21,6 +22,8 @@ export default function MyPagination({
   count,
   showPageSizeSelector = true,
 }: MyPaginationProps) {
+  const { t } = useTranslation();
+
   return (
     <Box
       sx={{
@@ -34,7 +37,7 @@ export default function MyPagination({
       {showPageSizeSelector && (
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Typography variant="body2" sx={{ color: "text.secondary" }}>
-            Results per page:
+            {t("common.resultsPerPage")}
           </Typography>
           <FormControl size="small">
             <Select

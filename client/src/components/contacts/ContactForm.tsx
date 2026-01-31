@@ -30,6 +30,7 @@ import type {
 import { contactSchema, Gender } from "../../utils/types";
 import axiosClient from "../../utils/axiosClient";
 import { handleValidationErrors } from "../../utils/handleValidationErrors";
+import { useTranslation } from "react-i18next";
 
 type ContactFormProps = {
   title: string;
@@ -52,10 +53,12 @@ export default function ContactForm({
   error,
   countries,
   initialData,
-  submitButtonText = "Submit",
+  submitButtonText,
 }: ContactFormProps) {
+  const { t } = useTranslation();
   const [photo, setPhoto] = useState<File | null>(null);
   const theme = useTheme();
+  const defaultSubmitButtonText = submitButtonText || t("common.submit");
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const {
@@ -163,7 +166,7 @@ export default function ContactForm({
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="First Name"
+                    label={t("contactForm.firstName")}
                     variant="outlined"
                     fullWidth
                     error={!!errors.first_name}
@@ -178,7 +181,7 @@ export default function ContactForm({
                   <TextField
                     {...field}
                     value={field.value || ""}
-                    label="Middle Name"
+                    label={t("contactForm.middleName")}
                     variant="outlined"
                     fullWidth
                     error={!!errors.middle_name}
@@ -193,7 +196,7 @@ export default function ContactForm({
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Last Name"
+                  label={t("contactForm.lastName")}
                   variant="outlined"
                   fullWidth
                   error={!!errors.last_name}
@@ -208,7 +211,7 @@ export default function ContactForm({
                 <TextField
                   {...field}
                   select
-                  label="Gender"
+                  label={t("contactForm.gender")}
                   variant="outlined"
                   fullWidth
                   error={!!errors.gender}
@@ -238,7 +241,7 @@ export default function ContactForm({
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        placeholder="Select country"
+                        placeholder={t("common.selectCountry")}
                         error={!!errors.id_country}
                         helperText={errors.id_country?.message}
                       />
@@ -266,8 +269,8 @@ export default function ContactForm({
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label="Districts"
-                        placeholder="Select districts"
+                        label={t("contactForm.districts")}
+                        placeholder={t("common.selectDistricts")}
                         error={!!errors.id_districts}
                         helperText={errors.id_districts?.message}
                         slotProps={{
@@ -296,7 +299,7 @@ export default function ContactForm({
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="Email"
+                    label={t("contactForm.email")}
                     variant="outlined"
                     fullWidth
                     type="email"
@@ -311,7 +314,7 @@ export default function ContactForm({
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="Phone Number"
+                    label={t("contactForm.phone")}
                     variant="outlined"
                     fullWidth
                     error={!!errors.phone}
@@ -333,7 +336,7 @@ export default function ContactForm({
                           onChange={(e) => field.onChange(e.target.checked)}
                         />
                       }
-                      label="LT"
+                      label={t("contactForm.longterm")}
                     />
                   )}
                 />
@@ -348,7 +351,7 @@ export default function ContactForm({
                           onChange={(e) => field.onChange(e.target.checked)}
                         />
                       }
-                      label="F2F"
+                      label={t("contactForm.familyToFamily")}
                     />
                   )}
                 />
@@ -363,7 +366,7 @@ export default function ContactForm({
                           onChange={(e) => field.onChange(e.target.checked)}
                         />
                       }
-                      label="CAMP"
+                      label={t("contactForm.camp")}
                     />
                   )}
                 />
@@ -376,7 +379,7 @@ export default function ContactForm({
                 <TextField
                   {...field}
                   value={field.value || ""}
-                  label="Notes"
+                  label={t("contactForm.notes")}
                   variant="outlined"
                   fullWidth
                   multiline
@@ -388,7 +391,7 @@ export default function ContactForm({
             />
             <SingleFileUpload
               uploadService={handlePhotoUpload}
-              body={<FileDropzoneInputBody title="Upload photo" />}
+              body={<FileDropzoneInputBody title={t("common.uploadPhoto")} />}
             />
             <Stack
               direction="row"
@@ -400,19 +403,19 @@ export default function ContactForm({
                 <CircularProgress sx={{ color: "secondary.main" }} />
               ) : (
                 <Button variant="contained" type="submit" size="large">
-                  {submitButtonText}
+                  {defaultSubmitButtonText}
                 </Button>
               )}
               <Button variant="outlined" onClick={onClose} size="large">
-                Cancel
+                {t("common.cancel")}
               </Button>
             </Stack>
             {error && (
               <Stack spacing={1}>
                 {handleValidationErrors(error.response?.data).map(
-                  (message: string, index: number) => (
+                  (errorMessage: string, index: number) => (
                     <Typography key={index} sx={{ color: "error.main" }}>
-                      {message}
+                      {errorMessage}
                     </Typography>
                   ),
                 )}
@@ -420,7 +423,7 @@ export default function ContactForm({
             )}
             {isSuccess && (
               <Typography sx={{ color: "success.main" }}>
-                Operation completed successfully!
+                {t("common.success")}
               </Typography>
             )}
           </Stack>

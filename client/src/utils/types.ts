@@ -147,7 +147,7 @@ export type Student = {
   second_language_proficiency_name: string;
   third_language: string;
   third_language_proficiency: number;
-  third_langugae_proficiency_name: string;
+  third_language_proficiency_name: string;
   id_country_of_departure: number;
   country_of_departure: string;
   id_country_of_passport: number;

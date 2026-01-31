@@ -1,8 +1,10 @@
 import { type GridColDef, DataGrid } from "@mui/x-data-grid";
-import type { PaginatedData, Family, PaginationModel} from "../../utils/types";
+import type { PaginatedData, Family, PaginationModel } from "../../utils/types";
 import { Box, IconButton, Tooltip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useTranslation } from "react-i18next";
+import useDataGridLocale from "../../hooks/useDataGridLocale";
 
 type FamilyListProps = {
   families: PaginatedData<Family>;
@@ -23,48 +25,51 @@ export default function FamilyList({
   onDelete,
   onRowClick,
 }: FamilyListProps) {
+  const { t } = useTranslation();
+  const localeText = useDataGridLocale();
+
   const columns: GridColDef<Family>[] = [
     {
       field: "name",
-      headerName: "Name",
+      headerName: t("familyForm.familyName"),
       width: 200,
     },
     {
       field: "country",
-      headerName: "Country",
+      headerName: t("clubForm.country"),
       width: 150,
       valueGetter: (_, row) => row.club?.country || "",
     },
     {
       field: "district",
-      headerName: "District",
+      headerName: t("clubForm.district"),
       width: 120,
       valueGetter: (_, row) => row.club?.district || "",
     },
     {
       field: "club_name",
-      headerName: "Club",
+      headerName: t("familyForm.club"),
       width: 150,
       valueGetter: (_, row) => row.club?.name || "",
     },
     {
       field: "city",
-      headerName: "City",
+      headerName: t("familyForm.city"),
       width: 150,
     },
     {
       field: "address",
-      headerName: "Address",
+      headerName: t("familyForm.address"),
       width: 200,
     },
     {
       field: "notes",
-      headerName: "Notes",
+      headerName: t("familyForm.notes"),
       width: 100,
     },
     {
       field: "actions",
-      headerName: "Actions",
+      headerName: t("common.actions"),
       width: 100,
       sortable: false,
       filterable: false,
@@ -74,7 +79,7 @@ export default function FamilyList({
           sx={{ display: "flex", gap: 1, alignItems: "center", height: "100%" }}
           onClick={(e) => e.stopPropagation()}
         >
-          <Tooltip title="Edit">
+          <Tooltip title={t("common.edit")}>
             <IconButton
               size="small"
               onClick={() => onEdit?.(params.row.id)}
@@ -83,7 +88,7 @@ export default function FamilyList({
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete">
+          <Tooltip title={t("common.delete")}>
             <IconButton
               size="small"
               onClick={() => onDelete?.(params.row.id)}
@@ -121,6 +126,7 @@ export default function FamilyList({
         pageSizeOptions={[10, 25, 50, 100]}
         hideFooter
         loading={isLoading}
+        localeText={localeText}
         initialState={{
           columns: {
             columnVisibilityModel: {

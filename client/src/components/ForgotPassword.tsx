@@ -6,6 +6,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import OutlinedInput from '@mui/material/OutlinedInput';
+import { useTranslation } from 'react-i18next';
 
 interface ForgotPasswordProps {
   open: boolean;
@@ -13,6 +14,8 @@ interface ForgotPasswordProps {
 }
 
 export default function ForgotPassword({ open, handleClose }: ForgotPasswordProps) {
+  const { t } = useTranslation();
+
   return (
     <Dialog
       open={open}
@@ -28,13 +31,12 @@ export default function ForgotPassword({ open, handleClose }: ForgotPasswordProp
         },
       }}
     >
-      <DialogTitle>Reset password</DialogTitle>
+      <DialogTitle>{t('forgotPassword.title')}</DialogTitle>
       <DialogContent
         sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}
       >
         <DialogContentText>
-          Enter your account&apos;s email address, and we&apos;ll send you a link to
-          reset your password.
+          {t('forgotPassword.description')}
         </DialogContentText>
         <OutlinedInput
           autoFocus
@@ -42,16 +44,16 @@ export default function ForgotPassword({ open, handleClose }: ForgotPasswordProp
           margin="dense"
           id="email"
           name="email"
-          label="Email address"
-          placeholder="Email address"
+          label={t('forgotPassword.emailLabel')}
+          placeholder={t('forgotPassword.emailLabel')}
           type="email"
           fullWidth
         />
       </DialogContent>
       <DialogActions sx={{ pb: 3, px: 3 }}>
-        <Button onClick={handleClose}>Cancel</Button>
+        <Button onClick={handleClose}>{t('common.cancel')}</Button>
         <Button variant="contained" type="submit">
-          Continue
+          {t('forgotPassword.continue')}
         </Button>
       </DialogActions>
     </Dialog>

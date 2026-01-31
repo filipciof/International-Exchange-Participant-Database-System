@@ -3,6 +3,7 @@ import type { StaffFormData } from "../../utils/types";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import Loading from "../Loading";
+import { useTranslation } from "react-i18next";
 
 type StaffUpdateProps = {
   handleClose: () => void;
@@ -21,6 +22,8 @@ export default function StaffUpdate({
   error,
   id,
 }: StaffUpdateProps) {
+  const { t } = useTranslation();
+
   const { data: staff, isLoading: isStaffLoading } = useQuery({
     queryKey: ["staff", id],
     queryFn: async () => {
@@ -28,19 +31,21 @@ export default function StaffUpdate({
       return response.data;
     },
   });
+
   if (isStaffLoading) {
     return <Loading />;
   }
+
   return (
     <StaffForm
-      title="Update Staff Member"
+      title={t("staff.updateStaff")}
       handleClose={handleClose}
       handleSubmit={handleUpdateStaff}
       isLoading={isLoading}
       isSuccess={isSuccess}
       error={error}
       initialData={staff}
-      submitButtonText="Update"
+      submitButtonText={t("common.update")}
     />
   );
 }

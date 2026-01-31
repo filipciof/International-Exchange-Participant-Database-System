@@ -1,18 +1,18 @@
 import { useState } from "react";
+import { Box, Grid, Typography, IconButton, TextField } from "@mui/material";
 import {
-  Box,
-  Grid,
-  Typography,
-  IconButton,
-  TextField,
-} from "@mui/material";
-import { Edit as EditIcon, Save, Close, ContactPhone } from "@mui/icons-material";
+  Edit as EditIcon,
+  Save,
+  Close,
+  ContactPhone,
+} from "@mui/icons-material";
 import type { Student } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
 import Section from "../../Section";
 import InfoItem from "../../InfoItem";
+import { useTranslation } from "react-i18next";
 
 type EditableParentInfoProps = {
   student: Student;
@@ -21,7 +21,9 @@ type EditableParentInfoProps = {
 export default function EditableParentInfo({
   student,
 }: EditableParentInfoProps) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
+
   const [formData, setFormData] = useState({
     first_parent_full_name: student.first_parent_full_name || "",
     first_parent_email: student.first_parent_email || "",
@@ -32,7 +34,10 @@ export default function EditableParentInfo({
 
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await axiosClient.patch(`/students/${student.id}/`, data);
+      const response = await axiosClient.patch(
+        `/students/${student.id}/`,
+        data,
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -81,7 +86,11 @@ export default function EditableParentInfo({
   );
 
   return (
-    <Section title="Parent/Guardian Information" icon={<ContactPhone />} actions={actions}>
+    <Section
+      title={t("studentForm.steps.parentsGuardian")}
+      icon={<ContactPhone />}
+      actions={actions}
+    >
       {!isEditing ? (
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, md: 6 }}>
@@ -91,15 +100,15 @@ export default function EditableParentInfo({
                 color="primary"
                 sx={{ mb: 2, fontWeight: 600 }}
               >
-                First Parent/Guardian
+                {t("studentForm.labels.firstParent")}
               </Typography>
               <InfoItem
-                label="Full Name"
+                label={t("studentForm.labels.fullName")}
                 value={student.first_parent_full_name}
                 fullWidth
               />
               <InfoItem
-                label="Email"
+                label={t("studentForm.labels.email")}
                 value={student.first_parent_email}
                 fullWidth
               />
@@ -112,22 +121,22 @@ export default function EditableParentInfo({
                 color="primary"
                 sx={{ mb: 2, fontWeight: 600 }}
               >
-                Second Parent/Guardian
+                {t("studentForm.labels.secondParent")}
               </Typography>
               <InfoItem
-                label="Full Name"
+                label={t("studentForm.labels.fullName")}
                 value={student.second_parent_full_name}
                 fullWidth
               />
               <InfoItem
-                label="Email"
+                label={t("studentForm.labels.email")}
                 value={student.second_parent_email}
                 fullWidth
               />
             </Box>
           </Grid>
           <InfoItem
-            label="Polish Phone Number"
+            label={t("students.searchFields.polishPhoneNumber")}
             value={student.polish_phone_number}
           />
         </Grid>
@@ -140,12 +149,12 @@ export default function EditableParentInfo({
                 color="primary"
                 sx={{ mb: 2, fontWeight: 600 }}
               >
-                First Parent/Guardian
+                {t("studentForm.labels.firstParent")}
               </Typography>
               <TextField
                 fullWidth
                 size="small"
-                label="Full Name"
+                label={t("studentForm.labels.fullName")}
                 value={formData.first_parent_full_name}
                 onChange={(e) =>
                   setFormData({
@@ -158,7 +167,7 @@ export default function EditableParentInfo({
               <TextField
                 fullWidth
                 size="small"
-                label="Email"
+                label={t("studentForm.labels.email")}
                 type="email"
                 value={formData.first_parent_email}
                 onChange={(e) =>
@@ -177,12 +186,12 @@ export default function EditableParentInfo({
                 color="primary"
                 sx={{ mb: 2, fontWeight: 600 }}
               >
-                Second Parent/Guardian
+                {t("studentForm.labels.secondParent")}
               </Typography>
               <TextField
                 fullWidth
                 size="small"
-                label="Full Name"
+                label={t("studentForm.labels.fullName")}
                 value={formData.second_parent_full_name}
                 onChange={(e) =>
                   setFormData({
@@ -195,7 +204,7 @@ export default function EditableParentInfo({
               <TextField
                 fullWidth
                 size="small"
-                label="Email"
+                label={t("studentForm.labels.email")}
                 type="email"
                 value={formData.second_parent_email}
                 onChange={(e) =>
@@ -211,7 +220,7 @@ export default function EditableParentInfo({
             <TextField
               fullWidth
               size="small"
-              label="Polish Phone Number"
+              label={t("students.searchFields.polishPhoneNumber")}
               value={formData.polish_phone_number}
               onChange={(e) =>
                 setFormData({
