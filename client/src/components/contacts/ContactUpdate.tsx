@@ -40,7 +40,7 @@ export default function UpdateContact({
 
   return (
     <ContactForm
-      title={t("conatcts.updateContact")}
+      title={t("contacts.updateContact")}
       handleClose={handleClose}
       handleSubmit={handleUpdateContact}
       isLoading={isLoading}

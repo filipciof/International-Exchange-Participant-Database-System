@@ -130,7 +130,7 @@ export default function ClubForm({
         </Stack>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack spacing={3}>
+          <Stack spacing={2}>
             <Controller
               name="name"
               control={control}
@@ -142,6 +142,7 @@ export default function ClubForm({
                   fullWidth
                   error={!!errors.name}
                   helperText={errors.name?.message}
+                  size="small"
                 />
               )}
             />
@@ -161,6 +162,7 @@ export default function ClubForm({
                     {...params}
                     label={t("clubForm.country")}
                     placeholder={t("common.selectCountry")}
+                    size="small"
                   />
                 )}
               />
@@ -198,6 +200,7 @@ export default function ClubForm({
                             ),
                           },
                         }}
+                        size="small"
                       />
                     )}
                   />
@@ -216,6 +219,7 @@ export default function ClubForm({
                   fullWidth
                   error={!!errors.city}
                   helperText={errors.city?.message}
+                  size="small"
                 />
               )}
             />

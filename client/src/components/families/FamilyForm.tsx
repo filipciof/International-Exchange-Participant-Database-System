@@ -147,7 +147,7 @@ export default function FamilyForm({
         </Stack>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack spacing={3}>
+          <Stack spacing={2}>
             <Controller
               name="name"
               control={control}
@@ -159,6 +159,7 @@ export default function FamilyForm({
                   fullWidth
                   error={!!errors.name}
                   helperText={errors.name?.message}
+                  size="small"
                 />
               )}
             />
@@ -192,6 +193,7 @@ export default function FamilyForm({
                       ),
                     },
                   }}
+                  size="small"
                 />
               )}
             />
@@ -225,6 +227,7 @@ export default function FamilyForm({
                       ),
                     },
                   }}
+                  size="small"
                 />
               )}
             />
@@ -262,6 +265,7 @@ export default function FamilyForm({
                           ),
                         },
                       }}
+                      size="small"
                     />
                   )}
                 />
@@ -280,6 +284,7 @@ export default function FamilyForm({
                     fullWidth
                     error={!!errors.city}
                     helperText={errors.city?.message}
+                    size="small"
                   />
                 )}
               />
@@ -295,6 +300,7 @@ export default function FamilyForm({
                     fullWidth
                     error={!!errors.address}
                     helperText={errors.address?.message}
+                    size="small"
                   />
                 )}
               />
@@ -313,6 +319,7 @@ export default function FamilyForm({
                   rows={4}
                   error={!!errors.notes}
                   helperText={errors.notes?.message}
+                  size="small"
                 />
               )}
             />

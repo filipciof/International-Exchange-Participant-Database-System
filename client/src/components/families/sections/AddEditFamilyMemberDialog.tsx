@@ -65,6 +65,7 @@ export default function AddEditFamilyMemberDialog({
                 first_name: e.target.value,
               })
             }
+            size="small"
           />
           <TextField
             fullWidth
@@ -76,6 +77,7 @@ export default function AddEditFamilyMemberDialog({
                 middle_name: e.target.value,
               })
             }
+            size="small"
           />
           <TextField
             fullWidth
@@ -87,6 +89,7 @@ export default function AddEditFamilyMemberDialog({
                 last_name: e.target.value,
               })
             }
+            size="small"
           />
           <Autocomplete
             options={Gender}
@@ -104,6 +107,7 @@ export default function AddEditFamilyMemberDialog({
                 label={t("gender.gender")}
                 variant="outlined"
                 fullWidth
+                size="small"
               />
             )}
           />
@@ -131,6 +135,7 @@ export default function AddEditFamilyMemberDialog({
                 email: e.target.value,
               })
             }
+            size="small"
           />
           <TextField
             fullWidth
@@ -142,6 +147,7 @@ export default function AddEditFamilyMemberDialog({
                 phone: e.target.value,
               })
             }
+            size="small"
           />
           <TextField
             fullWidth
@@ -153,6 +159,7 @@ export default function AddEditFamilyMemberDialog({
                 occupation: e.target.value,
               })
             }
+            size="small"
           />
           <FormControlLabel
             control={

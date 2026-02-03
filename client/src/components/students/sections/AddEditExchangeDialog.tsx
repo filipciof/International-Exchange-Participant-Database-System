@@ -174,6 +174,7 @@ export default function AddEditExchangeDialog({
                 label={t("exchanges.exchangeType")}
                 variant="outlined"
                 fullWidth
+                size="small"
               />
             )}
           />
@@ -235,6 +236,7 @@ export default function AddEditExchangeDialog({
                 {...params}
                 label={t("studentForm.labels.sendingCountry")}
                 placeholder={t("common.selectCountry")}
+                size="small"
               />
             )}
           />
@@ -272,6 +274,7 @@ export default function AddEditExchangeDialog({
                     ),
                   },
                 }}
+                size="small"
               />
             )}
           />
@@ -311,6 +314,7 @@ export default function AddEditExchangeDialog({
                     ),
                   },
                 }}
+                size="small"
               />
             )}
           />
@@ -336,6 +340,7 @@ export default function AddEditExchangeDialog({
                 {...params}
                 label={t("studentForm.labels.receivingCountry")}
                 placeholder={t("common.selectCountry")}
+                size="small"
               />
             )}
           />
@@ -373,6 +378,7 @@ export default function AddEditExchangeDialog({
                     ),
                   },
                 }}
+                size="small"
               />
             )}
           />
@@ -412,6 +418,7 @@ export default function AddEditExchangeDialog({
                     ),
                   },
                 }}
+                size="small"
               />
             )}
           />

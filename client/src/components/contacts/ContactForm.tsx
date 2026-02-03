@@ -158,7 +158,7 @@ export default function ContactForm({
         </Stack>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack spacing={3}>
+          <Stack spacing={2}>
             <Stack direction={isMobile ? "column" : "row"} spacing={2}>
               <Controller
                 name="first_name"
@@ -171,6 +171,7 @@ export default function ContactForm({
                     fullWidth
                     error={!!errors.first_name}
                     helperText={errors.first_name?.message}
+                    size="small"
                   />
                 )}
               />
@@ -186,6 +187,7 @@ export default function ContactForm({
                     fullWidth
                     error={!!errors.middle_name}
                     helperText={errors.middle_name?.message}
+                    size="small"
                   />
                 )}
               />
@@ -201,6 +203,7 @@ export default function ContactForm({
                   fullWidth
                   error={!!errors.last_name}
                   helperText={errors.last_name?.message}
+                  size="small"
                 />
               )}
             />
@@ -216,6 +219,7 @@ export default function ContactForm({
                   fullWidth
                   error={!!errors.gender}
                   helperText={errors.gender?.message}
+                  size="small"
                 >
                   {Gender.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -244,6 +248,7 @@ export default function ContactForm({
                         placeholder={t("common.selectCountry")}
                         error={!!errors.id_country}
                         helperText={errors.id_country?.message}
+                        size="small"
                       />
                     )}
                   />
@@ -286,6 +291,7 @@ export default function ContactForm({
                             ),
                           },
                         }}
+                        size="small"
                       />
                     )}
                   />
@@ -305,6 +311,7 @@ export default function ContactForm({
                     type="email"
                     error={!!errors.email}
                     helperText={errors.email?.message}
+                    size="small"
                   />
                 )}
               />
@@ -319,6 +326,7 @@ export default function ContactForm({
                     fullWidth
                     error={!!errors.phone}
                     helperText={errors.phone?.message}
+                    size="small"
                   />
                 )}
               />
@@ -386,6 +394,7 @@ export default function ContactForm({
                   rows={4}
                   error={!!errors.notes}
                   helperText={errors.notes?.message}
+                  size="small"
                 />
               )}
             />
