@@ -21,7 +21,7 @@ axiosClient.interceptors.request.use(
   }
 );
 
-const refreshAccessToken = async () => {
+export const refreshAccessToken = async () => {
   try {
     const response = await axiosClient.post("/auth/token/refresh/");
     const accessToken = response.data["access"];

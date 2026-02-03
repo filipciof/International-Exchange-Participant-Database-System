@@ -113,7 +113,8 @@
     "forgotPassword": "Zapomniałeś hasła?",
     "invalidCredentials": "Nieprawidłowe dane logowania",
     "emailError": "Proszę podać prawidłowy adres email.",
-    "passwordError": "Hasło musi mieć co najmniej 5 znaków."
+    "passwordError": "Hasło musi mieć co najmniej 5 znaków.",
+    "denyAccess": "Odmowa dostępu!"
   },
   "forgotPassword": {
     "title": "Zresetuj hasło",
