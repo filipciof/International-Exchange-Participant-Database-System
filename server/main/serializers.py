@@ -288,7 +288,7 @@ class StaffSerializer(serializers.ModelSerializer):
 class StaffUserAccountCreateSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=5)
-    group = serializers.ChoiceField(
+    groups = serializers.MultipleChoiceField(
         choices=["admin", "correspondent", "club_officer", "kwm_officer"]
     )
 
@@ -301,7 +301,7 @@ class StaffUserAccountCreateSerializer(serializers.Serializer):
 class StaffUserAccountUpdateSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False)
     password = serializers.CharField(required=False, write_only=True, min_length=5)
-    group = serializers.ChoiceField(
+    groups = serializers.MultipleChoiceField(
         choices=["admin", "correspondent", "club_officer", "kwm_officer"],
         required=False,
     )

@@ -346,18 +346,16 @@ class StudentView(APIView):
         return response
 
     def get(self, request) -> Response | StreamingHttpResponse:
-        students = self.__get_filtered_students(request)
-
         id = request.query_params.get("id")
         if id:
-            student = students.get(id=id, is_active=True)
+            student = Student.objects.get(id=id, is_active=True)
             serializer = StudentSerializer(student)
             return Response(serializer.data)
 
         me = request.query_params.get("me")
         if me and me.lower() in ("true", "1"):
             try:
-                student = students.get(id_user=request.user, is_active=True)
+                student = Student.objects.get(id_user=request.user, is_active=True)
                 serializer = StudentSerializer(student)
                 return Response(serializer.data)
             except Student.DoesNotExist:
@@ -366,8 +364,9 @@ class StudentView(APIView):
                     status=HTTP_404_NOT_FOUND,
                 )
 
+        students = self.__get_filtered_students(request)
+        
         export_format = request.query_params.get("export_format")
-
         if export_format == "csv":
             return self.__export_csv(students)
         elif export_format == "pdf":

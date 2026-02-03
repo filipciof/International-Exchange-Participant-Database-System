@@ -214,15 +214,16 @@ class StaffUserAccountView(APIView):
 
         email = serializer.validated_data["email"]
         password = serializer.validated_data["password"]
-        group_name = serializer.validated_data["group"]
+        group_names = serializer.validated_data["groups"]
 
         user = User.objects.create_user(
             email=email,
             password=password,
         )
 
-        group = Group.objects.get(name=group_name)
-        user.groups.add(group)
+        for name in group_names:
+            group = Group.objects.get(name=name)
+            user.groups.add(group)
 
         staff.id_user = user
         staff.save(update_fields=["id_user"])
@@ -253,12 +254,13 @@ class StaffUserAccountView(APIView):
 
         email = serializer.validated_data.get("email")
         password = serializer.validated_data.get("password")
-        group_name = serializer.validated_data.get("group")
+        group_names = serializer.validated_data.get("groups")
 
-        if group_name:
+        if group_names:
             user.groups.clear()
-            group = Group.objects.get(name=group_name)
-            user.groups.add(group)
+            for name in group_names:
+                group = Group.objects.get(name=name)
+                user.groups.add(group)
 
         if email and email != user.email:
             user.email = email
