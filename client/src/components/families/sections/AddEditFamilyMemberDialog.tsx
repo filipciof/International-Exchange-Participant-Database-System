@@ -179,7 +179,7 @@ export default function AddEditFamilyMemberDialog({
       </DialogContent>
       <DialogActions>
         <Stack spacing={2} sx={{ p: 2, width: "100%" }}>
-          <Stack direction="row" spacing={2} justifyContent="space-between">
+          <Stack direction="row" spacing={2} justifyContent="flex-end">
             <Button onClick={handleCloseDialog} disabled={isLoading}>
               {t("common.cancel")}
             </Button>

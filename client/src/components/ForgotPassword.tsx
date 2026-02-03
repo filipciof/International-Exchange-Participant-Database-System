@@ -50,7 +50,7 @@ export default function ForgotPassword({ open, handleClose }: ForgotPasswordProp
           fullWidth
         />
       </DialogContent>
-      <DialogActions sx={{ pb: 3, px: 3 }}>
+      <DialogActions sx={{ pb: 3, px: 3, justifyContent: "flex-end" }}>
         <Button onClick={handleClose}>{t('common.cancel')}</Button>
         <Button variant="contained" type="submit">
           {t('forgotPassword.continue')}

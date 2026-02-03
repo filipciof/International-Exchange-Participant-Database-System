@@ -380,7 +380,7 @@ export default function EditableDocuments({
               </Button>
             </Box>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ justifyContent: "flex-end" }}>
             <Button onClick={handleCloseDialog}>{t("common.cancel")}</Button>
             <Button
               type="submit"

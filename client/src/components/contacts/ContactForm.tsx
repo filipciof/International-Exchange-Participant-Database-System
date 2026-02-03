@@ -405,9 +405,12 @@ export default function ContactForm({
             <Stack
               direction="row"
               spacing={2}
-              justifyContent="flex-start"
+              justifyContent="flex-end"
               sx={{ pt: 2 }}
             >
+              <Button variant="outlined" onClick={onClose} size="large">
+                {t("common.cancel")}
+              </Button>
               {isLoading ? (
                 <CircularProgress sx={{ color: "secondary.main" }} />
               ) : (
@@ -415,9 +418,6 @@ export default function ContactForm({
                   {defaultSubmitButtonText}
                 </Button>
               )}
-              <Button variant="outlined" onClick={onClose} size="large">
-                {t("common.cancel")}
-              </Button>
             </Stack>
             {error && (
               <Stack spacing={1}>
