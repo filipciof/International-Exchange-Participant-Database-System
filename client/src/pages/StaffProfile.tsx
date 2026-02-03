@@ -10,7 +10,7 @@ import { useStaffMutations } from "../hooks/useStaffMutations";
 import EditableHeader from "../components/staff/sections/EditableHeader";
 import EditableContactInfo from "../components/staff/sections/EditableContactInfo";
 import EditableClubInfo from "../components/staff/sections/EditableClubInfo";
-import EditableNotes from "../components/staff/sections/EditableNotes";
+import EditableNotes from "../components/EditableNotes";
 import EditableUserAccount from "../components/staff/sections/EditableUserAccount";
 import EditableDocuments from "../components/EditableDocuments";
 import { useTranslation } from "react-i18next";
@@ -116,7 +116,14 @@ export default function StaffProfile({}: StaffProfileProps) {
           <EditableClubInfo staff={staff} />
           <EditableContactInfo staff={staff} />
           <EditableUserAccount staff={staff} readOnly />
-          <EditableNotes staff={staff} />
+          <EditableNotes
+            notes={staff.notes}
+            endpoint="/staff/?me=true"
+            queryKey="staff"
+            title={t("staff.steps.additionalInfo")}
+            placeholder={t("notes.addStaffNotes")}
+            noNotesText={t("notes.noNotes")}
+          />
         </>
       )}
 
@@ -135,7 +142,14 @@ export default function StaffProfile({}: StaffProfileProps) {
       )}
 
       {/* Notes */}
-      {activeTab === 5 && <EditableNotes staff={staff} />}
+      {activeTab === 5 && <EditableNotes
+            notes={staff.notes}
+            endpoint="/staff/?me=true"
+            queryKey="staff"
+            title={t("staff.steps.additionalInfo")}
+            placeholder={t("notes.addStaffNotes")}
+            noNotesText={t("notes.noNotes")}
+          />}
     </Box>
   );
 }

@@ -65,7 +65,9 @@
   "notes": {
     "noNotes": "No notes.",
     "addStudentNotes": "Add notes about the student...",
-    "addStaffNotes": "Add notes about the staff member..."
+    "addStaffNotes": "Add notes about the staff member...",
+    "addFamilyNotes": "Add notes about the family...",
+    "addContactNotes": "Add notest about the contact..."
   },
   "exchanges": {
     "exchangeType": "Exchange Type",

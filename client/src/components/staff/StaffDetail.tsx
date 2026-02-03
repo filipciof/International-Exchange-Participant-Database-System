@@ -7,7 +7,7 @@ import Loading from "../Loading";
 import EditableHeader from "./sections/EditableHeader";
 import EditableContactInfo from "./sections/EditableContactInfo";
 import EditableClubInfo from "./sections/EditableClubInfo";
-import EditableNotes from "./sections/EditableNotes";
+import EditableNotes from "../EditableNotes";
 import EditableUserAccount from "./sections/EditableUserAccount";
 import EditableDocuments from "../EditableDocuments";
 import { useTranslation } from "react-i18next";
@@ -102,7 +102,14 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
           <EditableClubInfo staff={staff} staffId={id} />
           <EditableContactInfo staff={staff} staffId={id} />
           <EditableUserAccount staff={staff} staffId={id} />
-          <EditableNotes staff={staff} staffId={id} />
+          <EditableNotes
+            notes={staff.notes}
+            endpoint={`/staff/${id}/`}
+            queryKey="staff"
+            title={t("staff.steps.additionalInfo")}
+            placeholder={t("notes.addStaffNotes")}
+            noNotesText={t("notes.noNotes")}
+          />
         </>
       )}
 
@@ -119,7 +126,14 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
       {activeTab === 4 && <EditableDocuments ownerType="staff" ownerId={id} />}
 
       {/* Notes */}
-      {activeTab === 5 && <EditableNotes staff={staff} staffId={id} />}
+      {activeTab === 5 && <EditableNotes
+            notes={staff.notes}
+            endpoint={`/staff/${id}/`}
+            queryKey="staff"
+            title={t("staff.steps.additionalInfo")}
+            placeholder={t("notes.addStaffNotes")}
+            noNotesText={t("notes.noNotes")}
+          />}
     </Box>
   );
 }

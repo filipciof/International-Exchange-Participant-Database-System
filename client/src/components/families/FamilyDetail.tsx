@@ -4,7 +4,6 @@ import {
   CardContent,
   Typography,
   Grid,
-  Paper,
   IconButton,
   Stack,
 } from "@mui/material";
@@ -12,7 +11,6 @@ import {
   ArrowBack,
   LocationOn,
   Business,
-  StickyNote2,
 } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
@@ -22,6 +20,7 @@ import Loading from "../Loading";
 import EditableFamilyMembers from "./sections/EditableFamilyMembers";
 import EditableDocuments from "../EditableDocuments";
 import { useTranslation } from "react-i18next";
+import EditableNotes from "../EditableNotes";
 
 type FamilyDetailProps = {
   id: number;
@@ -133,23 +132,14 @@ export default function FamilyDetail({ id, handleClose }: FamilyDetailProps) {
       <EditableDocuments ownerType="family" ownerId={family.id} />
 
       {/* Notes */}
-      {family.notes && (
-        <Section title={t("families.steps.additionalInfo")} icon={<StickyNote2 />}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2,
-              bgcolor: "warning.lighter",
-              border: "1px solid",
-              borderColor: "warning.light",
-            }}
-          >
-            <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-              {family.notes}
-            </Typography>
-          </Paper>
-        </Section>
-      )}
+      <EditableNotes
+        notes={family.notes}
+        endpoint={`/families/${family.id}/`}
+        queryKey="families"
+        title={t("families.steps.additionalInfo")}
+        placeholder={t("notes.addFamilyNotes")}
+        noNotesText={t("notes.noNotes")}
+      />
     </Box>
   );
 }

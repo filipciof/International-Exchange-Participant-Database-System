@@ -6,31 +6,38 @@ import {
   Close,
   StickyNote2,
 } from "@mui/icons-material";
-import type { Staff } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
-import axiosClient from "../../../utils/axiosClient";
-import queryClient from "../../../utils/queryClient";
-import Section from "../../Section";
-import { useTranslation } from "react-i18next";
+import axiosClient from "../utils/axiosClient";
+import queryClient from "../utils/queryClient";
+import Section from "./Section";
 
 type EditableNotesProps = {
-  staff: Staff;
-  staffId?: number;
+  notes: string | null;
+  endpoint: string;
+  queryKey: string;
+  title: string;
+  placeholder: string;
+  noNotesText: string;
 };
 
-export default function EditableNotes({ staff, staffId }: EditableNotesProps) {
-  const { t } = useTranslation();
+export default function EditableNotes({
+  notes: initialNotes,
+  endpoint,
+  queryKey,
+  title,
+  placeholder,
+  noNotesText,
+}: EditableNotesProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [notes, setNotes] = useState(staff.notes || "");
+  const [notes, setNotes] = useState(initialNotes || "");
 
   const updateMutation = useMutation({
     mutationFn: async (data: { notes: string }) => {
-      const url = staffId ? `/staff/${staffId}/` : `/staff/?me=true`;
-      const response = await axiosClient.patch(url, data);
+      const response = await axiosClient.patch(endpoint, data);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["staff"] });
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
       setIsEditing(false);
     },
   });
@@ -40,7 +47,7 @@ export default function EditableNotes({ staff, staffId }: EditableNotesProps) {
   };
 
   const handleCancel = () => {
-    setNotes(staff.notes || "");
+    setNotes(initialNotes || "");
     setIsEditing(false);
   };
 
@@ -69,19 +76,15 @@ export default function EditableNotes({ staff, staffId }: EditableNotesProps) {
   );
 
   return (
-    <Section
-      title={t("staff.steps.additionalInfo")}
-      icon={<StickyNote2 />}
-      actions={actions}
-    >
+    <Section title={title} icon={<StickyNote2 />} actions={actions}>
       {!isEditing ? (
         <Paper
           elevation={0}
           sx={{
             p: 2,
-            bgcolor: notes ? "warning.lighter" : "grey.50",
+            bgcolor: "grey.50",
             border: "1px solid",
-            borderColor: notes ? "warning.light" : "divider",
+            borderColor: "divider",
             minHeight: 100,
           }}
         >
@@ -90,7 +93,7 @@ export default function EditableNotes({ staff, staffId }: EditableNotesProps) {
             sx={{ whiteSpace: "pre-wrap" }}
             color={notes ? "text.primary" : "text.secondary"}
           >
-            {notes || t("notes.noNotes")}
+            {notes || noNotesText}
           </Typography>
         </Paper>
       ) : (
@@ -100,7 +103,7 @@ export default function EditableNotes({ staff, staffId }: EditableNotesProps) {
           rows={6}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder={t("notes.addStaffNotes")}
+          placeholder={placeholder}
         />
       )}
     </Section>

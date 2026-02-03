@@ -11,7 +11,7 @@ import EditableTravelDocs from "./sections/EditableTravelDocs";
 import EditableParentInfo from "./sections/EditableParentInfo";
 import EditableInsurance from "./sections/EditableInsurance";
 import EditableExchanges from "./sections/EditableExchanges";
-import EditableNotes from "./sections/EditableNotes";
+import EditableNotes from "../EditableNotes";
 import EditableUserAccount from "./sections/EditableUserAccount";
 import Loading from "../Loading";
 import EditableDocuments from "../EditableDocuments";
@@ -124,7 +124,14 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
           <EditableUserAccount student={student} />
           <EditableExchanges studentId={student.id} isInbound={student.is_inbound} />
           <EditableDocuments ownerType="student" ownerId={student.id} />
-          <EditableNotes student={student} />
+          <EditableNotes
+            notes={student.notes}
+            endpoint={`/students/${student.id}/`}
+            queryKey="students"
+            title={t("studentForm.steps.additionalInfo")}
+            placeholder={t("notes.addStudentNotes")}
+            noNotesText={t("notes.noNotes")}
+          />
         </>
       )}
 
@@ -159,7 +166,14 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
       )}
 
       {/* Notes */}
-      {activeTab === 9 && <EditableNotes student={student} />}
+      {activeTab === 9 && <EditableNotes
+            notes={student.notes}
+            endpoint={`/students/${student.id}/`}
+            queryKey="students"
+            title={t("studentForm.steps.additionalInfo")}
+            placeholder={t("notes.addStudentNotes")}
+            noNotesText={t("notes.noNotes")}
+          />}
     </Box>
   );
 }

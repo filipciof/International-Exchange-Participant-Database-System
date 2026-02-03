@@ -11,7 +11,7 @@ import EditableParentInfo from "../components/students/sections/EditableParentIn
 import EditableInsurance from "../components/students/sections/EditableInsurance";
 import EditableExchanges from "../components/students/sections/EditableExchanges";
 import EditableDocuments from "../components/EditableDocuments";
-import EditableNotes from "../components/students/sections/EditableNotes";
+import EditableNotes from "../components/EditableNotes";
 import Loading from "../components/Loading";
 import StudentForm from "../components/students/StudentForm";
 import { AxiosError } from "axios";
@@ -146,7 +146,14 @@ export default function StudentProfile({}: StudentProfileProps) {
             ownerId={student.id}
             readOnly
           />
-          <EditableNotes student={student} />
+          <EditableNotes
+            notes={student.notes}
+            endpoint={`/students/${student.id}/`}
+            queryKey="students"
+            title={t("studentForm.steps.additionalInfo")}
+            placeholder={t("notes.addStudentNotes")}
+            noNotesText={t("notes.noNotes")}
+          />
         </>
       )}
 
@@ -181,7 +188,14 @@ export default function StudentProfile({}: StudentProfileProps) {
       )}
 
       {/* Notes */}
-      {activeTab === 9 && <EditableNotes student={student} />}
+      {activeTab === 9 && <EditableNotes
+            notes={student.notes}
+            endpoint={`/students/${student.id}/`}
+            queryKey="students"
+            title={t("studentForm.steps.additionalInfo")}
+            placeholder={t("notes.addStudentNotes")}
+            noNotesText={t("notes.noNotes")}
+          />}
     </Box>
   );
 }

@@ -81,7 +81,9 @@
   "notes": {
     "noNotes": "Brak notatek.",
     "addStudentNotes": "Dodaj notatki o uczestniku...",
-    "addStaffNotes": "Dodaj notatki o pracowniku..."
+    "addStaffNotes": "Dodaj notatki o pracowniku...",
+    "addFamilyNotes": "Dodaj notatki o rodzinie...",
+    "addContactNotes": "Dodaj notatki o wizytówce..."
   },
   "exchanges": {
     "exchangeType": "Typ wymiany",

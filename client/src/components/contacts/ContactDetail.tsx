@@ -6,14 +6,12 @@ import {
   Grid,
   Avatar,
   Chip,
-  Paper,
   IconButton,
   Stack,
 } from "@mui/material";
 import {
   LocationOn,
   ContactPhone,
-  StickyNote2,
   ArrowBack,
   School,
 } from "@mui/icons-material";
@@ -23,6 +21,7 @@ import Section from "../Section";
 import InfoItem from "../InfoItem";
 import Loading from "../Loading";
 import { useTranslation } from "react-i18next";
+import EditableNotes from "../EditableNotes";
 
 type ContactDetailProps = {
   id: number;
@@ -245,23 +244,14 @@ export default function ContactDetail({ id, handleClose }: ContactDetailProps) {
       </Section>
 
       {/* Notes */}
-      {contact.notes && (
-        <Section title={t("contacts.steps.additionalInfo")} icon={<StickyNote2 />}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 2,
-              bgcolor: "warning.lighter",
-              border: "1px solid",
-              borderColor: "warning.light",
-            }}
-          >
-            <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-              {contact.notes}
-            </Typography>
-          </Paper>
-        </Section>
-      )}
+      <EditableNotes
+        notes={contact.notes}
+        endpoint={`/contacts/${contact.id}/`}
+        queryKey="contacts"
+        title={t("contacts.steps.additionalInfo")}
+        placeholder={t("notes.addContactNotes")}
+        noNotesText={t("notes.noNotes")}
+      />
     </Box>
   );
 }
