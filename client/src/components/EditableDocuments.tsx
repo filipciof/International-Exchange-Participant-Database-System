@@ -1,7 +1,6 @@
 import { useState } from "react";
 import {
   Box,
-  Button,
   IconButton,
   Paper,
   Table,
@@ -11,29 +10,21 @@ import {
   TableHead,
   TableRow,
   Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  CircularProgress,
 } from "@mui/material";
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
   Description as DescriptionIcon,
   Download as DownloadIcon,
-  CloudUpload as CloudUploadIcon,
+  Edit as EditIcon,
 } from "@mui/icons-material";
 import type { Document, DocumentFormInputs } from "../utils/types";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
-import queryClient from "../utils/queryClient";
 import Section from "./Section";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { documentSchema } from "../utils/types";
+import AddEditDocumentDialog from "./AddEditDocumentDialog";
+import useDocumentMutations from "../hooks/useDocumentMutation";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 
@@ -56,22 +47,23 @@ export default function EditableDocuments({
   >(null);
   const [editingDocument, setEditingDocument] = useState<Document | null>(null);
   const [deletingDocument, setDeletingDocument] = useState<Document | null>(
-    null,
+    null
   );
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<DocumentFormInputs>({
-    resolver: zodResolver(documentSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-    },
-  });
+  const { createMutation, updateMutation, deleteMutation } =
+    useDocumentMutations({
+      ownerType,
+      ownerId,
+    });
+
+  const handleCloseDialog = () => {
+    setDialogOpen(null);
+    setEditingDocument(null);
+    setDeletingDocument(null);
+    createMutation.reset();
+    updateMutation.reset();
+    deleteMutation.reset();
+  };
 
   const {
     data: documents,
@@ -81,120 +73,20 @@ export default function EditableDocuments({
     queryKey: ["documents", ownerType, ownerId],
     queryFn: async () => {
       const response = await axiosClient.get(
-        `/documents/?${ownerField}=${ownerId}`,
+        `/documents/?${ownerField}=${ownerId}`
       );
       return response.data;
     },
   });
 
-  const createMutation = useMutation({
-    mutationFn: async ({
-      data,
-      file,
-    }: {
-      data: DocumentFormInputs;
-      file: File | null;
-    }) => {
-      const formData = new FormData();
-      formData.append(ownerField, ownerId.toString());
-      formData.append("name", data.name);
-      if (data.description) formData.append("description", data.description);
-      if (file) formData.append("file", file);
-
-      const response = await axiosClient.post(`/documents/`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["documents", ownerType, ownerId],
-      });
-      handleCloseDialog();
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async ({
-      id,
-      data,
-      file,
-    }: {
-      id: number;
-      data: DocumentFormInputs;
-      file: File | null;
-    }) => {
-      const formData = new FormData();
-      formData.append("name", data.name);
-      if (data.description) formData.append("description", data.description);
-      if (file) formData.append("file", file);
-
-      const response = await axiosClient.patch(`/documents/${id}/`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["documents", ownerType, ownerId],
-      });
-      handleCloseDialog();
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await axiosClient.delete(`/documents/${id}/`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["documents", ownerType, ownerId],
-      });
-      handleCloseDialog();
-    },
-  });
-
   const handleOpenAddDialog = () => {
     setEditingDocument(null);
-    setSelectedFile(null);
-    reset({
-      name: "",
-      description: "",
-    });
     setDialogOpen("add");
   };
 
   const handleOpenEditDialog = (document: Document) => {
     setEditingDocument(document);
-    setSelectedFile(null);
-    reset({
-      name: document.name,
-      description: document.description,
-    });
     setDialogOpen("edit");
-  };
-
-  const handleCloseDialog = () => {
-    setDialogOpen(null);
-    setEditingDocument(null);
-    setDeletingDocument(null);
-    setSelectedFile(null);
-    reset();
-    createMutation.reset();
-    updateMutation.reset();
-    deleteMutation.reset();
-  };
-
-  const onSubmit = (data: DocumentFormInputs) => {
-    if (editingDocument) {
-      updateMutation.mutate({
-        id: editingDocument.id,
-        data,
-        file: selectedFile,
-      });
-    } else {
-      createMutation.mutate({ data, file: selectedFile });
-    }
   };
 
   const handleDownload = async (document: Document) => {
@@ -209,24 +101,37 @@ export default function EditableDocuments({
     URL.revokeObjectURL(url);
   };
 
-  const actions = (
+  const handleSubmit = (data: DocumentFormInputs, file: File | null) => {
+    if (editingDocument) {
+      updateMutation.mutate(
+        { id: editingDocument.id, data, file },
+        { onSuccess: handleCloseDialog }
+      );
+    } else {
+      createMutation.mutate({ data, file }, { onSuccess: handleCloseDialog });
+    }
+  };
+
+  const actions = !readOnly && (
     <IconButton size="small" onClick={handleOpenAddDialog}>
       <AddIcon />
     </IconButton>
   );
 
   return (
-    <Section title={t("students.tabs.documents")} icon={<DescriptionIcon />} actions={actions}>
+    <Section
+      title={t("students.tabs.documents")}
+      icon={<DescriptionIcon />}
+      actions={actions}
+    >
       {isLoading && (
         <Typography variant="body2" color="text.secondary">
-          {/* Loading documents... */}
           {t("common.loading")}
         </Typography>
       )}
 
       {error && (
         <Typography variant="body2" color="error.main">
-          {/* Error loading documents */}
           {t("common.error", error.message)}
         </Typography>
       )}
@@ -290,7 +195,7 @@ export default function EditableDocuments({
                                 size="small"
                                 onClick={() => handleOpenEditDialog(document)}
                               >
-                                <CloudUploadIcon fontSize="small" />
+                                <EditIcon fontSize="small" />
                               </IconButton>
                               <IconButton
                                 size="small"
@@ -315,89 +220,14 @@ export default function EditableDocuments({
         </>
       )}
 
-      <Dialog
+      <AddEditDocumentDialog
         open={dialogOpen === "add" || dialogOpen === "edit"}
         onClose={handleCloseDialog}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>
-          {editingDocument
-            ? t("documents.editDocument")
-            : t("documents.addDocument")}
-        </DialogTitle>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogContent>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Controller
-                name="name"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label={t("documents.documentName")}
-                    fullWidth
-                    required
-                    error={!!errors.name}
-                    helperText={errors.name?.message}
-                  />
-                )}
-              />
-              <Controller
-                name="description"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label={t("documents.description")}
-                    fullWidth
-                    multiline
-                    rows={3}
-                    error={!!errors.description}
-                    helperText={errors.description?.message}
-                  />
-                )}
-              />
-              <Button
-                variant="outlined"
-                component="label"
-                startIcon={<CloudUploadIcon />}
-                fullWidth
-              >
-                {selectedFile
-                  ? selectedFile.name
-                  : editingDocument
-                    ? t("documents.replaceFile")
-                    : t("documents.uploadFile")}
-                <input
-                  type="file"
-                  hidden
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) setSelectedFile(file);
-                  }}
-                />
-              </Button>
-            </Box>
-          </DialogContent>
-          <DialogActions sx={{ justifyContent: "flex-end" }}>
-            <Button onClick={handleCloseDialog}>{t("common.cancel")}</Button>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={createMutation.isPending || updateMutation.isPending}
-            >
-              {createMutation.isPending || updateMutation.isPending ? (
-                <CircularProgress size={24} />
-              ) : editingDocument ? (
-                t("common.update")
-              ) : (
-                t("common.add")
-              )}
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+        editingDocument={editingDocument}
+        onSubmit={handleSubmit}
+        isPending={createMutation.isPending || updateMutation.isPending}
+        error={createMutation.error || updateMutation.error}
+      />
 
       <DeleteConfirmationDialog
         open={dialogOpen === "delete"}
