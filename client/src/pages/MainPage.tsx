@@ -9,7 +9,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
 import SideBarList from "../components/SideBarList";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { appBarHeight, drawerWidth } from "../utils/constants";
 import Loading from "../components/Loading";
 import AccountMenu from "../components/AccountMenu";
@@ -17,6 +17,7 @@ import AccountMenu from "../components/AccountMenu";
 export default function MainPage() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -82,7 +83,7 @@ export default function MainPage() {
           p: 3,
         }}
       >
-        {loading ? <Loading /> : <Outlet />}
+        {loading ? <Loading /> : <Outlet key={(location.state as { key?: number })?.key} />}
       </Box>
 
       {!isStudent && (
