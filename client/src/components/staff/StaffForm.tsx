@@ -18,7 +18,14 @@ import { useQuery } from "@tanstack/react-query";
 import { SingleFileUpload, FileDropzoneInputBody } from "mui-file-upload";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { StaffFormData, StaffFormInputs, Club, Country, District, Staff } from "../../utils/types";
+import type {
+  StaffFormData,
+  StaffFormInputs,
+  Club,
+  Country,
+  District,
+  Staff,
+} from "../../utils/types";
 import { staffSchema, Gender } from "../../utils/types";
 import axiosClient from "../../utils/axiosClient";
 import { handleValidationErrors } from "../../utils/handleValidationErrors";
@@ -152,7 +159,7 @@ export default function StaffForm({
       <Paper elevation={0}>
         {/* Header with back button */}
         {(title || handleClose) && (
-          <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
             {handleClose && (
               <IconButton onClick={onClose} edge="start">
                 <ArrowBackIcon />
@@ -167,8 +174,8 @@ export default function StaffForm({
         )}
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack spacing={2}>
-            <Stack direction={isMobile ? "column" : "row"} spacing={2}>
+          <Stack spacing={1} sx={{ px: { xs: 0, md: 16 } }}>
+            <Stack direction={isMobile ? "column" : "row"} spacing={1}>
               <Controller
                 name="first_name"
                 control={control}
@@ -201,138 +208,146 @@ export default function StaffForm({
                 )}
               />
             </Stack>
-            <Controller
-              name="last_name"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label={t("staffForm.lastName")}
-                  variant="outlined"
-                  fullWidth
-                  error={!!errors.last_name}
-                  helperText={errors.last_name?.message}
-                  size="small"
-                />
-              )}
-            />
-            <Controller
-              name="gender"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  select
-                  label={t("staffForm.gender")}
-                  variant="outlined"
-                  fullWidth
-                  error={!!errors.gender}
-                  helperText={errors.gender?.message}
-                  size="small"
-                >
-                  {Gender.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              )}
-            />
-            <Autocomplete
-              value={countries.find((c: Country) => c.id === country) || null}
-              onChange={(_event, newValue) => {
-                setCountry(newValue?.id || null);
-                setDistrict(null);
-                setValue("id_club", undefined);
-              }}
-              options={countries.filter((c: Country) => c.is_home_country)}
-              getOptionLabel={(option) => option.name}
-              fullWidth
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t("clubForm.country")}
-                  placeholder={t("common.selectCountry")}
-                  size="small"
-                />
-              )}
-            />
+            <Stack direction={isMobile ? "column" : "row"} spacing={1}>
+              <Controller
+                name="last_name"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label={t("staffForm.lastName")}
+                    variant="outlined"
+                    fullWidth
+                    error={!!errors.last_name}
+                    helperText={errors.last_name?.message}
+                    size="small"
+                  />
+                )}
+              />
+              <Controller
+                name="gender"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    select
+                    label={t("staffForm.gender")}
+                    variant="outlined"
+                    fullWidth
+                    error={!!errors.gender}
+                    helperText={errors.gender?.message}
+                    size="small"
+                  >
+                    {Gender.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {t(`gender.${option.label}`)}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              />
+            </Stack>
+            <Stack direction={isMobile ? "column" : "row"} spacing={1}>
+              <Autocomplete
+                value={countries.find((c: Country) => c.id === country) || null}
+                onChange={(_event, newValue) => {
+                  setCountry(newValue?.id || null);
+                  setDistrict(null);
+                  setValue("id_club", undefined);
+                }}
+                options={countries.filter((c: Country) => c.is_home_country)}
+                getOptionLabel={(option) => option.name}
+                fullWidth
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("clubForm.country")}
+                    placeholder={t("common.selectCountry")}
+                    size="small"
+                  />
+                )}
+              />
 
-            <Autocomplete
-              value={districts.find((d: District) => d.id === district) || null}
-              onChange={(_event, newValue) => {
-                setDistrict(newValue?.id || null);
-                setValue("id_club", undefined);
-              }}
-              options={districts}
-              getOptionLabel={(option) => option.number.toString()}
-              disabled={!country || isLoadingDistricts}
-              loading={isLoadingDistricts}
-              fullWidth
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t("clubForm.district")}
-                  placeholder={t("common.selectDistrict")}
-                  slotProps={{
-                    input: {
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {isLoadingDistricts ? (
-                            <CircularProgress color="inherit" size={20} />
-                          ) : null}
-                          {params.InputProps.endAdornment}
-                        </>
-                      ),
-                    },
-                  }}
-                  size="small"
-                />
-              )}
-            />
+              <Autocomplete
+                value={
+                  districts.find((d: District) => d.id === district) || null
+                }
+                onChange={(_event, newValue) => {
+                  setDistrict(newValue?.id || null);
+                  setValue("id_club", undefined);
+                }}
+                options={districts}
+                getOptionLabel={(option) => option.number.toString()}
+                disabled={!country || isLoadingDistricts}
+                loading={isLoadingDistricts}
+                fullWidth
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("clubForm.district")}
+                    placeholder={t("common.selectDistrict")}
+                    slotProps={{
+                      input: {
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {isLoadingDistricts ? (
+                              <CircularProgress color="inherit" size={20} />
+                            ) : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      },
+                    }}
+                    size="small"
+                  />
+                )}
+              />
 
-            <Controller
-              name="id_club"
-              control={control}
-              render={({ field }) => (
-                <Autocomplete
-                  value={clubs.find((c: Club) => c.id === field.value) || null}
-                  onChange={(_event, newValue) => {
-                    field.onChange(newValue?.id || undefined);
-                  }}
-                  options={clubs}
-                  getOptionLabel={(option) => option.name}
-                  disabled={!district || isLoadingClubs}
-                  loading={isLoadingClubs}
-                  fullWidth
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label={t("staffForm.club")}
-                      placeholder={t("common.selectClub")}
-                      error={!!errors.id_club}
-                      helperText={errors.id_club?.message}
-                      slotProps={{
-                        input: {
-                          ...params.InputProps,
-                          endAdornment: (
-                            <>
-                              {isLoadingClubs ? (
-                                <CircularProgress color="inherit" size={20} />
-                              ) : null}
-                              {params.InputProps.endAdornment}
-                            </>
-                          ),
-                        },
-                      }}
-                      size="small"
-                    />
-                  )}
-                />
-              )}
-            />
-            <Stack direction={isMobile ? "column" : "row"} spacing={2}>
+              <Controller
+                name="id_club"
+                control={control}
+                render={({ field }) => (
+                  <Autocomplete
+                    value={
+                      clubs.find((c: Club) => c.id === field.value) || null
+                    }
+                    onChange={(_event, newValue) => {
+                      field.onChange(newValue?.id || undefined);
+                    }}
+                    options={clubs}
+                    getOptionLabel={(option) => option.name}
+                    disabled={!district || isLoadingClubs}
+                    loading={isLoadingClubs}
+                    fullWidth
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label={t("staffForm.club")}
+                        placeholder={t("common.selectClub")}
+                        error={!!errors.id_club}
+                        helperText={errors.id_club?.message}
+                        slotProps={{
+                          input: {
+                            ...params.InputProps,
+                            endAdornment: (
+                              <>
+                                {isLoadingClubs ? (
+                                  <CircularProgress color="inherit" size={20} />
+                                ) : null}
+                                {params.InputProps.endAdornment}
+                              </>
+                            ),
+                          },
+                        }}
+                        size="small"
+                      />
+                    )}
+                  />
+                )}
+              />
+            </Stack>
+            <Stack direction={isMobile ? "column" : "row"} spacing={1}>
               <Controller
                 name="email"
                 control={control}
@@ -390,7 +405,7 @@ export default function StaffForm({
             />
             <Stack
               direction="row"
-              spacing={2}
+              spacing={1}
               justifyContent="flex-end"
               sx={{ pt: 2 }}
             >

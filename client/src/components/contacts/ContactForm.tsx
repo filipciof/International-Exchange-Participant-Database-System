@@ -148,7 +148,7 @@ export default function ContactForm({
     >
       <Paper elevation={0}>
         {/* Header with back button */}
-        <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
           <IconButton onClick={onClose} edge="start">
             <ArrowBackIcon />
           </IconButton>
@@ -158,8 +158,8 @@ export default function ContactForm({
         </Stack>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack spacing={2}>
-            <Stack direction={isMobile ? "column" : "row"} spacing={2}>
+          <Stack spacing={1} sx={{ px: { xs: 0, md: 16 } }}>
+            <Stack direction={isMobile ? "column" : "row"} spacing={1}>
               <Controller
                 name="first_name"
                 control={control}
@@ -192,44 +192,46 @@ export default function ContactForm({
                 )}
               />
             </Stack>
-            <Controller
-              name="last_name"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label={t("contactForm.lastName")}
-                  variant="outlined"
-                  fullWidth
-                  error={!!errors.last_name}
-                  helperText={errors.last_name?.message}
-                  size="small"
-                />
-              )}
-            />
-            <Controller
-              name="gender"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  select
-                  label={t("contactForm.gender")}
-                  variant="outlined"
-                  fullWidth
-                  error={!!errors.gender}
-                  helperText={errors.gender?.message}
-                  size="small"
-                >
-                  {Gender.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              )}
-            />
-            <Stack direction={isMobile ? "column" : "row"} spacing={2}>
+            <Stack direction={isMobile ? "column" : "row"} spacing={1}>
+              <Controller
+                name="last_name"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label={t("contactForm.lastName")}
+                    variant="outlined"
+                    fullWidth
+                    error={!!errors.last_name}
+                    helperText={errors.last_name?.message}
+                    size="small"
+                  />
+                )}
+              />
+              <Controller
+                name="gender"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    select
+                    label={t("contactForm.gender")}
+                    variant="outlined"
+                    fullWidth
+                    error={!!errors.gender}
+                    helperText={errors.gender?.message}
+                    size="small"
+                  >
+                    {Gender.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              />
+            </Stack>
+            <Stack direction={isMobile ? "column" : "row"} spacing={1}>
               <Controller
                 name="id_country"
                 control={control}
@@ -298,7 +300,7 @@ export default function ContactForm({
                 )}
               />
             </Stack>
-            <Stack direction={isMobile ? "column" : "row"} spacing={2}>
+            <Stack direction={isMobile ? "column" : "row"} spacing={1}>
               <Controller
                 name="email"
                 control={control}
@@ -332,7 +334,7 @@ export default function ContactForm({
               />
             </Stack>
             <FormGroup>
-              <Stack direction="row" spacing={2} flexWrap="wrap">
+              <Stack direction="row" spacing={1} flexWrap="wrap">
                 <Controller
                   name="is_longterm"
                   control={control}
@@ -404,7 +406,7 @@ export default function ContactForm({
             />
             <Stack
               direction="row"
-              spacing={2}
+              spacing={1}
               justifyContent="flex-end"
               sx={{ pt: 2 }}
             >

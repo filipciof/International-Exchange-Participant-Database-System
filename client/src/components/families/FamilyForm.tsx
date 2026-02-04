@@ -16,7 +16,13 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { FamilyFormData, Club, Country, District, Family } from "../../utils/types";
+import type {
+  FamilyFormData,
+  Club,
+  Country,
+  District,
+  Family,
+} from "../../utils/types";
 import { familySchema } from "../../utils/types";
 import axiosClient from "../../utils/axiosClient";
 import { handleValidationErrors } from "../../utils/handleValidationErrors";
@@ -137,7 +143,7 @@ export default function FamilyForm({
       }}
     >
       <Paper elevation={0}>
-        <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
           <IconButton onClick={onClose} edge="start">
             <ArrowBackIcon />
           </IconButton>
@@ -147,7 +153,7 @@ export default function FamilyForm({
         </Stack>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack spacing={2}>
+          <Stack spacing={1} sx={{ px: { xs: 0, md: 16 } }}>
             <Controller
               name="name"
               control={control}
@@ -163,115 +169,125 @@ export default function FamilyForm({
                 />
               )}
             />
-            <Autocomplete
-              value={countries.find((c: Country) => c.id === selectedCountry) || null}
-              onChange={(_event, newValue) => {
-                setSelectedCountry(newValue?.id || null);
-                // Clear district and club when country changes
-                setSelectedDistrict(null);
-                setValue("id_club", undefined);
-              }}
-              options={countries}
-              getOptionLabel={(option) => option.name}
-              loading={isLoadingCountries}
-              fullWidth
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t("familyForm.country")}
-                  placeholder={t("common.selectCountry")}
-                  slotProps={{
-                    input: {
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {isLoadingCountries ? (
-                            <CircularProgress color="inherit" size={20} />
-                          ) : null}
-                          {params.InputProps.endAdornment}
-                        </>
-                      ),
-                    },
-                  }}
-                  size="small"
-                />
-              )}
-            />
-            <Autocomplete
-              value={districts.find((d: District) => d.id === selectedDistrict) || null}
-              onChange={(_event, newValue) => {
-                setSelectedDistrict(newValue?.id || null);
-                // Clear club when district changes
-                setValue("id_club", undefined);
-              }}
-              options={districts}
-              getOptionLabel={(option) => option.number.toString()}
-              disabled={!selectedCountry || isLoadingDistricts}
-              loading={isLoadingDistricts}
-              fullWidth
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t("familyForm.district")}
-                  placeholder={t("common.selectDistrict")}
-                  slotProps={{
-                    input: {
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {isLoadingDistricts ? (
-                            <CircularProgress color="inherit" size={20} />
-                          ) : null}
-                          {params.InputProps.endAdornment}
-                        </>
-                      ),
-                    },
-                  }}
-                  size="small"
-                />
-              )}
-            />
-            <Controller
-              name="id_club"
-              control={control}
-              render={({ field }) => (
-                <Autocomplete
-                  value={clubs.find((c: Club) => c.id === field.value) || null}
-                  onChange={(_event, newValue) => {
-                    field.onChange(newValue?.id || undefined);
-                  }}
-                  options={clubs}
-                  getOptionLabel={(option) => option.name}
-                  disabled={!selectedDistrict || isLoadingClubs}
-                  loading={isLoadingClubs}
-                  fullWidth
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label={t("familyForm.club")}
-                      placeholder={t("common.selectClub")}
-                      error={!!errors.id_club}
-                      helperText={errors.id_club?.message}
-                      slotProps={{
-                        input: {
-                          ...params.InputProps,
-                          endAdornment: (
-                            <>
-                              {isLoadingClubs ? (
-                                <CircularProgress color="inherit" size={20} />
-                              ) : null}
-                              {params.InputProps.endAdornment}
-                            </>
-                          ),
-                        },
-                      }}
-                      size="small"
-                    />
-                  )}
-                />
-              )}
-            />
-            <Stack direction={isMobile ? "column" : "row"} spacing={2}>
+            <Stack direction={isMobile ? "column" : "row"} spacing={1}>
+              <Autocomplete
+                value={
+                  countries.find((c: Country) => c.id === selectedCountry) ||
+                  null
+                }
+                onChange={(_event, newValue) => {
+                  setSelectedCountry(newValue?.id || null);
+                  // Clear district and club when country changes
+                  setSelectedDistrict(null);
+                  setValue("id_club", undefined);
+                }}
+                options={countries}
+                getOptionLabel={(option) => option.name}
+                loading={isLoadingCountries}
+                fullWidth
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("familyForm.country")}
+                    placeholder={t("common.selectCountry")}
+                    slotProps={{
+                      input: {
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {isLoadingCountries ? (
+                              <CircularProgress color="inherit" size={20} />
+                            ) : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      },
+                    }}
+                    size="small"
+                  />
+                )}
+              />
+              <Autocomplete
+                value={
+                  districts.find((d: District) => d.id === selectedDistrict) ||
+                  null
+                }
+                onChange={(_event, newValue) => {
+                  setSelectedDistrict(newValue?.id || null);
+                  // Clear club when district changes
+                  setValue("id_club", undefined);
+                }}
+                options={districts}
+                getOptionLabel={(option) => option.number.toString()}
+                disabled={!selectedCountry || isLoadingDistricts}
+                loading={isLoadingDistricts}
+                fullWidth
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t("familyForm.district")}
+                    placeholder={t("common.selectDistrict")}
+                    slotProps={{
+                      input: {
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {isLoadingDistricts ? (
+                              <CircularProgress color="inherit" size={20} />
+                            ) : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        ),
+                      },
+                    }}
+                    size="small"
+                  />
+                )}
+              />
+              <Controller
+                name="id_club"
+                control={control}
+                render={({ field }) => (
+                  <Autocomplete
+                    value={
+                      clubs.find((c: Club) => c.id === field.value) || null
+                    }
+                    onChange={(_event, newValue) => {
+                      field.onChange(newValue?.id || undefined);
+                    }}
+                    options={clubs}
+                    getOptionLabel={(option) => option.name}
+                    disabled={!selectedDistrict || isLoadingClubs}
+                    loading={isLoadingClubs}
+                    fullWidth
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label={t("familyForm.club")}
+                        placeholder={t("common.selectClub")}
+                        error={!!errors.id_club}
+                        helperText={errors.id_club?.message}
+                        slotProps={{
+                          input: {
+                            ...params.InputProps,
+                            endAdornment: (
+                              <>
+                                {isLoadingClubs ? (
+                                  <CircularProgress color="inherit" size={20} />
+                                ) : null}
+                                {params.InputProps.endAdornment}
+                              </>
+                            ),
+                          },
+                        }}
+                        size="small"
+                      />
+                    )}
+                  />
+                )}
+              />
+            </Stack>
+            <Stack direction={isMobile ? "column" : "row"} spacing={1}>
               <Controller
                 name="city"
                 control={control}
@@ -325,7 +341,7 @@ export default function FamilyForm({
             />
             <Stack
               direction="row"
-              spacing={2}
+              spacing={1}
               justifyContent="flex-end"
               sx={{ pt: 2 }}
             >

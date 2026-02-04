@@ -120,7 +120,7 @@ export default function ClubForm({
     >
       <Paper elevation={0}>
         {/* Header with back button */}
-        <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
           <IconButton onClick={onClose} edge="start">
             <ArrowBackIcon />
           </IconButton>
@@ -130,25 +130,13 @@ export default function ClubForm({
         </Stack>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack spacing={2}>
-            <Controller
-              name="name"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label={t("clubForm.clubName")}
-                  variant="outlined"
-                  fullWidth
-                  error={!!errors.name}
-                  helperText={errors.name?.message}
-                  size="small"
-                />
-              )}
-            />
-            <Stack direction={isMobile ? "column" : "row"} spacing={2}>
+          <Stack spacing={1} sx={{ px: { xs: 0, md: 16 } }}>
+            <Stack direction={isMobile ? "column" : "row"} spacing={1}>
               <Autocomplete
-                value={availableCountries.find((c) => c.id === selectedCountry) || null}
+                value={
+                  availableCountries.find((c) => c.id === selectedCountry) ||
+                  null
+                }
                 onChange={(_event, newValue) => {
                   setSelectedCountry(newValue?.id || null);
                   // Clear district selection when country changes
@@ -171,7 +159,10 @@ export default function ClubForm({
                 control={control}
                 render={({ field }) => (
                   <Autocomplete
-                    value={districts.find((d: District) => d.id === field.value) || null}
+                    value={
+                      districts.find((d: District) => d.id === field.value) ||
+                      null
+                    }
                     onChange={(_event, newValue) => {
                       field.onChange(newValue?.id || undefined);
                     }}
@@ -207,25 +198,42 @@ export default function ClubForm({
                 )}
               />
             </Stack>
-            <Controller
-              name="city"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  value={field.value || ""}
-                  label={t("clubForm.city")}
-                  variant="outlined"
-                  fullWidth
-                  error={!!errors.city}
-                  helperText={errors.city?.message}
-                  size="small"
-                />
-              )}
-            />
+            <Stack direction={isMobile ? "column" : "row"} spacing={1}>
+              <Controller
+                name="city"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    value={field.value || ""}
+                    label={t("clubForm.city")}
+                    variant="outlined"
+                    fullWidth
+                    error={!!errors.city}
+                    helperText={errors.city?.message}
+                    size="small"
+                  />
+                )}
+              />
+              <Controller
+                name="name"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label={t("clubForm.clubName")}
+                    variant="outlined"
+                    fullWidth
+                    error={!!errors.name}
+                    helperText={errors.name?.message}
+                    size="small"
+                  />
+                )}
+              />
+            </Stack>
             <Stack
               direction="row"
-              spacing={2}
+              spacing={1}
               justifyContent="flex-end"
               sx={{ pt: 2 }}
             >
