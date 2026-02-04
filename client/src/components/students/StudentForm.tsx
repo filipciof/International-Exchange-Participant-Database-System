@@ -13,11 +13,10 @@ import {
   Step,
   StepLabel,
 } from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
+import { ArrowBack, CloudUpload as CloudUploadIcon } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SingleFileUpload, FileDropzoneInputBody } from "mui-file-upload";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import type {
@@ -170,13 +169,6 @@ export default function StudentForm({
 
   const onError = (validationErrors: any) => {
     console.log("Validation errors preventing submission:", validationErrors);
-  };
-
-  const handlePhotoUpload = (newPhoto: File) => {
-    setPhoto(newPhoto);
-    return new Promise((resolve) => {
-      resolve("");
-    });
   };
 
   const onClose = () => {
@@ -898,10 +890,23 @@ export default function StudentForm({
             </Typography>
 
         <QuestionField question="Please upload a recent photo of yourself">
-          <SingleFileUpload
-            uploadService={handlePhotoUpload}
-            body={<FileDropzoneInputBody title="Upload photo" />}
-          />
+          <Button
+            variant="outlined"
+            component="label"
+            startIcon={<CloudUploadIcon />}
+            fullWidth
+          >
+            {photo ? photo.name : "Upload photo"}
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) setPhoto(file);
+              }}
+            />
+          </Button>
         </QuestionField>
 
         <QuestionField question="Is there anything else you would like us to know?">

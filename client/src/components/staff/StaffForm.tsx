@@ -15,7 +15,7 @@ import { useTheme } from "@mui/material/styles";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { SingleFileUpload, FileDropzoneInputBody } from "mui-file-upload";
+import { CloudUpload as CloudUploadIcon } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type {
@@ -132,13 +132,6 @@ export default function StaffForm({
     };
     console.log(staffData);
     onFormSubmit(staffData);
-  };
-
-  const handlePhotoUpload = (newPhoto: File) => {
-    setPhoto(newPhoto);
-    return new Promise((resolve) => {
-      resolve("");
-    });
   };
 
   const onClose = () => {
@@ -399,10 +392,23 @@ export default function StaffForm({
                 />
               )}
             />
-            <SingleFileUpload
-              uploadService={handlePhotoUpload}
-              body={<FileDropzoneInputBody title={t("common.uploadPhoto")} />}
-            />
+            <Button
+              variant="outlined"
+              component="label"
+              startIcon={<CloudUploadIcon />}
+              fullWidth
+            >
+              {photo ? photo.name : t("common.uploadPhoto")}
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) setPhoto(file);
+                }}
+              />
+            </Button>
             <Stack
               direction="row"
               spacing={1}

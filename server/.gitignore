@@ -7,3 +7,4 @@ test_media_faces/
 media/contact_photos/*.jpg
 !media/contact_photos/__nodelete__*.jpg
 *.sql
+media/

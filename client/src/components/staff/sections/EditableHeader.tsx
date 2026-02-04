@@ -9,9 +9,9 @@ import {
   TextField,
   MenuItem,
   Grid,
+  Button,
 } from "@mui/material";
-import { Edit as EditIcon, Save, Close } from "@mui/icons-material";
-import { SingleFileUpload, FileDropzoneInputBody } from "mui-file-upload";
+import { Edit as EditIcon, Save, Close, CloudUpload as CloudUploadIcon } from "@mui/icons-material";
 import type { Staff } from "../../../utils/types";
 import { Gender } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
@@ -68,13 +68,6 @@ export default function EditableHeader({
       setPhoto(null);
     },
   });
-
-  const handlePhotoUpload = (newPhoto: File) => {
-    setPhoto(newPhoto);
-    return new Promise((resolve) => {
-      resolve("");
-    });
-  };
 
   const handleSave = () => {
     updateMutation.mutate({ ...formData, photo });
@@ -285,12 +278,24 @@ export default function EditableHeader({
                   </TextField>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
-                  <Box sx={{ bgcolor: "white", borderRadius: 1, p: 2 }}>
-                    <SingleFileUpload
-                      uploadService={handlePhotoUpload}
-                      body={<FileDropzoneInputBody title="Upload photo" />}
+                  <Button
+                    variant="outlined"
+                    component="label"
+                    startIcon={<CloudUploadIcon />}
+                    fullWidth
+                    sx={{ bgcolor: "white" }}
+                  >
+                    {photo ? photo.name : "Upload photo"}
+                    <input
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setPhoto(file);
+                      }}
                     />
-                  </Box>
+                  </Button>
                 </Grid>
               </Grid>
             </Box>
