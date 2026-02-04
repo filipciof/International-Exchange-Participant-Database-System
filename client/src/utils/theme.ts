@@ -13,6 +13,9 @@ const theme = createTheme({
       main: "#FF5449",
     },
   },
+  typography: {
+    fontFamily: "'Lato', system-ui, Avenir, Helvetica, Arial, sans-serif",
+  },
 });
 
 export default theme;
