@@ -1,11 +1,7 @@
 import { useState } from "react";
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
-  Avatar,
-  Chip,
   IconButton,
   Stack,
   Tabs,
@@ -19,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import EditableNotes from "../EditableNotes";
 import EditablePersonalInfo from "../EditablePersonalInfo";
 import EditableLocation from "./EditableLocation";
+import EditableHeader from "./EditableHeader";
 
 type ContactDetailProps = {
   id: number;
@@ -55,10 +52,6 @@ export default function ContactDetail({ id, handleClose }: ContactDetailProps) {
     return <Loading />;
   }
 
-  const fullName = [contact.first_name, contact.middle_name, contact.last_name]
-    .filter(Boolean)
-    .join(" ");
-
   return (
     <Box sx={{}}>
       {/* Header with back button */}
@@ -72,78 +65,11 @@ export default function ContactDetail({ id, handleClose }: ContactDetailProps) {
       </Stack>
 
       {/* Header Card */}
-      <Card
-        sx={{
-          mb: 3,
-          bgcolor: "primary.main",
-          opacity: 0.9,
-        }}
-      >
-        <CardContent>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 3,
-              flexWrap: "wrap",
-            }}
-          >
-            <Avatar
-              src={!isLoading ? imageUrl || undefined : undefined}
-              alt={fullName}
-              sx={{
-                width: 100,
-                height: 100,
-                border: "4px solid white",
-                boxShadow: 3,
-              }}
-            >
-              {contact.first_name[0]}
-              {contact.last_name[0]}
-            </Avatar>
-            <Box sx={{ flex: 1, minWidth: 200 }}>
-              <Typography
-                variant="h4"
-                sx={{ color: "white", fontWeight: 700, mb: 1 }}
-              >
-                {fullName}
-              </Typography>
-              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                {contact.is_longterm && (
-                  <Chip
-                    label={t("contacts.longterm")}
-                    size="small"
-                    sx={{
-                      backgroundColor: "rgba(255,255,255,0.2)",
-                      color: "white",
-                    }}
-                  />
-                )}
-                {contact.is_family_to_family && (
-                  <Chip
-                    label={t("contacts.family-to-family")}
-                    size="small"
-                    sx={{
-                      backgroundColor: "rgba(255,255,255,0.2)",
-                      color: "white",
-                    }}
-                  />
-                )}
-                {contact.is_camp && (
-                  <Chip
-                    label={t("contacts.camp")}
-                    size="small"
-                    sx={{
-                      backgroundColor: "rgba(255,255,255,0.2)",
-                      color: "white",
-                    }}
-                  />
-                )}
-              </Box>
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
+      <EditableHeader 
+        contact={contact}
+        imageUrl={imageUrl}
+        isLoading={isLoading}
+      />
 
       {/* Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>

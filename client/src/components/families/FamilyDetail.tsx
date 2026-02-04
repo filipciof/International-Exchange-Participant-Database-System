@@ -1,8 +1,6 @@
 import { useState } from "react";
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
   IconButton,
   Stack,
@@ -19,6 +17,7 @@ import EditableDocuments from "../EditableDocuments";
 import { useTranslation } from "react-i18next";
 import EditableNotes from "../EditableNotes";
 import EditableClubInfo from "../EditableClubInfo";
+import EditableHeader from "./EditableHeader";
 
 type FamilyDetailProps = {
   id: number;
@@ -54,41 +53,7 @@ export default function FamilyDetail({ id, handleClose }: FamilyDetailProps) {
       </Stack>
 
       {/* Header Card */}
-      <Card
-        sx={{
-          mb: 3,
-          bgcolor: "primary.main",
-          opacity: 0.9,
-        }}
-      >
-        <CardContent>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 3,
-              flexWrap: "wrap",
-            }}
-          >
-            <Box sx={{ flex: 1, minWidth: 200 }}>
-              <Typography
-                variant="h4"
-                sx={{ color: "white", fontWeight: 700, mb: 1 }}
-              >
-                {family.name}
-              </Typography>
-              {family.club && (
-                <Typography
-                  variant="h6"
-                  sx={{ color: "rgba(255,255,255,0.9)", mb: 1 }}
-                >
-                  {family.club.name}
-                </Typography>
-              )}
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
+      <EditableHeader family={family} />
 
       {/* Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>

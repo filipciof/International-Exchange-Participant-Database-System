@@ -1,8 +1,6 @@
 import { useState } from "react";
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
   IconButton,
   Stack,
@@ -15,6 +13,7 @@ import axiosClient from "../../utils/axiosClient";
 import Loading from "../Loading";
 import EditableLocation from "./EditableLocation";
 import EditableDocuments from "../EditableDocuments";
+import EditableHeader from "./EditableHeader";
 import { useTranslation } from "react-i18next";
 
 type ClubDetailProps = {
@@ -51,39 +50,7 @@ export default function ClubDetail({ id, handleClose }: ClubDetailProps) {
       </Stack>
 
       {/* Header Card */}
-      <Card
-        sx={{
-          mb: 3,
-          bgcolor: "primary.main",
-          opacity: 0.9,
-        }}
-      >
-        <CardContent>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 3,
-              flexWrap: "wrap",
-            }}
-          >
-            <Box sx={{ flex: 1, minWidth: 200 }}>
-              <Typography
-                variant="h4"
-                sx={{ color: "white", fontWeight: 700, mb: 1 }}
-              >
-                {club.name}
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{ color: "rgba(255,255,255,0.9)", mb: 1 }}
-              >
-                {t("clubForm.district")} {club.district}
-              </Typography>
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
+      <EditableHeader club={club} />
 
       {/* Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
