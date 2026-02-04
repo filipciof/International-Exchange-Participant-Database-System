@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import Loading from "../Loading";
 import EditableHeader from "./sections/EditableHeader";
-import EditableContactInfo from "../EditableContactInfo";
+import EditablePersonalInfo from "../EditablePersonalInfo";
 import EditableClubInfo from "./sections/EditableClubInfo";
 import EditableNotes from "../EditableNotes";
 import EditableUserAccount from "./sections/EditableUserAccount";
@@ -88,9 +88,9 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
           scrollButtons="auto"
         >
           <Tab label={t("staff.tabs.all")} />
+          <Tab label={t("staff.tabs.personalInfo")} />
           <Tab label={t("staff.tabs.club")} />
-          <Tab label={t("staff.tabs.contact")} />
-          <Tab label={t("staff.tabs.account")}/>
+          <Tab label={t("staff.tabs.account")} />
           <Tab label={t("staff.tabs.documents")} />
           <Tab label={t("staff.tabs.notes")} />
         </Tabs>
@@ -99,13 +99,15 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
       {/* All sections */}
       {activeTab === 0 && (
         <>
-          <EditableClubInfo staff={staff} staffId={id} />
-          <EditableContactInfo
+          <EditablePersonalInfo
+            gender={staff.gender}
+            genderName={staff.gender_name}
             email={staff.email}
             phone={staff.phone}
             endpoint={`/staff/${id}/`}
             queryKey="staff"
           />
+          <EditableClubInfo staff={staff} staffId={id} />
           <EditableUserAccount staff={staff} staffId={id} />
           <EditableNotes
             notes={staff.notes}
@@ -118,16 +120,20 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
         </>
       )}
 
-      {/* Club Information */}
-      {activeTab === 1 && <EditableClubInfo staff={staff} staffId={id} />}
+      {/* Personal Information */}
+      {activeTab === 1 && (
+        <EditablePersonalInfo
+          gender={staff.gender}
+          genderName={staff.gender_name}
+          email={staff.email}
+          phone={staff.phone}
+          endpoint={`/staff/${id}/`}
+          queryKey="staff"
+        />
+      )}
 
-      {/* Contact Information */}
-      {activeTab === 2 && <EditableContactInfo
-            email={staff.email}
-            phone={staff.phone}
-            endpoint={`/staff/${id}/`}
-            queryKey="staff"
-          />}
+      {/* Club Information */}
+      {activeTab === 2 && <EditableClubInfo staff={staff} staffId={id} />}
 
       {/* User Account */}
       {activeTab === 3 && <EditableUserAccount staff={staff} staffId={id} />}
@@ -136,14 +142,16 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
       {activeTab === 4 && <EditableDocuments ownerType="staff" ownerId={id} />}
 
       {/* Notes */}
-      {activeTab === 5 && <EditableNotes
-            notes={staff.notes}
-            endpoint={`/staff/${id}/`}
-            queryKey="staff"
-            title={t("staff.steps.additionalInfo")}
-            placeholder={t("notes.addStaffNotes")}
-            noNotesText={t("notes.noNotes")}
-          />}
+      {activeTab === 5 && (
+        <EditableNotes
+          notes={staff.notes}
+          endpoint={`/staff/${id}/`}
+          queryKey="staff"
+          title={t("staff.steps.additionalInfo")}
+          placeholder={t("notes.addStaffNotes")}
+          noNotesText={t("notes.noNotes")}
+        />
+      )}
     </Box>
   );
 }

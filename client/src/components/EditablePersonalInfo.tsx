@@ -1,35 +1,36 @@
 import { useState } from "react";
-import { Box, Grid, IconButton, TextField } from "@mui/material";
-import {
-  Edit as EditIcon,
-  Save,
-  Close,
-  ContactPhone,
-} from "@mui/icons-material";
+import { Box, Grid, IconButton, TextField, MenuItem } from "@mui/material";
+import { Edit as EditIcon, Save, Close, Person } from "@mui/icons-material";
 import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import queryClient from "../utils/queryClient";
 import Section from "./Section";
 import InfoItem from "./InfoItem";
 import { useTranslation } from "react-i18next";
+import { Gender } from "../utils/types";
 
-type EditableContactInfoProps = {
+type EditablePersonalInfoProps = {
+  gender: number;
+  genderName: string;
   email: string | null;
   phone: string | null;
   endpoint: string;
   queryKey: string;
 };
 
-export default function EditableContactInfo({
+export default function EditablePersonalInfo({
+  gender: initialGender,
+  genderName,
   email: initialEmail,
   phone: initialPhone,
   endpoint,
   queryKey,
-}: EditableContactInfoProps) {
+}: EditablePersonalInfoProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
 
   const [formData, setFormData] = useState({
+    gender: initialGender,
     email: initialEmail || "",
     phone: initialPhone || "",
   });
@@ -51,6 +52,7 @@ export default function EditableContactInfo({
 
   const handleCancel = () => {
     setFormData({
+      gender: initialGender,
       email: initialEmail || "",
       phone: initialPhone || "",
     });
@@ -83,8 +85,8 @@ export default function EditableContactInfo({
 
   return (
     <Section
-      title={t("staff.steps.contact")}
-      icon={<ContactPhone />}
+      title={t("common.personalInfo")}
+      icon={<Person />}
       actions={actions}
     >
       {!isEditing ? (
@@ -92,13 +94,13 @@ export default function EditableContactInfo({
           <InfoItem
             label={t("staffForm.email")}
             value={formData.email}
-            fullWidth
           />
           <InfoItem label={t("staffForm.phone")} value={formData.phone} />
+          <InfoItem label={t("staffForm.gender")} value={t(`gender.${genderName}`)} />
         </Grid>
       ) : (
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
               fullWidth
               size="small"
@@ -110,7 +112,7 @@ export default function EditableContactInfo({
               }
             />
           </Grid>
-          <Grid size={{ xs: 12 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
               fullWidth
               size="small"
@@ -120,6 +122,27 @@ export default function EditableContactInfo({
                 setFormData({ ...formData, phone: e.target.value })
               }
             />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              fullWidth
+              size="small"
+              select
+              label={t("staffForm.gender")}
+              value={formData.gender}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  gender: Number(e.target.value),
+                })
+              }
+            >
+              {Gender.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {t(`gender.${option.label}`)}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
         </Grid>
       )}

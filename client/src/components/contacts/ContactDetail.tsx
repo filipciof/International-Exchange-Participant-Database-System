@@ -17,7 +17,7 @@ import axiosClient from "../../utils/axiosClient";
 import Loading from "../Loading";
 import { useTranslation } from "react-i18next";
 import EditableNotes from "../EditableNotes";
-import EditableContactInfo from "../EditableContactInfo";
+import EditablePersonalInfo from "../EditablePersonalInfo";
 import EditableLocation from "./EditableLocation";
 
 type ContactDetailProps = {
@@ -108,14 +108,6 @@ export default function ContactDetail({ id, handleClose }: ContactDetailProps) {
               >
                 {fullName}
               </Typography>
-              {contact.gender_name && (
-                <Typography
-                  variant="h6"
-                  sx={{ color: "rgba(255,255,255,0.9)", mb: 1 }}
-                >
-                  {contact.gender_name}
-                </Typography>
-              )}
               <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                 {contact.is_longterm && (
                   <Chip
@@ -162,7 +154,7 @@ export default function ContactDetail({ id, handleClose }: ContactDetailProps) {
           scrollButtons="auto"
         >
           <Tab label={t("contacts.tabs.all")} />
-          <Tab label={t("contacts.tabs.contact")} />
+          <Tab label={t("contacts.tabs.personalInfo")} />
           <Tab label={t("contacts.tabs.location")} />
           <Tab label={t("contacts.tabs.notes")} />
         </Tabs>
@@ -171,7 +163,9 @@ export default function ContactDetail({ id, handleClose }: ContactDetailProps) {
       {/* All sections */}
       {activeTab === 0 && (
         <>
-          <EditableContactInfo
+          <EditablePersonalInfo
+            gender={contact.gender}
+            genderName={contact.gender_name}
             email={contact.email}
             phone={contact.phone}
             endpoint={`/contacts/${id}/`}
@@ -189,9 +183,11 @@ export default function ContactDetail({ id, handleClose }: ContactDetailProps) {
         </>
       )}
 
-      {/* Contact Information */}
+      {/* Personal Information */}
       {activeTab === 1 && (
-        <EditableContactInfo
+        <EditablePersonalInfo
+          gender={contact.gender}
+          genderName={contact.gender_name}
           email={contact.email}
           phone={contact.phone}
           endpoint={`/contacts/${id}/`}

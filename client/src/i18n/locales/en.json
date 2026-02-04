@@ -33,7 +33,8 @@
     "update": "Update",
     "adding": "Adding...",
     "updating": "Updating...",
-    "edit": "Edit"
+    "edit": "Edit",
+    "personalInfo": "Personal Information"
   },
   "gender": {
     "gender": "Gender",
@@ -290,7 +291,9 @@
       "noHostFamilies": "No host families recorded.",
       "family": "Family",
       "unknownFamily": "Unknown Family",
-      "noDocuments": "No documents uploaded yet."
+      "noDocuments": "No documents uploaded yet.",
+      "height": "Height",
+      "shirtSize": "Shirt Size"
     }
   },
   "staff": {
@@ -302,14 +305,14 @@
     "tabs": {
       "all": "All",
       "club": "Club",
-      "contact": "Contact",
+      "personalInfo": "Personal",
       "account": "Account",
       "documents": "Documents",
       "notes": "Notes"
     },
     "steps": {
       "club": "Club Information",
-      "contact": "Contact Information",
+      "personalInfo": "Personal Information",
       "account": "User Account",
       "additionalInfo": "Additional Information"
     }
@@ -398,12 +401,12 @@
     "profile": "Contact Profile",
     "tabs": {
       "all": "All",
-      "contact": "Contact",
+      "personalInfo": "Personal",
       "location": "Location",
       "notes": "Notes"
     },
     "steps": {
-      "contact": "Contact Information",
+      "personalInfo": "Personal Information",
       "location": "Location",
       "program": "Program Participation",
       "additionalInfo": "Additional Information"

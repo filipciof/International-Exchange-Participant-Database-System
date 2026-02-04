@@ -8,7 +8,7 @@ import type { StaffFormData } from "../utils/types";
 import { AxiosError } from "axios";
 import { useStaffMutations } from "../hooks/useStaffMutations";
 import EditableHeader from "../components/staff/sections/EditableHeader";
-import EditableContactInfo from "../components/EditableContactInfo";
+import EditablePersonalInfo from "../components/EditablePersonalInfo";
 import EditableClubInfo from "../components/staff/sections/EditableClubInfo";
 import EditableNotes from "../components/EditableNotes";
 import EditableUserAccount from "../components/staff/sections/EditableUserAccount";
@@ -103,7 +103,7 @@ export default function StaffProfile({}: StaffProfileProps) {
         >
           <Tab label={t("staff.tabs.all")} />
           <Tab label={t("staff.tabs.club")} />
-          <Tab label={t("staff.tabs.contact")} />
+          <Tab label={t("staff.tabs.personalInfo")} />
           <Tab label={t("staff.tabs.account")} />
           <Tab label={t("staff.tabs.documents")} />
           <Tab label={t("staff.tabs.notes")} />
@@ -114,7 +114,9 @@ export default function StaffProfile({}: StaffProfileProps) {
       {activeTab === 0 && (
         <>
           <EditableClubInfo staff={staff} />
-          <EditableContactInfo
+          <EditablePersonalInfo
+            gender={staff.gender}
+            genderName={staff.gender_name}
             email={staff.email}
             phone={staff.phone}
             endpoint="/staff/?me=true"
@@ -135,8 +137,10 @@ export default function StaffProfile({}: StaffProfileProps) {
       {/* Club Information */}
       {activeTab === 1 && <EditableClubInfo staff={staff} />}
 
-      {/* Contact Information */}
-      {activeTab === 2 && <EditableContactInfo
+      {/* Personal Information */}
+      {activeTab === 2 && <EditablePersonalInfo
+            gender={staff.gender}
+            genderName={staff.gender_name}
             email={staff.email}
             phone={staff.phone}
             endpoint="/staff/?me=true"

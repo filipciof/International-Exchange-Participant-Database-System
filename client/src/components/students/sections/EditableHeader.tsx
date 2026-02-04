@@ -4,20 +4,23 @@ import {
   Card,
   CardContent,
   Avatar,
-  Chip,
   Typography,
   IconButton,
   TextField,
-  MenuItem,
   Grid,
   Button,
 } from "@mui/material";
-import { Edit as EditIcon, Save, Close, CloudUpload as CloudUploadIcon } from "@mui/icons-material";
+import {
+  Edit as EditIcon,
+  Save,
+  Close,
+  CloudUpload as CloudUploadIcon,
+} from "@mui/icons-material";
 import type { Student } from "../../../utils/types";
-import { Gender, ShirtSize } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
+import { useTranslation } from "react-i18next";
 
 type EditableHeaderProps = {
   student: Student;
@@ -30,6 +33,7 @@ export default function EditableHeader({
   imageUrl,
   isLoading,
 }: EditableHeaderProps) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
 
@@ -38,9 +42,6 @@ export default function EditableHeader({
     middle_name: student.middle_name || "",
     last_name: student.last_name || "",
     nick_name: student.nick_name || "",
-    gender: student.gender,
-    height: student.height || "",
-    shirt_size: student.shirt_size || "",
   });
 
   const updateMutation = useMutation({
@@ -81,9 +82,6 @@ export default function EditableHeader({
       middle_name: student.middle_name || "",
       last_name: student.last_name || "",
       nick_name: student.nick_name || "",
-      gender: student.gender,
-      height: student.height || "",
-      shirt_size: student.shirt_size || "",
     });
     setPhoto(null);
     setIsEditing(false);
@@ -174,32 +172,6 @@ export default function EditableHeader({
                   "{student.nick_name}"
                 </Typography>
               )}
-              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                <Chip
-                  label={student.gender_name}
-                  size="small"
-                  sx={{
-                    backgroundColor: "rgba(255,255,255,0.2)",
-                    color: "white",
-                  }}
-                />
-                <Chip
-                  label={student.height ? `${student.height} m` : "—"}
-                  size="small"
-                  sx={{
-                    backgroundColor: "rgba(255,255,255,0.2)",
-                    color: "white",
-                  }}
-                />
-                <Chip
-                  label={student.shirt_size || "—"}
-                  size="small"
-                  sx={{
-                    backgroundColor: "rgba(255,255,255,0.2)",
-                    color: "white",
-                  }}
-                />
-              </Box>
             </Box>
           </Box>
         ) : (
@@ -230,7 +202,7 @@ export default function EditableHeader({
                   <TextField
                     fullWidth
                     size="small"
-                    label="First Name"
+                    label={t("students.searchFields.firstName")}
                     value={formData.first_name}
                     onChange={(e) =>
                       setFormData({ ...formData, first_name: e.target.value })
@@ -249,7 +221,7 @@ export default function EditableHeader({
                   <TextField
                     fullWidth
                     size="small"
-                    label="Middle Name"
+                    label={t("students.searchFields.middleName")}
                     value={formData.middle_name}
                     onChange={(e) =>
                       setFormData({ ...formData, middle_name: e.target.value })
@@ -268,7 +240,7 @@ export default function EditableHeader({
                   <TextField
                     fullWidth
                     size="small"
-                    label="Last Name"
+                    label={t("students.searchFields.lastName")}
                     value={formData.last_name}
                     onChange={(e) =>
                       setFormData({ ...formData, last_name: e.target.value })
@@ -283,11 +255,11 @@ export default function EditableHeader({
                     }}
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
+                <Grid size={{ xs: 12, sm: 4 }}>
                   <TextField
                     fullWidth
                     size="small"
-                    label="Nick Name"
+                    label={t("students.searchFields.nickname")}
                     value={formData.nick_name}
                     onChange={(e) =>
                       setFormData({ ...formData, nick_name: e.target.value })
@@ -302,89 +274,6 @@ export default function EditableHeader({
                     }}
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    select
-                    label="Gender"
-                    value={formData.gender}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        gender: Number(e.target.value),
-                      })
-                    }
-                    sx={{
-                      "& .MuiInputBase-root": { bgcolor: "white" },
-                      "& .MuiInputLabel-root": {
-                        bgcolor: "white",
-                        px: 0.5,
-                        borderRadius: 0.5,
-                      },
-                    }}
-                  >
-                    {Gender.map((gender) => (
-                      <MenuItem key={gender.value} value={gender.value}>
-                        {gender.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Height (m)"
-                    type="number"
-                    value={formData.height}
-                    onChange={(e) =>
-                      setFormData({ ...formData, height: e.target.value })
-                    }
-                    sx={{
-                      "& .MuiInputBase-root": { bgcolor: "white" },
-                      "& .MuiInputLabel-root": {
-                        bgcolor: "white",
-                        px: 0.5,
-                        borderRadius: 0.5,
-                      },
-                    }}
-                    slotProps={{
-                      htmlInput: {
-                        step: "0.01",
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    select
-                    label="Shirt Size"
-                    value={formData.shirt_size}
-                    onChange={(e) =>
-                      setFormData({ ...formData, shirt_size: e.target.value })
-                    }
-                    sx={{
-                      "& .MuiInputBase-root": { bgcolor: "white" },
-                      "& .MuiInputLabel-root": {
-                        bgcolor: "white",
-                        px: 0.5,
-                        borderRadius: 0.5,
-                      },
-                    }}
-                  >
-                    <MenuItem value="">
-                      <em>None</em>
-                    </MenuItem>
-                    {ShirtSize.map((size) => (
-                      <MenuItem key={size} value={size}>
-                        {size}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
                 <Grid size={{ xs: 12 }}>
                   <Button
                     variant="outlined"
@@ -393,7 +282,7 @@ export default function EditableHeader({
                     fullWidth
                     sx={{ bgcolor: "white" }}
                   >
-                    {photo ? photo.name : "Upload photo"}
+                    {photo ? photo.name : t("common.uploadPhoto")}
                     <input
                       type="file"
                       hidden

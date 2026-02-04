@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Box, Grid, IconButton, TextField, Autocomplete } from "@mui/material";
+import { Box, Grid, IconButton, TextField, Autocomplete, MenuItem } from "@mui/material";
 import { Edit as EditIcon, Save, Close, Person } from "@mui/icons-material";
 import type { Student, Country } from "../../../utils/types";
+import { Gender, ShirtSize } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
@@ -24,6 +25,9 @@ export default function EditablePersonalInfo({
   const [isEditing, setIsEditing] = useState(false);
 
   const [formData, setFormData] = useState({
+    gender: student.gender,
+    height: student.height || "",
+    shirt_size: student.shirt_size || "",
     date_of_birth: student.date_of_birth || "",
     id_country_of_birth: student.id_country_of_birth || null,
     city_of_birth: student.city_of_birth || "",
@@ -53,6 +57,9 @@ export default function EditablePersonalInfo({
 
   const handleCancel = () => {
     setFormData({
+      gender: student.gender,
+      height: student.height || "",
+      shirt_size: student.shirt_size || "",
       date_of_birth: student.date_of_birth || "",
       id_country_of_birth: student.id_country_of_birth || null,
       city_of_birth: student.city_of_birth || "",
@@ -123,6 +130,18 @@ export default function EditablePersonalInfo({
             label={t("students.searchFields.dietaryRestrictions")}
             value={student.dietary_restrictions}
             fullWidth
+          />
+          <InfoItem
+            label={t("staffForm.gender")}
+            value={t(`gender.${student.gender_name}`)}
+          />
+          <InfoItem
+            label={t("studentForm.labels.height")}
+            value={student.height ? `${student.height} m` : null}
+          />
+          <InfoItem
+            label={t("studentForm.labels.shirtSize")}
+            value={student.shirt_size}
           />
         </Grid>
       ) : (
@@ -210,6 +229,66 @@ export default function EditablePersonalInfo({
               multiline
               rows={2}
             />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <TextField
+              fullWidth
+              size="small"
+              select
+              label={t("staffForm.gender")}
+              value={formData.gender}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  gender: Number(e.target.value),
+                })
+              }
+            >
+              {Gender.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {t(`gender.${option.label}`)}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <TextField
+              fullWidth
+              size="small"
+              label={t("studentForm.labels.height")}
+              type="number"
+              value={formData.height}
+              onChange={(e) =>
+                setFormData({ ...formData, height: e.target.value })
+              }
+              slotProps={{
+                htmlInput: {
+                  step: "0.01",
+                  min: "0",
+                },
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <TextField
+              fullWidth
+              size="small"
+              select
+              label={t("studentForm.labels.shirtSize")}
+              value={formData.shirt_size}
+              onChange={(e) =>
+                setFormData({ ...formData, shirt_size: e.target.value })
+              }
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {ShirtSize.map((size) => (
+                <MenuItem key={size} value={size}>
+                  {size}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
         </Grid>
       )}

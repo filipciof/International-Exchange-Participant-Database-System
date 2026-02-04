@@ -33,7 +33,8 @@
     "update": "Zaktualizuj",
     "adding": "Dodawanie...",
     "updating": "Aktualizowanie...",
-    "edit": "Edytuj"
+    "edit": "Edytuj",
+    "personalInfo": "Dane osobowe"
   },
   "gender": {
     "gender": "Płeć",
@@ -290,7 +291,9 @@
       "noHostFamilies": "Brak przypisanych rodzin goszczących.",
       "family": "Rodzina",
       "unknownFamily": "Nieznana rodzina",
-      "noDocuments": "Brak przesłanych dokumentów."
+      "noDocuments": "Brak przesłanych dokumentów.",
+      "height": "Wzrost",
+      "shirtSize": "Rozmiar koszulki"
     }
   },
   "staff": {
@@ -302,14 +305,14 @@
     "tabs": {
       "all": "Wszystko",
       "club": "Klub",
-      "contact": "Kontakt",
+      "personalInfo": "Dane osobowe",
       "account": "Konto",
       "documents": "Dokumenty",
       "notes": "Notatki"
     },
     "steps": {
       "club": "Informacje o klubie",
-      "contact": "Dane kontaktowe",
+      "personalInfo": "Dane osobowe",
       "account": "Konto użytkownika",
       "additionalInfo": "Dodatkowe informacje"
     }
@@ -398,12 +401,12 @@
     "profile": "Profil wizytówki",
     "tabs": {
       "all": "Wszystko",
-      "contact": "Kontakt",
+      "personalInfo": "Dane osobowe",
       "location": "Lokalizacja",
       "notes": "Notatki"
     },
     "steps": {
-      "contact": "Dane kontaktowe",
+      "personalInfo": "Dane osobowe",
       "location": "Lokalizacja",
       "program": "Udział w programach",
       "additionalInfo": "Dodatkowe informacje"

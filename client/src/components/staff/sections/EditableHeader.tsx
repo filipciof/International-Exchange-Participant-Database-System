@@ -7,16 +7,20 @@ import {
   Typography,
   IconButton,
   TextField,
-  MenuItem,
   Grid,
   Button,
 } from "@mui/material";
-import { Edit as EditIcon, Save, Close, CloudUpload as CloudUploadIcon } from "@mui/icons-material";
+import {
+  Edit as EditIcon,
+  Save,
+  Close,
+  CloudUpload as CloudUploadIcon,
+} from "@mui/icons-material";
 import type { Staff } from "../../../utils/types";
-import { Gender } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
+import { useTranslation } from "react-i18next";
 
 type EditableHeaderProps = {
   staff: Staff;
@@ -31,13 +35,14 @@ export default function EditableHeader({
   isLoading,
   staffId,
 }: EditableHeaderProps) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
+
   const [formData, setFormData] = useState({
     first_name: staff.first_name || "",
     middle_name: staff.middle_name || "",
     last_name: staff.last_name || "",
-    gender: staff.gender,
   });
 
   const updateMutation = useMutation({
@@ -51,15 +56,11 @@ export default function EditableHeader({
         }
       });
       const url = staffId ? `/staff/${staffId}/` : `/staff/?me=true`;
-      const response = await axiosClient.patch(
-        url,
-        formDataToSend,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await axiosClient.patch(url, formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return response.data;
     },
     onSuccess: () => {
@@ -78,13 +79,16 @@ export default function EditableHeader({
       first_name: staff.first_name || "",
       middle_name: staff.middle_name || "",
       last_name: staff.last_name || "",
-      gender: staff.gender,
     });
     setPhoto(null);
     setIsEditing(false);
   };
 
-  const fullName = [formData.first_name, formData.middle_name, formData.last_name]
+  const fullName = [
+    formData.first_name,
+    formData.middle_name,
+    formData.last_name,
+  ]
     .filter(Boolean)
     .join(" ");
 
@@ -157,14 +161,6 @@ export default function EditableHeader({
               >
                 {fullName}
               </Typography>
-              {staff.gender_name && (
-                <Typography
-                  variant="h6"
-                  sx={{ color: "rgba(255,255,255,0.9)", mb: 1 }}
-                >
-                  {staff.gender_name}
-                </Typography>
-              )}
             </Box>
           </Box>
         ) : (
@@ -195,7 +191,7 @@ export default function EditableHeader({
                   <TextField
                     fullWidth
                     size="small"
-                    label="First Name"
+                    label={t("staffForm.firstName")}
                     value={formData.first_name}
                     onChange={(e) =>
                       setFormData({ ...formData, first_name: e.target.value })
@@ -214,7 +210,7 @@ export default function EditableHeader({
                   <TextField
                     fullWidth
                     size="small"
-                    label="Middle Name"
+                    label={t("staffForm.middleName")}
                     value={formData.middle_name}
                     onChange={(e) =>
                       setFormData({ ...formData, middle_name: e.target.value })
@@ -233,7 +229,7 @@ export default function EditableHeader({
                   <TextField
                     fullWidth
                     size="small"
-                    label="Last Name"
+                    label={t("staffForm.lastName")}
                     value={formData.last_name}
                     onChange={(e) =>
                       setFormData({ ...formData, last_name: e.target.value })
@@ -248,35 +244,6 @@ export default function EditableHeader({
                     }}
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    select
-                    label="Gender"
-                    value={formData.gender}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        gender: Number(e.target.value),
-                      })
-                    }
-                    sx={{
-                      "& .MuiInputBase-root": { bgcolor: "white" },
-                      "& .MuiInputLabel-root": {
-                        bgcolor: "white",
-                        px: 0.5,
-                        borderRadius: 0.5,
-                      },
-                    }}
-                  >
-                    {Gender.map((gender) => (
-                      <MenuItem key={gender.value} value={gender.value}>
-                        {gender.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
                 <Grid size={{ xs: 12 }}>
                   <Button
                     variant="outlined"
@@ -285,7 +252,7 @@ export default function EditableHeader({
                     fullWidth
                     sx={{ bgcolor: "white" }}
                   >
-                    {photo ? photo.name : "Upload photo"}
+                    {photo ? photo.name : t("common.uploadPhoto")}
                     <input
                       type="file"
                       hidden
