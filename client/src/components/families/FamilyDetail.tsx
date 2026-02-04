@@ -1,26 +1,24 @@
+import { useState } from "react";
 import {
   Box,
   Card,
   CardContent,
   Typography,
-  Grid,
   IconButton,
   Stack,
+  Tabs,
+  Tab,
 } from "@mui/material";
-import {
-  ArrowBack,
-  LocationOn,
-  Business,
-} from "@mui/icons-material";
+import { ArrowBack } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
-import Section from "../Section";
-import InfoItem from "../InfoItem";
 import Loading from "../Loading";
+import EditableLocation from "./sections/EditableLocation";
 import EditableFamilyMembers from "./sections/EditableFamilyMembers";
 import EditableDocuments from "../EditableDocuments";
 import { useTranslation } from "react-i18next";
 import EditableNotes from "../EditableNotes";
+import EditableClubInfo from "../EditableClubInfo";
 
 type FamilyDetailProps = {
   id: number;
@@ -29,6 +27,7 @@ type FamilyDetailProps = {
 
 export default function FamilyDetail({ id, handleClose }: FamilyDetailProps) {
   const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState(0);
 
   const { data: family, isLoading: isFamilyLoading } = useQuery({
     queryKey: ["families", id],
@@ -91,55 +90,76 @@ export default function FamilyDetail({ id, handleClose }: FamilyDetailProps) {
         </CardContent>
       </Card>
 
+      {/* Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+        <Tabs
+          value={activeTab}
+          onChange={(_, newValue) => setActiveTab(newValue)}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
+          <Tab label={t("families.tabs.all")} />
+          <Tab label={t("families.tabs.club")} />
+          <Tab label={t("families.tabs.location")} />
+          <Tab label={t("families.tabs.members")} />
+          <Tab label={t("families.tabs.documents")} />
+          <Tab label={t("families.tabs.notes")} />
+        </Tabs>
+      </Box>
+
+      {/* All sections */}
+      {activeTab === 0 && (
+        <>
+          <EditableClubInfo
+            club={family.club}
+            endpoint={`/families/${family.id}/`}
+            queryKey="families"
+          />
+          <EditableLocation family={family} />
+          <EditableFamilyMembers familyId={family.id} />
+          <EditableDocuments ownerType="family" ownerId={family.id} />
+          <EditableNotes
+            notes={family.notes}
+            endpoint={`/families/${family.id}/`}
+            queryKey="families"
+            title={t("families.steps.additionalInfo")}
+            placeholder={t("notes.addFamilyNotes")}
+            noNotesText={t("notes.noNotes")}
+          />
+        </>
+      )}
+
       {/* Club Information */}
-      {family.club && (
-        <Section title={t("families.steps.club")} icon={<Business />}>
-          <Grid container spacing={3}>
-            <InfoItem
-              label={t("clubForm.country")}
-              value={family.club.country}
-            />
-            <InfoItem
-              label={t("clubForm.district")}
-              value={family.club.district}
-            />
-            <InfoItem
-              label={t("familyForm.club")}
-              value={family.club.name}
-              linkPath={`/clubs/?id=${family.club.id}&view=detail`}
-              fullWidth
-            />
-          </Grid>
-        </Section>
+      {activeTab === 1 && (
+        <EditableClubInfo
+          club={family.club}
+          endpoint={`/families/${family.id}/`}
+          queryKey="families"
+        />
       )}
 
       {/* Location Information */}
-      <Section title={t("families.steps.location")} icon={<LocationOn />}>
-        <Grid container spacing={3}>
-          <InfoItem label={t("familyForm.city")} value={family.city} />
-          <InfoItem
-            label={t("familyForm.address")}
-            value={family.address}
-            fullWidth
-          />
-        </Grid>
-      </Section>
+      {activeTab === 2 && <EditableLocation family={family} />}
 
       {/* Family Members */}
-      <EditableFamilyMembers familyId={family.id} />
+      {activeTab === 3 && <EditableFamilyMembers familyId={family.id} />}
 
       {/* Documents */}
-      <EditableDocuments ownerType="family" ownerId={family.id} />
+      {activeTab === 4 && (
+        <EditableDocuments ownerType="family" ownerId={family.id} />
+      )}
 
       {/* Notes */}
-      <EditableNotes
-        notes={family.notes}
-        endpoint={`/families/${family.id}/`}
-        queryKey="families"
-        title={t("families.steps.additionalInfo")}
-        placeholder={t("notes.addFamilyNotes")}
-        noNotesText={t("notes.noNotes")}
-      />
+      {activeTab === 5 && (
+        <EditableNotes
+          notes={family.notes}
+          endpoint={`/families/${family.id}/`}
+          queryKey="families"
+          title={t("families.steps.additionalInfo")}
+          placeholder={t("notes.addFamilyNotes")}
+          noNotesText={t("notes.noNotes")}
+        />
+      )}
     </Box>
   );
 }

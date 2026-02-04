@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import Loading from "../Loading";
 import EditableHeader from "./sections/EditableHeader";
-import EditableContactInfo from "./sections/EditableContactInfo";
+import EditableContactInfo from "../EditableContactInfo";
 import EditableClubInfo from "./sections/EditableClubInfo";
 import EditableNotes from "../EditableNotes";
 import EditableUserAccount from "./sections/EditableUserAccount";
@@ -100,7 +100,12 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
       {activeTab === 0 && (
         <>
           <EditableClubInfo staff={staff} staffId={id} />
-          <EditableContactInfo staff={staff} staffId={id} />
+          <EditableContactInfo
+            email={staff.email}
+            phone={staff.phone}
+            endpoint={`/staff/${id}/`}
+            queryKey="staff"
+          />
           <EditableUserAccount staff={staff} staffId={id} />
           <EditableNotes
             notes={staff.notes}
@@ -117,7 +122,12 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
       {activeTab === 1 && <EditableClubInfo staff={staff} staffId={id} />}
 
       {/* Contact Information */}
-      {activeTab === 2 && <EditableContactInfo staff={staff} staffId={id} />}
+      {activeTab === 2 && <EditableContactInfo
+            email={staff.email}
+            phone={staff.phone}
+            endpoint={`/staff/${id}/`}
+            queryKey="staff"
+          />}
 
       {/* User Account */}
       {activeTab === 3 && <EditableUserAccount staff={staff} staffId={id} />}

@@ -330,7 +330,12 @@
     "updateClub": "Zaktualizuj klub",
     "searchPlaceholder": "Wyszukaj kluby...",
     "profile": "Profil klubu",
-    "location": "Lokalizacja"
+    "location": "Lokalizacja",
+    "tabs": {
+      "all": "Wszystko",
+      "location": "Lokalizacja",
+      "documents": "Dokumenty"
+    }
   },
   "clubForm": {
     "clubName": "Nazwa klubu",
@@ -348,6 +353,14 @@
     "hostUpdateSuccess": "Rodzina goszcząca zaktualizowana pomyślnie!",
     "hostAddSuccess": "Rodzina goszcząca dodana pomyślnie!",
     "profile": "Profil rodziny",
+    "tabs": {
+      "all": "Wszystko",
+      "club": "Klub",
+      "location": "Lokalizacja",
+      "members": "Członkowie",
+      "documents": "Dokumenty",
+      "notes": "Notatki"
+    },
     "steps": {
       "club": "Informacje o klubie",
       "location": "Lokalizacja",
@@ -383,6 +396,12 @@
     "family-to-family": "family-to-family",
     "camp": "obozy",
     "profile": "Profil wizytówki",
+    "tabs": {
+      "all": "Wszystko",
+      "contact": "Kontakt",
+      "location": "Lokalizacja",
+      "notes": "Notatki"
+    },
     "steps": {
       "contact": "Dane kontaktowe",
       "location": "Lokalizacja",

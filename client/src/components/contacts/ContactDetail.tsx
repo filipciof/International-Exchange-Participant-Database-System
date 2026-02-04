@@ -1,27 +1,24 @@
+import { useState } from "react";
 import {
   Box,
   Card,
   CardContent,
   Typography,
-  Grid,
   Avatar,
   Chip,
   IconButton,
   Stack,
+  Tabs,
+  Tab,
 } from "@mui/material";
-import {
-  LocationOn,
-  ContactPhone,
-  ArrowBack,
-  School,
-} from "@mui/icons-material";
+import { ArrowBack } from "@mui/icons-material";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
-import Section from "../Section";
-import InfoItem from "../InfoItem";
 import Loading from "../Loading";
 import { useTranslation } from "react-i18next";
 import EditableNotes from "../EditableNotes";
+import EditableContactInfo from "../EditableContactInfo";
+import EditableLocation from "./EditableLocation";
 
 type ContactDetailProps = {
   id: number;
@@ -30,6 +27,7 @@ type ContactDetailProps = {
 
 export default function ContactDetail({ id, handleClose }: ContactDetailProps) {
   const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState(0);
 
   const { data: contact, isLoading: isContactLoading } = useQuery({
     queryKey: ["contacts", id],
@@ -155,103 +153,66 @@ export default function ContactDetail({ id, handleClose }: ContactDetailProps) {
         </CardContent>
       </Card>
 
-      {/* Contact Information */}
-      <Section title={t("contacts.steps.contact")} icon={<ContactPhone />}>
-        <Grid container spacing={3}>
-          <InfoItem
-            label={t("contactForm.email")}
-            value={contact.email}
-            fullWidth
+      {/* Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+        <Tabs
+          value={activeTab}
+          onChange={(_, newValue) => setActiveTab(newValue)}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
+          <Tab label={t("contacts.tabs.all")} />
+          <Tab label={t("contacts.tabs.contact")} />
+          <Tab label={t("contacts.tabs.location")} />
+          <Tab label={t("contacts.tabs.notes")} />
+        </Tabs>
+      </Box>
+
+      {/* All sections */}
+      {activeTab === 0 && (
+        <>
+          <EditableContactInfo
+            email={contact.email}
+            phone={contact.phone}
+            endpoint={`/contacts/${id}/`}
+            queryKey="contacts"
           />
-          <InfoItem label={t("contactForm.phone")} value={contact.phone} />
-        </Grid>
-      </Section>
+          <EditableLocation contact={contact} />
+          <EditableNotes
+            notes={contact.notes}
+            endpoint={`/contacts/${contact.id}/`}
+            queryKey="contacts"
+            title={t("contacts.steps.additionalInfo")}
+            placeholder={t("notes.addContactNotes")}
+            noNotesText={t("notes.noNotes")}
+          />
+        </>
+      )}
+
+      {/* Contact Information */}
+      {activeTab === 1 && (
+        <EditableContactInfo
+          email={contact.email}
+          phone={contact.phone}
+          endpoint={`/contacts/${id}/`}
+          queryKey="contacts"
+        />
+      )}
 
       {/* Location Information */}
-      <Section title={t("contacts.steps.location")} icon={<LocationOn />}>
-        <Grid container spacing={3}>
-          <InfoItem label={t("clubForm.country")} value={contact.country} />
-          {contact.districts.length > 0 && (
-            <Grid size={{ xs: 12 }}>
-              <Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ fontWeight: 600 }}
-                >
-                  {t("contactForm.districts")}
-                </Typography>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  flexWrap="wrap"
-                  gap={1}
-                  sx={{ mt: 1 }}
-                >
-                  {contact.districts.map((district: number) => (
-                    <Chip
-                      key={district}
-                      label={district}
-                      size="small"
-                      variant="outlined"
-                    />
-                  ))}
-                </Stack>
-              </Box>
-            </Grid>
-          )}
-        </Grid>
-      </Section>
-
-      {/* Program Participation */}
-      <Section title={t("contacts.steps.program")} icon={<School />}>
-        <Grid container spacing={3}>
-          <Grid size={{ xs: 12 }}>
-            <Box sx={{ p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
-              <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-                {contact.is_longterm && (
-                  <Chip
-                    label={t("contacts.longterm")}
-                    color="primary"
-                    size="medium"
-                  />
-                )}
-                {contact.is_family_to_family && (
-                  <Chip
-                    label={t("contacts.family-to-family")}
-                    color="secondary"
-                    size="medium"
-                  />
-                )}
-                {contact.is_camp && (
-                  <Chip
-                    label={t("contacts.camp")}
-                    color="success"
-                    size="medium"
-                  />
-                )}
-                {!contact.is_longterm &&
-                  !contact.is_family_to_family &&
-                  !contact.is_camp && (
-                    <Typography variant="body2" color="text.secondary">
-                      {t("contacts.noPrograms")}
-                    </Typography>
-                  )}
-              </Stack>
-            </Box>
-          </Grid>
-        </Grid>
-      </Section>
+      {activeTab === 2 && <EditableLocation contact={contact} />}
 
       {/* Notes */}
-      <EditableNotes
-        notes={contact.notes}
-        endpoint={`/contacts/${contact.id}/`}
-        queryKey="contacts"
-        title={t("contacts.steps.additionalInfo")}
-        placeholder={t("notes.addContactNotes")}
-        noNotesText={t("notes.noNotes")}
-      />
+      {activeTab === 3 && (
+        <EditableNotes
+          notes={contact.notes}
+          endpoint={`/contacts/${contact.id}/`}
+          queryKey="contacts"
+          title={t("contacts.steps.additionalInfo")}
+          placeholder={t("notes.addContactNotes")}
+          noNotesText={t("notes.noNotes")}
+        />
+      )}
     </Box>
   );
 }

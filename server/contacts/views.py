@@ -160,7 +160,7 @@ class ContactView(APIView):
 
         contact = serializer.save()
 
-        id_districts = data.getlist("id_districts[]", None)
+        id_districts = data.get("id_districts", None)
         if id_districts is not None:
             ContactDistrict.objects.filter(id_contact=contact).delete()
 

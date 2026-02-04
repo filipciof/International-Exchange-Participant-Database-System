@@ -330,7 +330,12 @@
     "updateClub": "Update Club",
     "searchPlaceholder": "Search clubs...",
     "profile": "Club Profile",
-    "location": "Location"
+    "location": "Location",
+    "tabs": {
+      "all": "All",
+      "location": "Location",
+      "documents": "Documents"
+    }
   },
   "clubForm": {
     "clubName": "Club Name",
@@ -348,6 +353,14 @@
     "hostUpdateSuccess": "Host families updated successfully!",
     "hostAddSuccess": "Host family added successfully",
     "profile": "Family Profile",
+    "tabs": {
+      "all": "All",
+      "club": "Club",
+      "location": "Location",
+      "members": "Members",
+      "documents": "Documents",
+      "notes": "Notes"
+    },
     "steps": {
       "club": "Club Information",
       "location": "Location",
@@ -383,6 +396,12 @@
     "family-to-family": "family-to-family",
     "camp": "camp",
     "profile": "Contact Profile",
+    "tabs": {
+      "all": "All",
+      "contact": "Contact",
+      "location": "Location",
+      "notes": "Notes"
+    },
     "steps": {
       "contact": "Contact Information",
       "location": "Location",

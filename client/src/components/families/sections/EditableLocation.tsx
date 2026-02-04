@@ -1,44 +1,37 @@
 import { useState } from "react";
 import { Box, Grid, IconButton, TextField } from "@mui/material";
-import {
-  Edit as EditIcon,
-  Save,
-  Close,
-  ContactPhone,
-} from "@mui/icons-material";
-import type { Staff } from "../../../utils/types";
+import { Edit as EditIcon, Save, Close, LocationOn } from "@mui/icons-material";
 import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
 import Section from "../../Section";
 import InfoItem from "../../InfoItem";
 import { useTranslation } from "react-i18next";
+import type { Family } from "../../../utils/types";
 
-type EditableContactInfoProps = {
-  staff: Staff;
-  staffId?: number;
+type EditableLocationProps = {
+  family: Family;
 };
 
-export default function EditableContactInfo({
-  staff,
-  staffId,
-}: EditableContactInfoProps) {
+export default function EditableLocation({ family }: EditableLocationProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
 
   const [formData, setFormData] = useState({
-    email: staff.email || "",
-    phone: staff.phone || "",
+    city: family.city || "",
+    address: family.address || "",
   });
 
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const url = staffId ? `/staff/${staffId}/` : `/staff/?me=true`;
-      const response = await axiosClient.patch(url, data);
+      const response = await axiosClient.patch(
+        `/families/${family.id}/`,
+        data
+      );
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["staff"] });
+      queryClient.invalidateQueries({ queryKey: ["families"] });
       setIsEditing(false);
     },
   });
@@ -49,8 +42,8 @@ export default function EditableContactInfo({
 
   const handleCancel = () => {
     setFormData({
-      email: staff.email || "",
-      phone: staff.phone || "",
+      city: family.city || "",
+      address: family.address || "",
     });
     setIsEditing(false);
   };
@@ -81,14 +74,18 @@ export default function EditableContactInfo({
 
   return (
     <Section
-      title={t("staff.steps.contact")}
-      icon={<ContactPhone />}
+      title={t("families.steps.location")}
+      icon={<LocationOn />}
       actions={actions}
     >
       {!isEditing ? (
         <Grid container spacing={3}>
-          <InfoItem label={t("staffForm.email")} value={staff.email} fullWidth />
-          <InfoItem label={t("staffForm.phone")} value={staff.phone} />
+          <InfoItem label={t("familyForm.city")} value={formData.city} />
+          <InfoItem
+            label={t("familyForm.address")}
+            value={formData.address}
+            fullWidth
+          />
         </Grid>
       ) : (
         <Grid container spacing={2}>
@@ -96,22 +93,21 @@ export default function EditableContactInfo({
             <TextField
               fullWidth
               size="small"
-              label={t("staffForm.email")}
-              type="email"
-              value={formData.email}
+              label={t("familyForm.city")}
+              value={formData.city}
               onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
+                setFormData({ ...formData, city: e.target.value })
               }
             />
           </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid size={{ xs: 12 }}>
             <TextField
               fullWidth
               size="small"
-              label={t("staffForm.phone")}
-              value={formData.phone}
+              label={t("familyForm.address")}
+              value={formData.address}
               onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
+                setFormData({ ...formData, address: e.target.value })
               }
             />
           </Grid>
