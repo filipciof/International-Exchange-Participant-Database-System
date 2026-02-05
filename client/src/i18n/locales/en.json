@@ -93,6 +93,7 @@
     "club_officer": "Club Officer",
     "kwm_officer": "KWM Officer",
     "onlyAdmin": "Only admins can change groups.",
+    "student": "Student",
     "denyAccess": "Access denied!"
   },
   "navigation": {

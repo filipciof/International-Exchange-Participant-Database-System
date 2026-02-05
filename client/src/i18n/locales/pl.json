@@ -75,9 +75,10 @@
     "noGroups": "Brak przypisanych grup.",
     "admin": "Admin",
     "correspondent": "Korespondent",
-    "clubOfficer": "Oficer klubowy",
-    "kwmOfficer": "Oficer KWM",
-    "onlyAdmin": "Tylko adminowie mogą zmieniać grupy."
+    "club_officer": "Oficer klubowy",
+    "kwm_officer": "Oficer KWM",
+    "onlyAdmin": "Tylko adminowie mogą zmieniać grupy.",
+    "student": "Uczestnik"
   },
   "notes": {
     "noNotes": "Brak notatek.",

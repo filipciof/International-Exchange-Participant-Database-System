@@ -123,6 +123,12 @@ export default function SignIn() {
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("userGroups", userGroups);
       localStorage.setItem("userEmail", userEmail);
+
+      const groups: string[] = response.data["user"]["groups"];
+      if (groups.length > 0) {
+        localStorage.setItem("activeGroup", groups[0]);
+      }
+
       navigate("/");
     } catch (err) {
       setLoading(false);

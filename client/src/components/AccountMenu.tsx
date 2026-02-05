@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import axiosClient from "../utils/axiosClient";
 import LanguageSwitcher from "./LanguageSwitcher";
+import GroupSwitcher from "./GroupSwitcher";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 type AccountMenuProps = {
@@ -64,6 +65,10 @@ export default function AccountMenu({ setLoading }: AccountMenuProps) {
         horizontal: "right",
       }}
     >
+      <MenuItem disableRipple sx={{ "&:hover": { backgroundColor: "transparent" } }}>
+        <GroupSwitcher />
+      </MenuItem>
+      <Divider />
       <MenuItem disableRipple sx={{ "&:hover": { backgroundColor: "transparent" } }}>
         <LanguageSwitcher />
       </MenuItem>
