@@ -78,7 +78,8 @@
     "club_officer": "Oficer klubowy",
     "kwm_officer": "Oficer KWM",
     "onlyAdmin": "Tylko adminowie mogą zmieniać grupy.",
-    "student": "Uczestnik"
+    "student": "Uczestnik",
+    "denyAccess": "Odmowa dostępu!"
   },
   "notes": {
     "noNotes": "Brak notatek.",
@@ -117,8 +118,7 @@
     "forgotPassword": "Zapomniałeś hasła?",
     "invalidCredentials": "Nieprawidłowe dane logowania",
     "emailError": "Proszę podać prawidłowy adres email.",
-    "passwordError": "Hasło musi mieć co najmniej 5 znaków.",
-    "denyAccess": "Odmowa dostępu!"
+    "passwordError": "Hasło musi mieć co najmniej 5 znaków."
   },
   "forgotPassword": {
     "title": "Zresetuj hasło",

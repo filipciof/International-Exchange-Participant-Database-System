@@ -5,11 +5,11 @@ import useTokenRefresh from "../hooks/useTokenRefresh";
 import { useTranslation } from "react-i18next";
 
 type ProtectedRouteProps = PropsWithChildren & {
-  allowedGroups?: string[];
+  hasPermission?: boolean;
 };
 
 export default function ProtectedRoute({
-  allowedGroups,
+  hasPermission,
   children,
 }: ProtectedRouteProps) {
   const { t } = useTranslation();
@@ -21,21 +21,8 @@ export default function ProtectedRoute({
     return <Navigate to={"/sign-in"} />;
   }
 
-  if (!allowedGroups) {
-    return children;
-  }
-
-  const userGroupsWrapper = localStorage.getItem("userGroups");
-  let userGroups: string[] = [];
-
-  if (userGroupsWrapper) {
-    userGroups = JSON.parse(userGroupsWrapper);
-  }
-
-  const hasAccess = allowedGroups?.some((group) => userGroups?.includes(group));
-
-  if (!hasAccess) {
-    return <Typography>{t("auth.denyAccess")}</Typography>;
+  if (hasPermission === false) {
+    return <Typography>{t("account.denyAccess")}</Typography>;
   }
 
   return children;

@@ -13,8 +13,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-
-const allowedGroups = ["admin", "correspondent", "club_officer", "kwm_officer"];
+import usePermissions from "../hooks/usePermissions";
 
 interface MenuItem {
   text: string;
@@ -26,41 +25,30 @@ export default function SideBarList() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  const permissions = usePermissions();
 
   const getMenuItems = (): MenuItem[] => {
-    const userGroupsWrapper = localStorage.getItem("userGroups");
-    let userGroups: string[] = [];
+    const items: MenuItem[] = [
+      { text: t("navigation.home"), icon: <PersonIcon />, path: "/" },
+    ];
 
-    if (userGroupsWrapper) {
-      userGroups = JSON.parse(userGroupsWrapper);
+    if (permissions.canViewStudents) {
+      items.push({ text: t("navigation.students"), icon: <SchoolIcon />, path: "/students" });
+    }
+    if (permissions.canViewStaff) {
+      items.push({ text: t("navigation.staff"), icon: <WorkIcon />, path: "/staff" });
+    }
+    if (permissions.canViewClubs) {
+      items.push({ text: t("navigation.clubs"), icon: <GroupsIcon />, path: "/clubs" });
+    }
+    if (permissions.canViewFamilies) {
+      items.push({ text: t("navigation.families"), icon: <HouseIcon />, path: "/families" });
+    }
+    if (permissions.canViewContacts) {
+      items.push({ text: t("navigation.contacts"), icon: <ContactPageIcon />, path: "/contacts" });
     }
 
-    for (let group of userGroups) {
-      if (allowedGroups.includes(group)) {
-        return [
-          { text: t("navigation.home"), icon: <PersonIcon />, path: "/" },
-          {
-            text: t("navigation.students"),
-            icon: <SchoolIcon />,
-            path: "/students",
-          },
-          { text: t("navigation.staff"), icon: <WorkIcon />, path: "/staff" },
-          { text: t("navigation.clubs"), icon: <GroupsIcon />, path: "/clubs" },
-          {
-            text: t("navigation.families"),
-            icon: <HouseIcon />,
-            path: "/families",
-          },
-          {
-            text: t("navigation.contacts"),
-            icon: <ContactPageIcon />,
-            path: "/contacts",
-          },
-        ];
-      }
-    }
-
-    return [{ text: t("navigation.home"), icon: <PersonIcon />, path: "/" }];
+    return items;
   };
 
   return (

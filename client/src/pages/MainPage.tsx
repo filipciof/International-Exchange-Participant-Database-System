@@ -13,6 +13,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { appBarHeight, drawerWidth } from "../utils/constants";
 import Loading from "../components/Loading";
 import AccountMenu from "../components/AccountMenu";
+import usePermissions from "../hooks/usePermissions";
 
 export default function MainPage() {
   const [open, setOpen] = useState(false);
@@ -23,15 +24,14 @@ export default function MainPage() {
     setOpen(newOpen);
   };
 
-  const userGroups = localStorage.getItem("userGroups");
-  const isStudent = userGroups?.includes("student");
+  const { canViewSidebar } = usePermissions();
 
   return (
     <Box>
       <Box>
         <AppBar position="fixed">
           <Toolbar>
-            {!isStudent && (
+            {canViewSidebar && (
               <IconButton
                 size="large"
                 edge="start"
@@ -54,7 +54,7 @@ export default function MainPage() {
         </AppBar>
       </Box>
 
-      {!isStudent && (
+      {canViewSidebar && (
         <Box
           sx={{
             position: "fixed",
@@ -75,8 +75,8 @@ export default function MainPage() {
           ml: {
             xs: 0,
             sm: 0,
-            md: !isStudent ? `${drawerWidth + 32}px` : "32px",
-            lg: !isStudent ? `${drawerWidth + 64}px` : "64px",
+            md: canViewSidebar ? `${drawerWidth + 32}px` : "32px",
+            lg: canViewSidebar ? `${drawerWidth + 64}px` : "64px",
           },
           mr: { xs: 0, sm: 0, md: "32px", lg: "64px" },
           flexGrow: 1,
@@ -86,7 +86,7 @@ export default function MainPage() {
         {loading ? <Loading /> : <Outlet key={(location.state as { key?: number })?.key} />}
       </Box>
 
-      {!isStudent && (
+      {canViewSidebar && (
         <Drawer
           sx={{
             "& .MuiDrawer-paper": {

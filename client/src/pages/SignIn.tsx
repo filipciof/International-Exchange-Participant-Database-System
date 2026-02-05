@@ -17,6 +17,7 @@ import axiosClient from "../utils/axiosClient";
 import { Navigate, useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
 import { useTranslation } from "react-i18next";
+import { setActiveGroup } from "../hooks/usePermissions";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -126,7 +127,7 @@ export default function SignIn() {
 
       const groups: string[] = response.data["user"]["groups"];
       if (groups.length > 0) {
-        localStorage.setItem("activeGroup", groups[0]);
+        setActiveGroup(groups[0]);
       }
 
       navigate("/");

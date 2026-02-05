@@ -21,6 +21,7 @@ import { clubSchema } from "../../utils/types";
 import axiosClient from "../../utils/axiosClient";
 import { handleValidationErrors } from "../../utils/handleValidationErrors";
 import { useTranslation } from "react-i18next";
+import usePermissions from "../../hooks/usePermissions";
 
 type ClubFormProps = {
   title: string;
@@ -51,10 +52,8 @@ export default function ClubForm({
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [selectedCountry, setSelectedCountry] = useState<number | null>(null);
 
-  // Check if user is admin - non-admins cannot create home country clubs
-  const userGroups = JSON.parse(localStorage.getItem("userGroups") || "[]");
-  const isAdmin = userGroups.includes("admin");
-  const availableCountries = isAdmin
+  const { canCreateHomeCountryClubs } = usePermissions();
+  const availableCountries = canCreateHomeCountryClubs
     ? countries
     : countries.filter((c) => !c.is_home_country);
 

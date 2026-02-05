@@ -15,10 +15,11 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import UserProfile from "./pages/UserProfile";
 import Contacts from "./pages/Contacts";
 import Staff from "./pages/Staff";
-
-const allowedGroups = ["admin", "correspondent", "club_officer", "kwm_officer"];
+import usePermissions from "./hooks/usePermissions";
 
 function App() {
+  const permissions = usePermissions();
+
   return (
     <>
       <BrowserRouter>
@@ -37,7 +38,7 @@ function App() {
             <Route
               path="students"
               element={
-                <ProtectedRoute allowedGroups={allowedGroups}>
+                <ProtectedRoute hasPermission={permissions.canViewStudents}>
                   <Students />
                 </ProtectedRoute>
               }
@@ -45,7 +46,7 @@ function App() {
             <Route
               path="staff"
               element={
-                <ProtectedRoute allowedGroups={allowedGroups}>
+                <ProtectedRoute hasPermission={permissions.canViewStaff}>
                   <Staff />
                 </ProtectedRoute>
               }
@@ -53,7 +54,7 @@ function App() {
             <Route
               path="clubs"
               element={
-                <ProtectedRoute allowedGroups={allowedGroups}>
+                <ProtectedRoute hasPermission={permissions.canViewClubs}>
                   <Clubs />
                 </ProtectedRoute>
               }
@@ -61,7 +62,7 @@ function App() {
             <Route
               path="families"
               element={
-                <ProtectedRoute allowedGroups={allowedGroups}>
+                <ProtectedRoute hasPermission={permissions.canViewFamilies}>
                   <Families />
                 </ProtectedRoute>
               }
@@ -69,7 +70,7 @@ function App() {
             <Route
               path="contacts"
               element={
-                <ProtectedRoute allowedGroups={allowedGroups}>
+                <ProtectedRoute hasPermission={permissions.canViewContacts}>
                   <Contacts />
                 </ProtectedRoute>
               }

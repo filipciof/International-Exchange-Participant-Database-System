@@ -2,20 +2,17 @@ import { useTranslation } from "react-i18next";
 import { MenuItem, Select, Box, Typography } from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material";
 import GroupsIcon from "@mui/icons-material/Groups";
-import { useNavigate, useLocation } from "react-router-dom";
+import usePermissions, { setActiveGroup } from "../hooks/usePermissions";
 
 export default function GroupSwitcher() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { group: activeGroup } = usePermissions();
 
   const raw = localStorage.getItem("userGroups");
   const userGroups: string[] = raw ? JSON.parse(raw) : [];
-  const activeGroup = localStorage.getItem("activeGroup") || userGroups[0] || "";
 
   const handleChange = (event: SelectChangeEvent) => {
-    localStorage.setItem("activeGroup", event.target.value);
-    navigate(location.pathname, { state: { key: Date.now() } });
+    setActiveGroup(event.target.value);
   };
 
   return (

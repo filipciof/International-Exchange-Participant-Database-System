@@ -27,6 +27,7 @@ import queryClient from "../../../utils/queryClient";
 import Section from "../../Section";
 import InfoItem from "../../InfoItem";
 import { useTranslation } from "react-i18next";
+import usePermissions from "../../../hooks/usePermissions";
 
 type EditableUserAccountProps = {
   staff: Staff;
@@ -51,13 +52,7 @@ export default function EditableUserAccount({
   const hasUserAccount = Boolean(staff.user_email);
   const effectiveStaffId = staffId || staff.id;
 
-  // Check if current user is admin
-  const userGroupsWrapper = localStorage.getItem("userGroups");
-  const userGroups: string[] = userGroupsWrapper
-    ? JSON.parse(userGroupsWrapper)
-    : [];
-  const isAdmin =
-    userGroups.includes("admin") || userGroups.includes("correspondent");
+  const { canAssignGroups } = usePermissions();
 
   const createMutation = useMutation({
     mutationFn: async (data: {
@@ -107,7 +102,7 @@ export default function EditableUserAccount({
       } = {};
       if (formData.email) updateData.email = formData.email;
       if (formData.password) updateData.password = formData.password;
-      if (formData.groups.length > 0 && isAdmin)
+      if (formData.groups.length > 0 && canAssignGroups)
         updateData.groups = formData.groups;
       updateMutation.mutate(updateData);
     } else {
@@ -274,7 +269,7 @@ export default function EditableUserAccount({
           <FormControl
             fullWidth
             required={!hasUserAccount}
-            disabled={isLoading || (hasUserAccount && !isAdmin)}
+            disabled={isLoading || (hasUserAccount && !canAssignGroups)}
           >
             <InputLabel id="group-select-label">
               {t("account.groups")}
@@ -311,7 +306,7 @@ export default function EditableUserAccount({
                 {t("account.kwm_officer")}
               </MenuItem>
             </Select>
-            {hasUserAccount && !isAdmin && (
+            {hasUserAccount && !canAssignGroups && (
               <Box
                 sx={{
                   fontSize: "0.75rem",

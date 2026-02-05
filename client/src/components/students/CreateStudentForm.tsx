@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,33 +23,19 @@ import type {
   Club,
   Country,
   District,
+  Staff,
 } from "../../utils/types";
 import { createStudentSchema } from "../../utils/types";
 import axiosClient from "../../utils/axiosClient";
 import { handleValidationErrors } from "../../utils/handleValidationErrors";
 import { useTranslation } from "react-i18next";
+import usePermissions from "../../hooks/usePermissions";
 
 type CreateStudentFormProps = {
   title: string;
   handleClose: () => void;
   submitButtonText?: string;
 };
-
-function getIsInboundDefault(): { value: boolean; locked: boolean } {
-  const raw = localStorage.getItem("userGroups");
-  const groups: string[] = raw ? JSON.parse(raw) : [];
-
-  if (groups.includes("admin")) {
-    return { value: true, locked: false };
-  }
-  if (groups.includes("correspondent") || groups.includes("kwm_officer")) {
-    return { value: true, locked: true };
-  }
-  if (groups.includes("club_officer")) {
-    return { value: false, locked: true };
-  }
-  return { value: true, locked: false };
-}
 
 export default function CreateStudentForm({
   title,
@@ -64,7 +50,11 @@ export default function CreateStudentForm({
   const [selectedCountry, setSelectedCountry] = useState<number | null>(null);
   const [selectedDistrict, setSelectedDistrict] = useState<number | null>(null);
 
-  const inboundConfig = useMemo(() => getIsInboundDefault(), []);
+  const { canToggleIsInbound, defaultIsInbound, hasLockedSendingClub } = usePermissions();
+  const inboundConfig = useMemo(() => ({
+    value: defaultIsInbound,
+    locked: !canToggleIsInbound,
+  }), [canToggleIsInbound, defaultIsInbound]);
 
   const {
     control,
@@ -72,6 +62,7 @@ export default function CreateStudentForm({
     formState: { errors },
     reset,
     setValue,
+    watch,
   } = useForm<CreateStudentFormData>({
     resolver: zodResolver(createStudentSchema),
     defaultValues: {
@@ -82,6 +73,31 @@ export default function CreateStudentForm({
       is_inbound: inboundConfig.value,
     },
   });
+
+  const isInbound = watch("is_inbound");
+
+  useEffect(() => {
+    setValue("is_inbound", inboundConfig.value);
+  }, [inboundConfig.value, setValue]);
+
+  // Fetch current staff member's club when hasLockedSendingClub is true
+  const { data: currentStaff } = useQuery<Staff>({
+    queryKey: ["staff", "me"],
+    queryFn: async () => {
+      const response = await axiosClient.get("/staff/?me=true");
+      return response.data;
+    },
+    enabled: hasLockedSendingClub,
+  });
+
+  // Pre-populate club fields when staff data is available and club is locked
+  useEffect(() => {
+    if (hasLockedSendingClub && currentStaff?.club) {
+      setSelectedCountry(currentStaff.club.id_country);
+      setSelectedDistrict(currentStaff.club.id_district);
+      setValue("id_club", currentStaff.club.id);
+    }
+  }, [hasLockedSendingClub, currentStaff, setValue]);
 
   const mutation = useMutation({
     mutationFn: async (data: CreateStudentFormData) => {
@@ -102,6 +118,30 @@ export default function CreateStudentForm({
       return response.data;
     },
   });
+
+  // Filter countries based on is_inbound:
+  // Outbound students -> only home country
+  // Inbound students -> only foreign countries
+  const filteredCountries = useMemo(() => {
+    return countries.filter((c: Country) =>
+      isInbound ? !c.is_home_country : c.is_home_country
+    );
+  }, [countries, isInbound]);
+
+  // Reset country/district/club when is_inbound changes and current selection doesn't match
+  useEffect(() => {
+    if (selectedCountry !== null) {
+      const currentCountry = countries.find((c: Country) => c.id === selectedCountry);
+      if (currentCountry) {
+        const shouldBeHomeCountry = !isInbound;
+        if (currentCountry.is_home_country !== shouldBeHomeCountry) {
+          setSelectedCountry(null);
+          setSelectedDistrict(null);
+          setValue("id_club", undefined as any);
+        }
+      }
+    }
+  }, [isInbound, countries, selectedCountry, setValue]);
 
   const { data: districts = [], isLoading: isLoadingDistricts } = useQuery({
     queryKey: ["districts", selectedCountry],
@@ -212,7 +252,9 @@ export default function CreateStudentForm({
             <Stack direction={isMobile ? "column" : "row"} spacing={1}>
               <Autocomplete
                 value={
-                  countries.find((c: Country) => c.id === selectedCountry) ||
+                  (hasLockedSendingClub
+                    ? countries.find((c: Country) => c.id === selectedCountry)
+                    : filteredCountries.find((c: Country) => c.id === selectedCountry)) ||
                   null
                 }
                 onChange={(_event, newValue) => {
@@ -220,9 +262,10 @@ export default function CreateStudentForm({
                   setSelectedDistrict(null);
                   setValue("id_club", undefined as any);
                 }}
-                options={countries}
+                options={filteredCountries}
                 getOptionLabel={(option) => option.name}
                 loading={isLoadingCountries}
+                disabled={hasLockedSendingClub}
                 fullWidth
                 renderInput={(params) => (
                   <TextField
@@ -250,7 +293,9 @@ export default function CreateStudentForm({
               <Autocomplete
                 value={
                   districts.find((d: District) => d.id === selectedDistrict) ||
-                  null
+                  (hasLockedSendingClub && currentStaff?.club
+                    ? { id: currentStaff.club.id_district, number: currentStaff.club.district }
+                    : null)
                 }
                 onChange={(_event, newValue) => {
                   setSelectedDistrict(newValue?.id || null);
@@ -258,7 +303,7 @@ export default function CreateStudentForm({
                 }}
                 options={districts}
                 getOptionLabel={(option) => option.number.toString()}
-                disabled={!selectedCountry || isLoadingDistricts}
+                disabled={hasLockedSendingClub || !selectedCountry || isLoadingDistricts}
                 loading={isLoadingDistricts}
                 fullWidth
                 renderInput={(params) => (
@@ -290,14 +335,16 @@ export default function CreateStudentForm({
                 render={({ field }) => (
                   <Autocomplete
                     value={
-                      clubs.find((c: Club) => c.id === field.value) || null
+                      clubs.find((c: Club) => c.id === field.value) ||
+                      (hasLockedSendingClub && currentStaff?.club) ||
+                      null
                     }
                     onChange={(_event, newValue) => {
                       field.onChange(newValue?.id || undefined);
                     }}
                     options={clubs}
                     getOptionLabel={(option) => option.name}
-                    disabled={!selectedDistrict || isLoadingClubs}
+                    disabled={hasLockedSendingClub || !selectedDistrict || isLoadingClubs}
                     loading={isLoadingClubs}
                     fullWidth
                     renderInput={(params) => (
