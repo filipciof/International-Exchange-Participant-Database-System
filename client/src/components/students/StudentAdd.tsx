@@ -1,35 +1,17 @@
-import StudentForm from "./StudentForm";
-import type { StudentFormData, Country } from "../../utils/types";
 import { useTranslation } from "react-i18next";
+import CreateStudentForm from "./CreateStudentForm";
 
 type StudentAddProps = {
   handleClose: () => void;
-  handleAddStudent: (student: StudentFormData) => void;
-  isLoading: boolean;
-  isSuccess: boolean;
-  error: any | null;
-  countries: Country[];
 };
 
-export default function StudentAdd({
-  handleClose,
-  handleAddStudent,
-  isLoading,
-  isSuccess,
-  error,
-  countries,
-}: StudentAddProps) {
+export default function StudentAdd({ handleClose }: StudentAddProps) {
   const { t } = useTranslation();
 
   return (
-    <StudentForm
+    <CreateStudentForm
       title={t("students.newStudent")}
       handleClose={handleClose}
-      handleSubmit={handleAddStudent}
-      isLoading={isLoading}
-      isSuccess={isSuccess}
-      error={error}
-      countries={countries}
       submitButtonText={t("common.add")}
     />
   );

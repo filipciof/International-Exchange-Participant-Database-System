@@ -15,6 +15,7 @@ from .models import (
     Staff,
 )
 from django.contrib.auth import get_user_model
+from config.permissions.base import is_correspondent, is_kwm_officer, is_club_officer, is_club_from_home_country
 
 User = get_user_model()
 
@@ -119,6 +120,62 @@ class StudentSerializer(serializers.ModelSerializer):
         )
 
         return representation
+
+
+class CreateStudentSerializer(serializers.Serializer):
+    first_name = serializers.CharField(max_length=50)
+    last_name = serializers.CharField(max_length=50)
+    email = serializers.EmailField()
+    id_club = serializers.IntegerField()
+    is_inbound = serializers.BooleanField()
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email is already in use.")
+        return value
+
+    def validate_id_club(self, value):
+        if not Club.objects.filter(id=value, is_active=True).exists():
+            raise serializers.ValidationError("Club does not exist.")
+        return value
+
+    def validate(self, attrs):
+        user = self.context.get("user")
+
+        club = Club.objects.select_related("id_district__id_country").get(
+            id=attrs["id_club"], is_active=True
+        )
+
+        if attrs.get("is_inbound") and is_club_from_home_country(club):
+            raise serializers.ValidationError(
+                {"id_club": "Inbound students must have a foreign sending club."}
+            )
+
+        if not attrs.get("is_inbound") and not is_club_from_home_country(club):
+            raise serializers.ValidationError(
+                {"id_club": "Outbound students must have a home country sending club."}
+            )
+
+        if not user:
+            return attrs
+
+        if is_correspondent(user) or is_kwm_officer(user):
+            if not attrs.get("is_inbound"):
+                raise serializers.ValidationError(
+                    {"is_inbound": "Correspondents and KWM officers can only create inbound students."}
+                )
+        elif is_club_officer(user):
+            if attrs.get("is_inbound"):
+                raise serializers.ValidationError(
+                    {"is_inbound": "Club officers can only create outbound students."}
+                )
+            staff = getattr(user, "id_staff", None)
+            if staff and staff.id_club_id and attrs["id_club"] != staff.id_club_id:
+                raise serializers.ValidationError(
+                    {"id_club": "Club officers can only create students for their own club."}
+                )
+
+        return attrs
 
 
 class StudentUserAccountCreateSerializer(serializers.Serializer):

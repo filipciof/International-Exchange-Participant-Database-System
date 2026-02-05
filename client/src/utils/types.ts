@@ -122,6 +122,16 @@ export type StudentFormData = StudentFormInputs & {
   photo: File | null;
 };
 
+export const createStudentSchema = z.object({
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+  email: z.email().min(1, "Email is required"),
+  id_club: z.number().min(1, "Club is required"),
+  is_inbound: z.boolean(),
+});
+
+export type CreateStudentFormData = z.infer<typeof createStudentSchema>;
+
 export type ViewType = "list" | "add" | "update" | "delete" | "detail";
 
 export type Student = {

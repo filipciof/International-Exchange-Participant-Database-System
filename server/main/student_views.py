@@ -6,6 +6,7 @@ from typing import Any, Generator
 from django.http.response import HttpResponse, StreamingHttpResponse
 from .models import Student, GENDER_MAP, LANG_PROF_MAP
 from .serializers import (
+    CreateStudentSerializer,
     StudentSerializer,
     StudentUserAccountCreateSerializer,
     StudentUserAccountUpdateSerializer,
@@ -30,7 +31,8 @@ from rest_framework.status import (
 )
 from config.permissions.policy_permissions import StudentPermission
 from config.selectors.student import student_queryset_for
-from config.permissions.base import is_student, is_correspondent, is_kwm_officer, is_club_officer
+from config.permissions.base import is_admin, is_student, is_correspondent, is_kwm_officer, is_club_officer
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 User = get_user_model()
@@ -379,60 +381,55 @@ class StudentView(APIView):
         return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
-        from .models import Exchange
+        from .models import Club, Exchange
 
-        if is_student(request.user):
-            existing_student = Student.objects.filter(
-                id_user=request.user, is_active=True
-            ).first()
-            if existing_student:
-                return Response(
-                    {"message": "You already have a student profile."},
-                    status=HTTP_400_BAD_REQUEST,
-                )
-
-        data = request.data.copy()
-
-        if is_student(request.user):
-            data["id_user"] = request.user.id
-
-        # Auto-set is_inbound based on creator role
-        if is_correspondent(request.user) or is_kwm_officer(request.user):
-            data["is_inbound"] = True
-        elif is_club_officer(request.user):
-            data["is_inbound"] = False
-
-        photo = request.FILES.get("photo")
-
-        if photo:
-            ext = os.path.splitext(photo.name)[1].lower() or ".bin"
-            target_name = f"{uuid4().hex}{ext}"
-            unique_name = default_storage.get_available_name(target_name)
-            photo.name = unique_name
-            data["photo"] = photo
-
-        serializer = StudentSerializer(data=data)
-
+        serializer = CreateStudentSerializer(
+            data=request.data, context={"user": request.user}
+        )
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        student = serializer.save()
+        data = serializer.validated_data
+        first_name = data["first_name"]
+        last_name = data["last_name"]
+        email = data["email"]
+        id_club = data["id_club"]
+        is_inbound = data["is_inbound"]
 
-        # Auto-create exchange for correspondent/kwm_officer/club_officer
-        if is_correspondent(request.user) or is_kwm_officer(request.user):
-            Exchange.objects.create(
-                id_student=student,
-                id_counsellor=request.user.id_staff,
+        club = Club.objects.get(id=id_club, is_active=True)
+
+        with transaction.atomic():
+            # 1. Create User with unusable password
+            user = User.objects.create_user(email=email, password=None)
+            user.set_unusable_password()
+            user.save(update_fields=["password"])
+            student_group = Group.objects.get(name="student")
+            user.groups.add(student_group)
+
+            # 2. Create Student linked to User
+            student = Student.objects.create(
+                id_user=user,
+                first_name=first_name,
+                last_name=last_name,
+                is_inbound=is_inbound,
                 is_active=True,
             )
-        elif is_club_officer(request.user):
-            Exchange.objects.create(
-                id_student=student,
-                id_sending_club=request.user.id_staff.id_club,
-                is_active=True,
-            )
 
-        return Response(serializer.data, status=HTTP_201_CREATED)
+            # 3. Create Exchange with id_sending_club set to the form's club
+            exchange_kwargs = {
+                "id_student": student,
+                "id_sending_club": club,
+                "is_active": True,
+            }
+
+            # Set counsellor if creator is correspondent/kwm_officer
+            if is_correspondent(request.user) or is_kwm_officer(request.user):
+                exchange_kwargs["id_counsellor"] = request.user.id_staff
+
+            Exchange.objects.create(**exchange_kwargs)
+
+        response_serializer = StudentSerializer(student)
+        return Response(response_serializer.data, status=HTTP_201_CREATED)
 
     def delete(self, request, pk=None):
         student = get_object_or_404(Student, pk=pk, is_active=True)

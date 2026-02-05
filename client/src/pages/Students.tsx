@@ -116,7 +116,6 @@ export default function Students() {
     countries,
     isLoading,
     error,
-    addStudentMutation,
     updateStudentMutation,
     deleteStudentMutation,
     exportStudentsMutation,
@@ -154,7 +153,6 @@ export default function Students() {
 
   const handleClose = () => {
     setSelectedId(null);
-    addStudentMutation.reset();
     deleteStudentMutation.reset();
     updateStudentMutation.reset();
     handleViewChange("list");
@@ -167,10 +165,6 @@ export default function Students() {
 
   const handleAddOpen = () => {
     handleViewChange("add");
-  };
-
-  const handleAddStudent = (student: StudentFormData) => {
-    addStudentMutation.mutate(student);
   };
 
   const handleDeleteOpen = (id: number) => {
@@ -200,16 +194,7 @@ export default function Students() {
   }
 
   if (currentView === "add") {
-    return (
-      <AddStudent
-        handleClose={handleClose}
-        handleAddStudent={handleAddStudent}
-        isLoading={addStudentMutation.isPending}
-        isSuccess={addStudentMutation.isSuccess}
-        error={addStudentMutation.error}
-        countries={countries}
-      />
-    );
+    return <AddStudent handleClose={handleClose} />;
   }
 
   if (currentView === "update" && selectedId) {
