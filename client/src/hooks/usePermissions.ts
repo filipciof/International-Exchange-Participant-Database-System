@@ -35,6 +35,8 @@ type Permissions = {
   canCreateHomeCountryClubs: boolean;
   hasLockedSendingClub: boolean;
   canEditStaffClubInfo: boolean;
+  canEditStudentName: boolean;
+  canEditStaffName: boolean;
 };
 
 function resolvePermissions(group: string): Permissions {
@@ -57,6 +59,8 @@ function resolvePermissions(group: string): Permissions {
         canCreateHomeCountryClubs: true,
         hasLockedSendingClub: false,
         canEditStaffClubInfo: true,
+        canEditStudentName: true,
+        canEditStaffName: true,
       };
     case "correspondent":
       return {
@@ -76,6 +80,8 @@ function resolvePermissions(group: string): Permissions {
         canCreateHomeCountryClubs: false,
         hasLockedSendingClub: false,
         canEditStaffClubInfo: false,
+        canEditStudentName: true,
+        canEditStaffName: false,
       };
     case "kwm_officer":
       return {
@@ -95,6 +101,8 @@ function resolvePermissions(group: string): Permissions {
         canCreateHomeCountryClubs: false,
         hasLockedSendingClub: false,
         canEditStaffClubInfo: false,
+        canEditStudentName: true,
+        canEditStaffName: false,
       };
     case "club_officer":
       return {
@@ -114,6 +122,8 @@ function resolvePermissions(group: string): Permissions {
         canCreateHomeCountryClubs: false,
         hasLockedSendingClub: true,
         canEditStaffClubInfo: false,
+        canEditStudentName: true,
+        canEditStaffName: false,
       };
     case "student":
       return {
@@ -133,6 +143,8 @@ function resolvePermissions(group: string): Permissions {
         canCreateHomeCountryClubs: false,
         hasLockedSendingClub: false,
         canEditStaffClubInfo: false,
+        canEditStudentName: false,
+        canEditStaffName: false,
       };
     default:
       return {
@@ -152,6 +164,8 @@ function resolvePermissions(group: string): Permissions {
         canCreateHomeCountryClubs: false,
         hasLockedSendingClub: false,
         canEditStaffClubInfo: false,
+        canEditStudentName: false,
+        canEditStaffName: false,
       };
   }
 }

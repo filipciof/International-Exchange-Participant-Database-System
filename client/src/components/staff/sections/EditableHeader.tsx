@@ -21,6 +21,7 @@ import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
 import { useTranslation } from "react-i18next";
+import usePermissions from "../../../hooks/usePermissions";
 
 type EditableHeaderProps = {
   staff: Staff;
@@ -34,6 +35,7 @@ export default function EditableHeader({
   isLoading,
 }: EditableHeaderProps) {
   const { t } = useTranslation();
+  const { canEditStaffName } = usePermissions();
   const [isEditing, setIsEditing] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
 
@@ -191,6 +193,7 @@ export default function EditableHeader({
                     size="small"
                     label={t("staffForm.firstName")}
                     value={formData.first_name}
+                    disabled={!canEditStaffName}
                     onChange={(e) =>
                       setFormData({ ...formData, first_name: e.target.value })
                     }
@@ -229,6 +232,7 @@ export default function EditableHeader({
                     size="small"
                     label={t("staffForm.lastName")}
                     value={formData.last_name}
+                    disabled={!canEditStaffName}
                     onChange={(e) =>
                       setFormData({ ...formData, last_name: e.target.value })
                     }
