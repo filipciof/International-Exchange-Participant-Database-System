@@ -139,13 +139,9 @@ export default function StudentProfile({}: StudentProfileProps) {
           <EditableTravelDocs student={student} countries={countries} />
           <EditableParentInfo student={student} />
           <EditableInsurance student={student} />
-          <EditableUserAccount student={student} readOnly />
-          <EditableExchanges studentId={student.id} isInbound={student.is_inbound} readOnly />
-          <EditableDocuments
-            ownerType="student"
-            ownerId={student.id}
-            readOnly
-          />
+          <EditableUserAccount student={student} />
+          <EditableExchanges studentId={student.id} isInbound={student.is_inbound} />
+          <EditableDocuments ownerType="student" ownerId={student.id} />
           <EditableNotes
             notes={student.notes}
             endpoint={`/students/${student.id}/`}
@@ -177,14 +173,14 @@ export default function StudentProfile({}: StudentProfileProps) {
       {activeTab === 5 && <EditableInsurance student={student} />}
 
       {/* User Account */}
-      {activeTab === 6 && <EditableUserAccount student={student} readOnly />}
+      {activeTab === 6 && <EditableUserAccount student={student} />}
 
       {/* Exchange History */}
-      {activeTab === 7 && <EditableExchanges studentId={student.id} isInbound={student.is_inbound} readOnly />}
+      {activeTab === 7 && <EditableExchanges studentId={student.id} isInbound={student.is_inbound} />}
 
       {/* Documents */}
       {activeTab === 8 && (
-        <EditableDocuments ownerType="student" ownerId={student.id} readOnly />
+        <EditableDocuments ownerType="student" ownerId={student.id} />
       )}
 
       {/* Notes */}

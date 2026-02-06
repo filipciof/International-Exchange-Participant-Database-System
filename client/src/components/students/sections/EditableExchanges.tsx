@@ -24,11 +24,11 @@ import DeleteConfirmationDialog from "../../DeleteConfirmationDialog";
 import InfoItem from "../../InfoItem";
 import EditableExchangeFamilies from "./EditableExchangeFamilies";
 import { useTranslation } from "react-i18next";
+import usePermissions from "../../../hooks/usePermissions";
 
 type EditableExchangesProps = {
   studentId: number;
   isInbound: boolean;
-  readOnly?: boolean;
 };
 
 // Helper function to get current academic year in YYYY/YY format
@@ -52,9 +52,9 @@ const getCurrentAcademicYear = (): string => {
 export default function EditableExchanges({
   studentId,
   isInbound,
-  readOnly = false,
 }: EditableExchangesProps) {
   const { t } = useTranslation();
+  const { canEditExchanges, canViewClubs, canViewStaff } = usePermissions();
   const [dialogOpen, setDialogOpen] = useState<
     null | "update" | "add" | "delete"
   >(null);
@@ -181,7 +181,7 @@ export default function EditableExchanges({
     }
   };
 
-  const actions = !readOnly ? (
+  const actions = canEditExchanges ? (
     <IconButton size="small" onClick={handleOpenAddDialog}>
       <AddIcon />
     </IconButton>
@@ -271,7 +271,7 @@ export default function EditableExchanges({
                           {exchange.year}
                         </Typography>
                       )}
-                      {!readOnly && (
+                      {canEditExchanges && (
                         <>
                           <IconButton
                             size="small"
@@ -312,9 +312,9 @@ export default function EditableExchanges({
                         label={t("studentForm.labels.sendingClub")}
                         value={`${exchange.sending_club.name} - ${exchange.sending_club.country}, District ${exchange.sending_club.district}`}
                         linkPath={
-                          readOnly
-                            ? null
-                            : `/clubs/?id=${exchange.id_sending_club}&view=detail`
+                          canViewClubs
+                            ? `/clubs/?id=${exchange.id_sending_club}&view=detail`
+                            : null
                         }
                       />
                     )}
@@ -323,9 +323,9 @@ export default function EditableExchanges({
                         label={t("studentForm.labels.receivingClub")}
                         value={`${exchange.receiving_club.name} - ${exchange.receiving_club.country}, District ${exchange.receiving_club.district}`}
                         linkPath={
-                          readOnly
-                            ? null
-                            : `/clubs/?id=${exchange.id_receiving_club}&view=detail`
+                          canViewClubs
+                            ? `/clubs/?id=${exchange.id_receiving_club}&view=detail`
+                            : null
                         }
                       />
                     )}
@@ -334,9 +334,9 @@ export default function EditableExchanges({
                         label={t("studentForm.labels.counsellor")}
                         value={exchange.counsellor}
                         linkPath={
-                          readOnly
-                            ? null
-                            : `/staff/?id=${exchange.id_counsellor}&view=detail`
+                          canViewStaff
+                            ? `/staff/?id=${exchange.id_counsellor}&view=detail`
+                            : null
                         }
                       />
                     )}
@@ -345,9 +345,9 @@ export default function EditableExchanges({
                         label={t("studentForm.labels.kwmOfficer")}
                         value={exchange.kwm_officer}
                         linkPath={
-                          readOnly
-                            ? null
-                            : `/staff/?id=${exchange.id_kwm_officer}&view=detail`
+                          canViewStaff
+                            ? `/staff/?id=${exchange.id_kwm_officer}&view=detail`
+                            : null
                         }
                       />
                     )}
@@ -356,7 +356,6 @@ export default function EditableExchanges({
                   <EditableExchangeFamilies
                     exchangeId={exchange.id}
                     id_receiving_club={exchange.id_receiving_club}
-                    readOnly={readOnly}
                   />
                 </Paper>
               ))}

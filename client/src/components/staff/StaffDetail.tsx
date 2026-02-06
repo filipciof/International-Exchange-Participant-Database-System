@@ -72,12 +72,7 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
       </Stack>
 
       {/* Editable Header Card */}
-      <EditableHeader
-        staff={staff}
-        imageUrl={imageUrl}
-        isLoading={isLoading}
-        staffId={id}
-      />
+      <EditableHeader staff={staff} imageUrl={imageUrl} isLoading={isLoading} />
 
       {/* Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
@@ -107,8 +102,8 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
             endpoint={`/staff/${id}/`}
             queryKey="staff"
           />
-          <EditableClubInfo staff={staff} staffId={id} />
-          <EditableUserAccount staff={staff} staffId={id} />
+          <EditableClubInfo staff={staff} />
+          <EditableUserAccount staff={staff} />
           <EditableNotes
             notes={staff.notes}
             endpoint={`/staff/${id}/`}
@@ -133,10 +128,10 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
       )}
 
       {/* Club Information */}
-      {activeTab === 2 && <EditableClubInfo staff={staff} staffId={id} />}
+      {activeTab === 2 && <EditableClubInfo staff={staff} />}
 
       {/* User Account */}
-      {activeTab === 3 && <EditableUserAccount staff={staff} staffId={id} />}
+      {activeTab === 3 && <EditableUserAccount staff={staff} />}
 
       {/* Documents */}
       {activeTab === 4 && <EditableDocuments ownerType="staff" ownerId={id} />}

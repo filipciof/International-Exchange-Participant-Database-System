@@ -15,17 +15,17 @@ import queryClient from "../../../utils/queryClient";
 import Section from "../../Section";
 import InfoItem from "../../InfoItem";
 import { useTranslation } from "react-i18next";
+import usePermissions from "../../../hooks/usePermissions";
 
 type EditableClubInfoProps = {
   staff: Staff;
-  staffId?: number;
 };
 
 export default function EditableClubInfo({
   staff,
-  staffId,
 }: EditableClubInfoProps) {
   const { t } = useTranslation();
+  const { canEditStaffClubInfo } = usePermissions();
   const [isEditing, setIsEditing] = useState(false);
   const [country, setCountry] = useState<number | null>(null);
   const [district, setDistrict] = useState<number | null>(null);
@@ -74,7 +74,7 @@ export default function EditableClubInfo({
 
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const url = staffId ? `/staff/${staffId}/` : `/staff/?me=true`;
+      const url = `/staff/${staff.id}/`;
       const response = await axiosClient.patch(url, data);
       return response.data;
     },
@@ -102,28 +102,32 @@ export default function EditableClubInfo({
   const selectedDistrict = districts.find((d) => d.id === district) || null;
   const selectedClub = clubs.find((c) => c.id === formData.id_club) || null;
 
-  const actions = !isEditing ? (
-    <IconButton size="small" onClick={() => setIsEditing(true)}>
-      <EditIcon />
-    </IconButton>
+  const actions = canEditStaffClubInfo ? (
+    !isEditing ? (
+      <IconButton size="small" onClick={() => setIsEditing(true)}>
+        <EditIcon />
+      </IconButton>
+    ) : (
+      <Box sx={{ display: "flex", gap: 1 }}>
+        <IconButton
+          size="small"
+          onClick={handleSave}
+          disabled={updateMutation.isPending}
+          color="primary"
+        >
+          <Save />
+        </IconButton>
+        <IconButton
+          size="small"
+          onClick={handleCancel}
+          disabled={updateMutation.isPending}
+        >
+          <Close />
+        </IconButton>
+      </Box>
+    )
   ) : (
-    <Box sx={{ display: "flex", gap: 1 }}>
-      <IconButton
-        size="small"
-        onClick={handleSave}
-        disabled={updateMutation.isPending}
-        color="primary"
-      >
-        <Save />
-      </IconButton>
-      <IconButton
-        size="small"
-        onClick={handleCancel}
-        disabled={updateMutation.isPending}
-      >
-        <Close />
-      </IconButton>
-    </Box>
+    <></>
   );
 
   return (

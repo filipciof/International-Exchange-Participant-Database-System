@@ -26,12 +26,10 @@ import { useTranslation } from "react-i18next";
 
 type EditableFamilyMembersProps = {
   familyId: number;
-  readOnly?: boolean;
 };
 
 export default function EditableFamilyMembers({
   familyId,
-  readOnly = false,
 }: EditableFamilyMembersProps) {
   const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState<null | "delete" | "addEdit">(
@@ -171,11 +169,11 @@ export default function EditableFamilyMembers({
     }
   };
 
-  const actions = !readOnly ? (
+  const actions = (
     <IconButton size="small" onClick={handleAddOpen}>
       <AddIcon />
     </IconButton>
-  ) : undefined;
+  );
 
   return (
     <Section
@@ -265,27 +263,25 @@ export default function EditableFamilyMembers({
                           />
                         )}
                       </Box>
-                      {!readOnly && (
-                        <Box sx={{ display: "flex", gap: 1 }}>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleEditOpen(member)}
-                            color="primary"
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            size="small"
-                            onClick={() => {
-                              setDeletingMember(member);
-                              setDialogOpen("delete");
-                            }}
-                            color="error"
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      )}
+                      <Box sx={{ display: "flex", gap: 1 }}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleEditOpen(member)}
+                          color="primary"
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setDeletingMember(member);
+                            setDialogOpen("delete");
+                          }}
+                          color="error"
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
                     </Box>
 
                     <Grid container spacing={2}>

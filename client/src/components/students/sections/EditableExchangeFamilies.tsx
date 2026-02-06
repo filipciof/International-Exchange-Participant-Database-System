@@ -17,19 +17,19 @@ import AddEditExchangeFamilyDialog from "./AddEditExchangeFamilyDialog";
 import DeleteConfirmationDialog from "../../DeleteConfirmationDialog";
 import InfoItem from "../../InfoItem";
 import { useTranslation } from "react-i18next";
+import usePermissions from "../../../hooks/usePermissions";
 
 type EditableExchangeFamiliesProps = {
   exchangeId: number;
   id_receiving_club: number | null;
-  readOnly?: boolean;
 };
 
 export default function EditableExchangeFamilies({
   exchangeId,
   id_receiving_club,
-  readOnly = false,
 }: EditableExchangeFamiliesProps) {
   const { t } = useTranslation();
+  const { canEditExchanges, canViewFamilies } = usePermissions();
   const [dialogOpen, setDialogOpen] = useState<
     null | "update" | "add" | "delete"
   >(null);
@@ -160,7 +160,7 @@ export default function EditableExchangeFamilies({
             {t("studentForm.labels.hostFamilies")}
           </Typography>
         </Box>
-        {!readOnly && (
+        {canEditExchanges && (
           <IconButton size="small" onClick={handleOpenAddDialog}>
             <AddIcon fontSize="small" />
           </IconButton>
@@ -242,9 +242,9 @@ export default function EditableExchangeFamilies({
                               exchangeFamily.family_name || "Unknown Family"
                             }
                             linkPath={
-                              readOnly
-                                ? null
-                                : `/families/?id=${exchangeFamily.id_family}&view=detail`
+                              canViewFamilies
+                                ? `/families/?id=${exchangeFamily.id_family}&view=detail`
+                                : null
                             }
                           />
                           {exchangeFamily.start_date && (
@@ -261,7 +261,7 @@ export default function EditableExchangeFamilies({
                           )}
                         </Grid>
                       </Box>
-                      {!readOnly && (
+                      {canEditExchanges && (
                         <Box sx={{ display: "flex", gap: 0.5 }}>
                           <IconButton
                             size="small"

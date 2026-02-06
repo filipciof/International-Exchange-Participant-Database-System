@@ -102,8 +102,8 @@ export default function StaffProfile({}: StaffProfileProps) {
           scrollButtons="auto"
         >
           <Tab label={t("staff.tabs.all")} />
-          <Tab label={t("staff.tabs.club")} />
           <Tab label={t("staff.tabs.personalInfo")} />
+          <Tab label={t("staff.tabs.club")} />
           <Tab label={t("staff.tabs.account")} />
           <Tab label={t("staff.tabs.documents")} />
           <Tab label={t("staff.tabs.notes")} />
@@ -113,7 +113,6 @@ export default function StaffProfile({}: StaffProfileProps) {
       {/* All sections */}
       {activeTab === 0 && (
         <>
-          <EditableClubInfo staff={staff} />
           <EditablePersonalInfo
             gender={staff.gender}
             genderName={staff.gender_name}
@@ -122,7 +121,8 @@ export default function StaffProfile({}: StaffProfileProps) {
             endpoint="/staff/?me=true"
             queryKey="staff"
           />
-          <EditableUserAccount staff={staff} readOnly />
+          <EditableClubInfo staff={staff} />
+          <EditableUserAccount staff={staff} />
           <EditableNotes
             notes={staff.notes}
             endpoint="/staff/?me=true"
@@ -134,21 +134,23 @@ export default function StaffProfile({}: StaffProfileProps) {
         </>
       )}
 
-      {/* Club Information */}
-      {activeTab === 1 && <EditableClubInfo staff={staff} />}
-
       {/* Personal Information */}
-      {activeTab === 2 && <EditablePersonalInfo
-            gender={staff.gender}
-            genderName={staff.gender_name}
-            email={staff.email}
-            phone={staff.phone}
-            endpoint="/staff/?me=true"
-            queryKey="staff"
-          />}
+      {activeTab === 1 && (
+        <EditablePersonalInfo
+          gender={staff.gender}
+          genderName={staff.gender_name}
+          email={staff.email}
+          phone={staff.phone}
+          endpoint="/staff/?me=true"
+          queryKey="staff"
+        />
+      )}
+
+      {/* Club Information */}
+      {activeTab === 2 && <EditableClubInfo staff={staff} />}
 
       {/* User Account */}
-      {activeTab === 3 && <EditableUserAccount staff={staff} readOnly />}
+      {activeTab === 3 && <EditableUserAccount staff={staff} />}
 
       {/* Documents */}
       {activeTab === 4 && (
@@ -156,14 +158,16 @@ export default function StaffProfile({}: StaffProfileProps) {
       )}
 
       {/* Notes */}
-      {activeTab === 5 && <EditableNotes
-            notes={staff.notes}
-            endpoint="/staff/?me=true"
-            queryKey="staff"
-            title={t("staff.steps.additionalInfo")}
-            placeholder={t("notes.addStaffNotes")}
-            noNotesText={t("notes.noNotes")}
-          />}
+      {activeTab === 5 && (
+        <EditableNotes
+          notes={staff.notes}
+          endpoint="/staff/?me=true"
+          queryKey="staff"
+          title={t("staff.steps.additionalInfo")}
+          placeholder={t("notes.addStaffNotes")}
+          noNotesText={t("notes.noNotes")}
+        />
+      )}
     </Box>
   );
 }

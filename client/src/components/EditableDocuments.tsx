@@ -27,18 +27,18 @@ import AddEditDocumentDialog from "./AddEditDocumentDialog";
 import useDocumentMutations from "../hooks/useDocumentMutation";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
+import usePermissions from "../hooks/usePermissions";
 
 type EditableDocumentsProps = {
   ownerType: "student" | "staff" | "club" | "family" | "district";
   ownerId: number;
-  readOnly?: boolean;
 };
 
 export default function EditableDocuments({
   ownerType,
   ownerId,
-  readOnly = false,
 }: EditableDocumentsProps) {
+  const { canAddDocuments, canEditDocuments } = usePermissions();
   const { t } = useTranslation();
   const ownerField = `id_${ownerType}` as const;
 
@@ -112,7 +112,7 @@ export default function EditableDocuments({
     }
   };
 
-  const actions = !readOnly && (
+  const actions = canAddDocuments && (
     <IconButton size="small" onClick={handleOpenAddDialog}>
       <AddIcon />
     </IconButton>
@@ -189,7 +189,7 @@ export default function EditableDocuments({
                               <DownloadIcon fontSize="small" />
                             </IconButton>
                           )}
-                          {!readOnly && (
+                          {canEditDocuments && (
                             <>
                               <IconButton
                                 size="small"

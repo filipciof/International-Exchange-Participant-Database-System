@@ -17,12 +17,10 @@ import { useTranslation } from "react-i18next";
 
 type EditableUserAccountProps = {
   student: Student;
-  readOnly?: boolean;
 };
 
 export default function EditableUserAccount({
   student,
-  readOnly = false,
 }: EditableUserAccountProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
@@ -94,21 +92,16 @@ export default function EditableUserAccount({
   const isLoading = createMutation.isPending || updateMutation.isPending;
   const error = createMutation.error || updateMutation.error;
 
-  const canEdit = !readOnly || hasUserAccount; // Admins can always edit, students can edit if they have an account
-  const canCreate = !readOnly; // Only admins can create accounts
-
   const actions = !isEditing ? (
     hasUserAccount ? (
-      canEdit ? (
-        <IconButton size="small" onClick={handleEdit}>
-          <EditIcon />
-        </IconButton>
-      ) : undefined
-    ) : canCreate ? (
+      <IconButton size="small" onClick={handleEdit}>
+        <EditIcon />
+      </IconButton>
+    ) : (
       <IconButton size="small" onClick={handleCreate}>
         <AddIcon />
       </IconButton>
-    ) : undefined
+    )
   ) : (
     <Box sx={{ display: "flex", gap: 1 }}>
       <IconButton
@@ -162,24 +155,16 @@ export default function EditableUserAccount({
                 textAlign: "center",
               }}
             >
-              {readOnly ? (
-                <Box sx={{ color: "text.secondary" }}>
-                  {t("account.noUser")}
-                </Box>
-              ) : (
-                <>
-                  <Box sx={{ mb: 2, color: "text.secondary" }}>
-                    {t("account.noUser")}
-                  </Box>
-                  <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={handleCreate}
-                  >
-                    {t("account.createUser")}
-                  </Button>
-                </>
-              )}
+              <Box sx={{ mb: 2, color: "text.secondary" }}>
+                {t("account.noUser")}
+              </Box>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+              >
+                {t("account.createUser")}
+              </Button>
             </Box>
           )}
         </>

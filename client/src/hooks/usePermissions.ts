@@ -34,6 +34,7 @@ type Permissions = {
   canAssignGroups: boolean;
   canCreateHomeCountryClubs: boolean;
   hasLockedSendingClub: boolean;
+  canEditStaffClubInfo: boolean;
 };
 
 function resolvePermissions(group: string): Permissions {
@@ -55,6 +56,7 @@ function resolvePermissions(group: string): Permissions {
         canAssignGroups: true,
         canCreateHomeCountryClubs: true,
         hasLockedSendingClub: false,
+        canEditStaffClubInfo: true,
       };
     case "correspondent":
       return {
@@ -73,6 +75,7 @@ function resolvePermissions(group: string): Permissions {
         canAssignGroups: false,
         canCreateHomeCountryClubs: false,
         hasLockedSendingClub: false,
+        canEditStaffClubInfo: false,
       };
     case "kwm_officer":
       return {
@@ -91,6 +94,7 @@ function resolvePermissions(group: string): Permissions {
         canAssignGroups: false,
         canCreateHomeCountryClubs: false,
         hasLockedSendingClub: false,
+        canEditStaffClubInfo: false,
       };
     case "club_officer":
       return {
@@ -109,6 +113,7 @@ function resolvePermissions(group: string): Permissions {
         canAssignGroups: false,
         canCreateHomeCountryClubs: false,
         hasLockedSendingClub: true,
+        canEditStaffClubInfo: false,
       };
     case "student":
       return {
@@ -120,13 +125,14 @@ function resolvePermissions(group: string): Permissions {
         canViewFamilies: false,
         canViewContacts: false,
         canEditExchanges: false,
-        canAddDocuments: false,
+        canAddDocuments: true,
         canEditDocuments: false,
         canToggleIsInbound: false,
         defaultIsInbound: false,
         canAssignGroups: false,
         canCreateHomeCountryClubs: false,
         hasLockedSendingClub: false,
+        canEditStaffClubInfo: false,
       };
     default:
       return {
@@ -145,6 +151,7 @@ function resolvePermissions(group: string): Permissions {
         canAssignGroups: false,
         canCreateHomeCountryClubs: false,
         hasLockedSendingClub: false,
+        canEditStaffClubInfo: false,
       };
   }
 }

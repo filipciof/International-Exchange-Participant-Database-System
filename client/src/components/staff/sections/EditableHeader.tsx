@@ -26,14 +26,12 @@ type EditableHeaderProps = {
   staff: Staff;
   imageUrl?: string;
   isLoading: boolean;
-  staffId?: number;
 };
 
 export default function EditableHeader({
   staff,
   imageUrl,
   isLoading,
-  staffId,
 }: EditableHeaderProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
@@ -55,7 +53,7 @@ export default function EditableHeader({
           formDataToSend.append(key, String(value));
         }
       });
-      const url = staffId ? `/staff/${staffId}/` : `/staff/?me=true`;
+      const url = `/staff/${staff.id}/`;
       const response = await axiosClient.patch(url, formDataToSend, {
         headers: {
           "Content-Type": "multipart/form-data",

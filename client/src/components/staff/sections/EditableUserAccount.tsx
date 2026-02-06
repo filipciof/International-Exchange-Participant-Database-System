@@ -31,14 +31,10 @@ import usePermissions from "../../../hooks/usePermissions";
 
 type EditableUserAccountProps = {
   staff: Staff;
-  staffId?: number;
-  readOnly?: boolean;
 };
 
 export default function EditableUserAccount({
   staff,
-  staffId,
-  readOnly = false,
 }: EditableUserAccountProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
@@ -50,7 +46,6 @@ export default function EditableUserAccount({
   });
 
   const hasUserAccount = Boolean(staff.user_email);
-  const effectiveStaffId = staffId || staff.id;
 
   const { canAssignGroups } = usePermissions();
 
@@ -61,7 +56,7 @@ export default function EditableUserAccount({
       groups: string[];
     }) => {
       const response = await axiosClient.post(
-        `/staff/${effectiveStaffId}/user-account/`,
+        `/staff/${staff.id}/user-account/`,
         data,
       );
       return response.data;
@@ -80,7 +75,7 @@ export default function EditableUserAccount({
       groups?: string[];
     }) => {
       const response = await axiosClient.patch(
-        `/staff/${effectiveStaffId}/user-account/`,
+        `/staff/${staff.id}/user-account/`,
         data,
       );
       return response.data;
@@ -132,21 +127,16 @@ export default function EditableUserAccount({
   const isLoading = createMutation.isPending || updateMutation.isPending;
   const error = createMutation.error || updateMutation.error;
 
-  const canEdit = !readOnly || hasUserAccount; // Admins can always edit, staff can edit if they have an account
-  const canCreate = !readOnly; // Only admins can create accounts
-
   const actions = !isEditing ? (
     hasUserAccount ? (
-      canEdit ? (
-        <IconButton size="small" onClick={handleEdit}>
-          <EditIcon />
-        </IconButton>
-      ) : undefined
-    ) : canCreate ? (
+      <IconButton size="small" onClick={handleEdit}>
+        <EditIcon />
+      </IconButton>
+    ) : (
       <IconButton size="small" onClick={handleCreate}>
         <AddIcon />
       </IconButton>
-    ) : undefined
+    )
   ) : (
     <Box sx={{ display: "flex", gap: 1 }}>
       <IconButton
@@ -210,24 +200,16 @@ export default function EditableUserAccount({
                 textAlign: "center",
               }}
             >
-              {readOnly ? (
-                <Box sx={{ color: "text.secondary" }}>
-                  {t("account.noUser")}
-                </Box>
-              ) : (
-                <>
-                  <Box sx={{ mb: 2, color: "text.secondary" }}>
-                    {t("account.noUser")}
-                  </Box>
-                  <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={handleCreate}
-                  >
-                    {t("account.createUser")}
-                  </Button>
-                </>
-              )}
+              <Box sx={{ mb: 2, color: "text.secondary" }}>
+                {t("account.noUser")}
+              </Box>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+              >
+                {t("account.createUser")}
+              </Button>
             </Box>
           )}
         </>
