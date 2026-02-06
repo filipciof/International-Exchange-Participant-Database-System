@@ -131,7 +131,7 @@ class StudentView(APIView):
         ]
 
     def __get_filtered_students(self, request):
-        students = student_queryset_for(request.user).order_by("-id")
+        students = student_queryset_for(request).order_by("-id")
         exchange_start_year = request.query_params.get("start_year")
 
         if exchange_start_year:

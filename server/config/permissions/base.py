@@ -13,6 +13,13 @@ def has_role(user, role) -> bool:
     return user.groups.filter(name=role).exists()
 
 
+def get_active_role(request):
+    role = request.META.get("HTTP_X_ACTIVE_ROLE")
+    if role and has_role(request.user, role):
+        return role
+    return None
+
+
 def is_admin(user) -> bool:
     return has_role(user, Roles.ADMIN)
 

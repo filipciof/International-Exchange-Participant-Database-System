@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import queryClient from "../utils/queryClient";
 
 let listeners: (() => void)[] = [];
 
@@ -16,6 +17,7 @@ function getSnapshot() {
 export function setActiveGroup(group: string) {
   localStorage.setItem("activeGroup", group);
   listeners.forEach((l) => l());
+  queryClient.invalidateQueries();
 }
 
 type Permissions = {

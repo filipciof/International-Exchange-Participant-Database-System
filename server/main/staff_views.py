@@ -32,7 +32,7 @@ class StaffView(APIView):
     permission_classes = [StaffPermission]
 
     def get(self, request):
-        staff = staff_queryset_for(request.user).order_by("-id")
+        staff = staff_queryset_for(request).order_by("-id")
 
         id = request.query_params.get("id")
         if id:

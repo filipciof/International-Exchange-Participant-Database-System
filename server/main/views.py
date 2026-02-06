@@ -79,7 +79,7 @@ class ClubView(APIView):
     permission_classes = [ClubPermission]
 
     def get(self, request):
-        clubs = club_queryset_for(request.user).order_by("-id")
+        clubs = club_queryset_for(request).order_by("-id")
 
         id = request.query_params.get("id")
         if id:
@@ -152,7 +152,7 @@ class FamilyView(APIView):
     permission_classes = [FamilyPermission]
 
     def get(self, request):
-        families = family_queryset_for(request.user).order_by("-id")
+        families = family_queryset_for(request).order_by("-id")
 
         id = request.query_params.get("id")
         if id:
@@ -226,7 +226,7 @@ class FamilyMemberView(APIView):
     permission_classes = [FamilyMemberPermission]
 
     def get(self, request):
-        family_members = family_member_queryset_for(request.user).order_by("-id")
+        family_members = family_member_queryset_for(request).order_by("-id")
 
         id = request.query_params.get("id")
         if id:
@@ -314,7 +314,7 @@ class ExchangeView(APIView):
     permission_classes = [ExchangePermission]
 
     def get(self, request):
-        exchanges = exchange_queryset_for(request.user).order_by("-id")
+        exchanges = exchange_queryset_for(request).order_by("-id")
 
         # Allow filtering by id_student
         id_student = request.query_params.get("id_student")
@@ -369,7 +369,7 @@ class ExchangeFamilyView(APIView):
     permission_classes = [ExchangeFamilyPermission]
 
     def get(self, request):
-        exchange_families = exchange_family_queryset_for(request.user).order_by("-id")
+        exchange_families = exchange_family_queryset_for(request).order_by("-id")
 
         id_exchange = request.query_params.get("id_exchange")
         if id_exchange:
@@ -449,7 +449,7 @@ class DocumentView(APIView):
     permission_classes = [DocumentPermission]
 
     def get(self, request):
-        documents = document_queryset_for(request.user).order_by("-id")
+        documents = document_queryset_for(request).order_by("-id")
 
         id = request.query_params.get("id")
         if id:

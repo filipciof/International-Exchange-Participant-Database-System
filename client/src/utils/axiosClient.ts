@@ -14,6 +14,10 @@ axiosClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    const activeGroup = localStorage.getItem("activeGroup");
+    if (activeGroup) {
+      config.headers["X-Active-Role"] = activeGroup;
+    }
     return config;
   },
   (error) => {

@@ -55,7 +55,7 @@ class ContactView(APIView):
     permission_classes = [ContactPermission]
 
     def get(self, request, format=None):
-        contacts = contact_queryset_for(request.user).order_by("-id")
+        contacts = contact_queryset_for(request).order_by("-id")
 
         id = request.query_params.get("id")
         if id:

@@ -80,6 +80,13 @@ CORS_ALLOWED_ORIGINS = [
     f"https://{config("PROD_HOST")}",
 ]
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "authorization",
+    "content-type",
+    "origin",
+    "x-active-role",
+]
 
 ROOT_URLCONF = "config.urls"
 
