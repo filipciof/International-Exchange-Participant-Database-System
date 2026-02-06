@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Box, Typography, Stack, Tabs, Tab } from "@mui/material";
-import type { Country, StudentFormData } from "../utils/types";
+import type { Country } from "../utils/types";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import EditableHeader from "../components/students/sections/EditableHeader";
@@ -13,9 +13,7 @@ import EditableExchanges from "../components/students/sections/EditableExchanges
 import EditableDocuments from "../components/EditableDocuments";
 import EditableNotes from "../components/EditableNotes";
 import Loading from "../components/Loading";
-import StudentForm from "../components/students/StudentForm";
 import { AxiosError } from "axios";
-import { useStudentMutations } from "../hooks/useStudentMutations";
 import EditableUserAccount from "../components/students/sections/EditableUserAccount";
 import { useTranslation } from "react-i18next";
 
@@ -24,6 +22,7 @@ type StudentProfileProps = {};
 export default function StudentProfile({}: StudentProfileProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
+
   const {
     data: student,
     isLoading: isStudentLoading,
@@ -36,6 +35,7 @@ export default function StudentProfile({}: StudentProfileProps) {
     },
     retry: false,
   });
+
   const { data: imageUrl, isLoading: isImageLoading } = useQuery({
     queryKey: ["studentPhoto", student?.photo],
     queryFn: async () => {
@@ -59,8 +59,6 @@ export default function StudentProfile({}: StudentProfileProps) {
     staleTime: Infinity,
   });
 
-  const { addStudentMutation } = useStudentMutations();
-
   if (isStudentLoading) {
     return <Loading />;
   }
@@ -72,18 +70,10 @@ export default function StudentProfile({}: StudentProfileProps) {
 
     if (is404) {
       return (
-        <StudentForm
-          handleSubmit={(student: StudentFormData) => {
-            addStudentMutation.mutate(student);
-          }}
-          isLoading={addStudentMutation.isPending}
-          isSuccess={addStudentMutation.isSuccess}
-          error={addStudentMutation.error}
-          countries={countries}
-          submitButtonText={t("students.createProfile")}
-        />
+        <Typography>{t("notFound.message")}</Typography>
       );
     }
+    
     return (
       <Typography sx={{ color: "error.main" }}>
         {t("common.error", { message: studentError.message })}
@@ -95,9 +85,6 @@ export default function StudentProfile({}: StudentProfileProps) {
     <Box sx={{}}>
       {/* Header with back button */}
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
-        {/* <IconButton onClick={handleClose} edge="start">
-          <ArrowBack />
-        </IconButton> */}
         <Typography variant="h5" component="h1">
           {t("students.profile")}
         </Typography>

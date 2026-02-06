@@ -82,22 +82,7 @@ class StaffView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        me = request.query_params.get("me")
-
-        if me and me.lower() in ("true", "1"):
-            existing_staff = Staff.objects.filter(
-                id_user=request.user, is_active=True
-            ).first()
-            if existing_staff:
-                return Response(
-                    {"message": "You already have a staff profile."},
-                    status=HTTP_400_BAD_REQUEST,
-                )
-
-            data = request.data.copy()
-            data["id_user"] = request.user.id
-        else:
-            data = request.data.copy()
+        data = request.data.copy()
 
         photo = request.FILES.get("photo")
         if photo:

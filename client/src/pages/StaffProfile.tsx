@@ -3,10 +3,7 @@ import { Box, Typography, Stack, Tabs, Tab } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import Loading from "../components/Loading";
-import StaffForm from "../components/staff/StaffForm";
-import type { StaffFormData } from "../utils/types";
 import { AxiosError } from "axios";
-import { useStaffMutations } from "../hooks/useStaffMutations";
 import EditableHeader from "../components/staff/sections/EditableHeader";
 import EditablePersonalInfo from "../components/EditablePersonalInfo";
 import EditableClubInfo from "../components/staff/sections/EditableClubInfo";
@@ -20,6 +17,7 @@ type StaffProfileProps = {};
 export default function StaffProfile({}: StaffProfileProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
+
   const {
     data: staff,
     isLoading: isStaffLoading,
@@ -32,6 +30,7 @@ export default function StaffProfile({}: StaffProfileProps) {
     },
     retry: false,
   });
+
   const { data: imageUrl, isLoading: isImageLoading } = useQuery({
     queryKey: ["staffPhoto", staff?.photo],
     queryFn: async () => {
@@ -46,8 +45,6 @@ export default function StaffProfile({}: StaffProfileProps) {
     staleTime: Infinity,
   });
 
-  const { addMyStaffProfileMutation } = useStaffMutations();
-
   if (isStaffLoading) {
     return <Loading />;
   }
@@ -58,18 +55,10 @@ export default function StaffProfile({}: StaffProfileProps) {
 
     if (is404) {
       return (
-        <StaffForm
-          title={t("staff.createProfile")}
-          handleSubmit={(staff: StaffFormData) => {
-            addMyStaffProfileMutation.mutate(staff);
-          }}
-          isLoading={addMyStaffProfileMutation.isPending}
-          isSuccess={addMyStaffProfileMutation.isSuccess}
-          error={addMyStaffProfileMutation.error}
-          submitButtonText={t("staff.createProfile")}
-        />
+        <Typography>{t("notFound.message")}</Typography>
       );
     }
+
     return (
       <Typography sx={{ color: "error.main" }}>
         {t("common.error", { message: staffError.message })}
@@ -79,7 +68,6 @@ export default function StaffProfile({}: StaffProfileProps) {
 
   return (
     <Box sx={{}}>
-      {/* Header with back button */}
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
         <Typography variant="h5" component="h1">
           {t("staff.profile")}
