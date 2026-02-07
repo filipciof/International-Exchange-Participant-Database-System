@@ -196,7 +196,7 @@ export default function CreateStudentForm({
           </Typography>
         </Stack>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form noValidate onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={1} sx={{ px: { xs: 0, md: 16 } }}>
             <Stack direction={isMobile ? "column" : "row"} spacing={1}>
               <Controller

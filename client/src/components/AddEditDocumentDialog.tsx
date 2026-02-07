@@ -80,7 +80,7 @@ export default function AddEditDocumentDialog({
           ? t("documents.editDocument")
           : t("documents.addDocument")}
       </DialogTitle>
-      <form onSubmit={handleSubmit(handleFormSubmit)}>
+      <form noValidate onSubmit={handleSubmit(handleFormSubmit)}>
         <DialogContent>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Controller

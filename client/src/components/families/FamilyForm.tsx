@@ -152,7 +152,7 @@ export default function FamilyForm({
           </Typography>
         </Stack>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form noValidate onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={1} sx={{ px: { xs: 0, md: 16 } }}>
             <Controller
               name="name"

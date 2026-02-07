@@ -210,7 +210,7 @@ export default function StudentForm({
         ))}
       </Stepper>
 
-      <form onSubmit={handleSubmit(onSubmit, onError)}>
+      <form noValidate onSubmit={handleSubmit(onSubmit, onError)}>
         {/* Personal Information */}
         {activeStep === 0 && (
           <>
