@@ -15,7 +15,13 @@ from .models import (
     Staff,
 )
 from django.contrib.auth import get_user_model
-from config.permissions.base import is_correspondent, is_kwm_officer, is_club_officer, is_club_from_home_country
+from config.permissions.base import (
+    is_admin,
+    is_correspondent,
+    is_kwm_officer,
+    is_club_officer,
+    is_club_from_home_country,
+)
 
 User = get_user_model()
 
@@ -159,20 +165,31 @@ class CreateStudentSerializer(serializers.Serializer):
         if not user:
             return attrs
 
-        if is_correspondent(user) or is_kwm_officer(user):
-            if not attrs.get("is_inbound"):
-                raise serializers.ValidationError(
-                    {"is_inbound": "Correspondents and KWM officers can only create inbound students."}
-                )
-        elif is_club_officer(user):
-            if attrs.get("is_inbound"):
-                raise serializers.ValidationError(
-                    {"is_inbound": "Club officers can only create outbound students."}
-                )
+        is_inbound = attrs.get("is_inbound")
+        can_create_inbound = (
+            is_admin(user) or is_correspondent(user) or is_kwm_officer(user)
+        )
+        can_create_outbound = is_admin(user) or is_club_officer(user)
+
+        if is_inbound and not can_create_inbound:
+            raise serializers.ValidationError(
+                {"is_inbound": "You do not have permission to create inbound students."}
+            )
+
+        if not is_inbound and not can_create_outbound:
+            raise serializers.ValidationError(
+                {
+                    "is_inbound": "You do not have permission to create outbound students."
+                }
+            )
+
+        if is_club_officer(user) and not is_inbound:
             staff = getattr(user, "id_staff", None)
             if staff and staff.id_club_id and attrs["id_club"] != staff.id_club_id:
                 raise serializers.ValidationError(
-                    {"id_club": "Club officers can only create students for their own club."}
+                    {
+                        "id_club": "Club officers can only create students for their own club."
+                    }
                 )
 
         return attrs

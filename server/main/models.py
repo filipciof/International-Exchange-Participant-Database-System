@@ -2,14 +2,8 @@ from django.db import models
 from django.core.validators import RegexValidator
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth import get_user_model
-from datetime import datetime, timedelta
-from django.utils import timezone
 
 User = get_user_model()
-
-
-def default_expires_at() -> datetime:
-    return timezone.now() + timedelta(hours=24)
 
 
 class Country(models.Model):
@@ -337,19 +331,3 @@ class Document(models.Model):
 
     class Meta:
         db_table = "document"
-
-
-class UserActivationToken(models.Model):
-    id_user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        db_column="id_user",
-        related_name="activation_tokens",
-    )
-    token = models.CharField(max_length=64, unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField(default=default_expires_at)
-    is_used = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = "userActivationToken"

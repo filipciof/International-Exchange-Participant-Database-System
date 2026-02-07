@@ -40,7 +40,8 @@
     "gender": "Płeć",
     "male": "męska",
     "female": "żeńska",
-    "nonbinary": "niebinarna"
+    "nonbinary": "niebinarna",
+    "unknown": "—"
   },
   "languageProficiency": {
     "beginner": "pocztąkująca",
@@ -51,7 +52,8 @@
   "exchangeTypes": {
     "longterm": "długoterminowa",
     "family-to-family": "family-to-family",
-    "camp": "obóz"
+    "camp": "obóz",
+    "": ""
   },
   "documents": {
     "name": "Nazwa",
@@ -118,7 +120,15 @@
     "forgotPassword": "Zapomniałeś hasła?",
     "invalidCredentials": "Nieprawidłowe dane logowania",
     "emailError": "Proszę podać prawidłowy adres email.",
-    "passwordError": "Hasło musi mieć co najmniej 5 znaków."
+    "passwordError": "Hasło musi mieć co najmniej 5 znaków.",
+    "confirmPassword": "Potwierdź hasło",
+    "passwordMismatch": "Hasła nie są takie same.",
+    "activateAccount": "Aktywuj konto",
+    "activationSuccess": "Twoje konto zostało aktywowane! Przekierowanie do logowania...",
+    "activationError": "Coś poszło nie tak. Link aktywacyjny może być nieprawidłowy lub wygasł.",
+    "resetPassword": "Zresetuj hasło",
+    "resetSuccess": "Twoje hasło zostało zresetowane! Przekierowanie do logowania...",
+    "resetError": "Coś poszło nie tak. Link do resetowania hasła może być nieprawidłowy lub wygasł."
   },
   "forgotPassword": {
     "title": "Zresetuj hasło",

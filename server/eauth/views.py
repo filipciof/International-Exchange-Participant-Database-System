@@ -1,5 +1,8 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
@@ -10,7 +13,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.exceptions import InvalidToken
-from eauth.serializers import UserSerializer, TokenObtainPairSerializer
+from eauth.serializers import UserSerializer, TokenObtainPairSerializer, ActivateAccountSerializer
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.exceptions import AuthenticationFailed
 
@@ -91,7 +94,65 @@ class CookieTokenRefreshView(TokenRefreshView):
 
 
 class LogoutView(APIView):
+    permission_classes = [AllowAny]
+    
     def post(self, request):
         response = Response({"message": "Successfully logged out!"}, status=HTTP_200_OK)
         response.delete_cookie("refresh_token")
         return response
+
+
+class ActivateAccountView(APIView):
+    permission_classes = [AllowAny]
+
+    def _validate_link(self, uid, token):
+        try:
+            id_user = urlsafe_base64_decode(uid).decode()
+            user = get_user_model().objects.get(pk=id_user)
+        except (ValueError, TypeError, get_user_model().DoesNotExist):
+            return None
+
+        if not default_token_generator.check_token(user, token):
+            return None
+
+        return user
+
+    def get(self, request):
+        uid = request.query_params.get("uid")
+        token = request.query_params.get("token")
+
+        if not uid or not token:
+            return Response(
+                {"detail": "Missing uid or token."},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        user = self._validate_link(uid, token)
+        if not user:
+            return Response(
+                {"detail": "Activation link is invalid or has expired."},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        return Response({"detail": "Valid activation link."}, status=HTTP_200_OK)
+
+    def post(self, request):
+        serializer = ActivateAccountSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        uid = serializer.validated_data["uid"]
+        token = serializer.validated_data["token"]
+        password = serializer.validated_data["password"]
+
+        user = self._validate_link(uid, token)
+        if not user:
+            return Response(
+                {"detail": "Activation link is invalid or has expired."},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        user.set_password(password)
+        user.save(update_fields=["password"])
+
+        return Response({"detail": "Account activated successfully."}, status=HTTP_200_OK)

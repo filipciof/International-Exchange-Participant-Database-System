@@ -8,8 +8,6 @@ from .models import (
     District,
     Exchange,
     ExchangeType,
-    Staff,
-    Student,
 )
 from .serializers import (
     ClubSerializer,
@@ -26,8 +24,6 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import (
-    HTTP_403_FORBIDDEN,
-    HTTP_404_NOT_FOUND,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
     HTTP_204_NO_CONTENT,
@@ -65,7 +61,6 @@ class CountryView(APIView):
 class DistrictView(APIView):
     def get(self, request):
         districts = District.objects.order_by("id")
-
 
         country = request.query_params.get("country")
         if country:

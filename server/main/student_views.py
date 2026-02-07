@@ -4,7 +4,7 @@ from reportlab.lib.pagesizes import A4, landscape
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from typing import Any, Generator
 from django.http.response import HttpResponse, StreamingHttpResponse
-from .models import Student, GENDER_MAP, LANG_PROF_MAP
+from .models import Student, GENDER_MAP, LANG_PROF_MAP, Club, Exchange
 from .serializers import (
     CreateStudentSerializer,
     StudentSerializer,
@@ -31,9 +31,10 @@ from rest_framework.status import (
 )
 from config.permissions.policy_permissions import StudentPermission
 from config.selectors.student import student_queryset_for
-from config.permissions.base import is_admin, is_student, is_correspondent, is_kwm_officer, is_club_officer
+from config.permissions.base import is_correspondent, is_kwm_officer
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from eauth.utils import send_activation_email
 
 User = get_user_model()
 
@@ -367,7 +368,7 @@ class StudentView(APIView):
                     {"message": "Student profile not found for this user."},
                     status=HTTP_404_NOT_FOUND,
                 )
-        
+
         export_format = request.query_params.get("export_format")
         if export_format == "csv":
             return self.__export_csv(students)
@@ -381,8 +382,6 @@ class StudentView(APIView):
         return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
-        from .models import Club, Exchange
-
         serializer = CreateStudentSerializer(
             data=request.data, context={"user": request.user}
         )
@@ -427,6 +426,8 @@ class StudentView(APIView):
                 exchange_kwargs["id_counsellor"] = request.user.id_staff
 
             Exchange.objects.create(**exchange_kwargs)
+
+        send_activation_email(user)
 
         response_serializer = StudentSerializer(student)
         return Response(response_serializer.data, status=HTTP_201_CREATED)

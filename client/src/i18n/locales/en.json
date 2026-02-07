@@ -40,7 +40,8 @@
     "gender": "Gender",
     "male": "male",
     "female": "female",
-    "nonbinary": "nonbinary"
+    "nonbinary": "nonbinary",
+    "unknown": "—"
   },
   "languageProficiency": {
     "beginner": "beginner",
@@ -51,7 +52,8 @@
   "exchangeTypes": {
     "longterm": "longterm",
     "family-to-family": "family-to-family",
-    "camp": "camp"
+    "camp": "camp",
+    "": ""
   },
   "documents": {
     "name": "Name",
@@ -118,7 +120,15 @@
     "forgotPassword": "Forgot your password?",
     "invalidCredentials": "Invalid credentials",
     "emailError": "Please enter a valid email address.",
-    "passwordError": "Password must be at least 5 characters long."
+    "passwordError": "Password must be at least 5 characters long.",
+    "confirmPassword": "Confirm Password",
+    "passwordMismatch": "Passwords do not match.",
+    "activateAccount": "Activate Account",
+    "activationSuccess": "Your account has been activated! Redirecting to sign in...",
+    "activationError": "Something went wrong. The activation link may be invalid or expired.",
+    "resetPassword": "Reset Password",
+    "resetSuccess": "Your password has been reset! Redirecting to sign in...",
+    "resetError": "Something went wrong. The reset link may be invalid or expired."
   },
   "forgotPassword": {
     "title": "Reset password",
