@@ -122,6 +122,7 @@ export default function ActivateAccount() {
     setSubmitting(true);
     try {
       await axiosClient.post("/auth/activate/", { uid, token, password });
+      setSubmitting(false);
       setSuccess(true);
       setTimeout(() => navigate("/sign-in"), 3000);
     } catch {

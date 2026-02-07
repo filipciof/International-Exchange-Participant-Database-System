@@ -2,6 +2,7 @@
   "common": {
     "logout": "Logout",
     "cancel": "Cancel",
+    "close": "Close",
     "delete": "Delete",
     "deleting": "Deleting...",
     "submit": "Submit",
@@ -134,7 +135,8 @@
     "title": "Reset password",
     "description": "Enter your account's email address, and we'll send you a link to reset your password.",
     "emailLabel": "Email address",
-    "continue": "Continue"
+    "continue": "Continue",
+    "confirmation": "A password reset link has been sent. Please check your inbox."
   },
   "deleteDialog": {
     "title": "Confirm Delete",

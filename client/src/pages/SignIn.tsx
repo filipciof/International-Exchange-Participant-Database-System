@@ -229,7 +229,6 @@ export default function SignIn() {
               control={<Checkbox value="remember" color="primary" />}
               label={t("auth.rememberMe")}
             />
-            <ForgotPassword open={open} handleClose={handleClose} />
             <Button
               type="submit"
               fullWidth
@@ -251,6 +250,7 @@ export default function SignIn() {
           <LoginErrorMessage isError={loginError} message={t("auth.invalidCredentials")} />
         </Card>
       </SignInContainer>
+      <ForgotPassword open={open} handleClose={handleClose} />
     </>
   );
 }

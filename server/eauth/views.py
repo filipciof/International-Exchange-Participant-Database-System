@@ -13,9 +13,14 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.exceptions import InvalidToken
-from eauth.serializers import UserSerializer, TokenObtainPairSerializer, ActivateAccountSerializer
+from eauth.serializers import (
+    UserSerializer,
+    TokenObtainPairSerializer,
+    ActivateAccountSerializer,
+)
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.exceptions import AuthenticationFailed
+from eauth.utils import send_password_reset_email
 
 
 class RegisterView(APIView):
@@ -95,7 +100,7 @@ class CookieTokenRefreshView(TokenRefreshView):
 
 class LogoutView(APIView):
     permission_classes = [AllowAny]
-    
+
     def post(self, request):
         response = Response({"message": "Successfully logged out!"}, status=HTTP_200_OK)
         response.delete_cookie("refresh_token")
@@ -155,4 +160,27 @@ class ActivateAccountView(APIView):
         user.set_password(password)
         user.save(update_fields=["password"])
 
-        return Response({"detail": "Account activated successfully."}, status=HTTP_200_OK)
+        return Response(
+            {"detail": "Account activated successfully."}, status=HTTP_200_OK
+        )
+
+
+class PasswordResetView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get("email")
+        if not email:
+            return Response(
+                {"detail": "Email is required."}, status=HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = get_user_model().objects.get(email=email)
+            send_password_reset_email(user)
+        except get_user_model().DoesNotExist:
+            pass
+
+        return Response(
+            {"detail": "Password reset email sent."}, status=HTTP_200_OK
+        )

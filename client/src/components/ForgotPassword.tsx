@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -6,6 +7,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import { useTranslation } from "react-i18next";
+import axiosClient from "../utils/axiosClient";
 
 interface ForgotPasswordProps {
   open: boolean;
@@ -17,47 +19,75 @@ export default function ForgotPassword({
   handleClose,
 }: ForgotPasswordProps) {
   const { t } = useTranslation();
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleDialogClose = () => {
+    handleClose();
+  };
 
   return (
     <Dialog
       open={open}
-      onClose={handleClose}
+      onClose={handleDialogClose}
+      onTransitionExited={() => setSubmitted(false)}
       slotProps={{
         paper: {
           sx: { backgroundImage: "none" },
         },
       }}
     >
-      <form
-        noValidate
-        onSubmit={(event) => {
-          event.preventDefault();
-          handleClose();
-        }}
-      >
-        <DialogTitle>{t("forgotPassword.title")}</DialogTitle>
-        <DialogContent
-          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+      {submitted ? (
+        <>
+          <DialogTitle>{t("forgotPassword.title")}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {t("forgotPassword.confirmation")}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions sx={{ pb: 3, px: 3, justifyContent: "flex-end" }}>
+            <Button variant="contained" onClick={handleDialogClose}>
+              {t("common.close")}
+            </Button>
+          </DialogActions>
+        </>
+      ) : (
+        <form
+          noValidate
+          onSubmit={async (event) => {
+            event.preventDefault();
+            const data = new FormData(event.currentTarget);
+            const email = data.get("email");
+            if (!email) return;
+            await axiosClient.post("/auth/password-reset/", { email });
+            setSubmitted(true);
+          }}
         >
-          <DialogContentText>{t("forgotPassword.description")}</DialogContentText>
-          <TextField
-            autoFocus
-            required
-            margin="dense"
-            id="email"
-            name="email"
-            label={t("forgotPassword.emailLabel")}
-            placeholder={t("forgotPassword.emailLabel")}
-            type="email"
-          />
-        </DialogContent>
-        <DialogActions sx={{ pb: 3, px: 3, justifyContent: "flex-end" }}>
-          <Button onClick={handleClose}>{t("common.cancel")}</Button>
-          <Button variant="contained" type="submit">
-            {t("forgotPassword.continue")}
-          </Button>
-        </DialogActions>
-      </form>
+          <DialogTitle>{t("forgotPassword.title")}</DialogTitle>
+          <DialogContent
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
+            <DialogContentText>
+              {t("forgotPassword.description")}
+            </DialogContentText>
+            <TextField
+              autoFocus
+              required
+              margin="dense"
+              id="email"
+              name="email"
+              label={t("forgotPassword.emailLabel")}
+              placeholder={t("forgotPassword.emailLabel")}
+              type="email"
+            />
+          </DialogContent>
+          <DialogActions sx={{ pb: 3, px: 3, justifyContent: "flex-end" }}>
+            <Button onClick={handleDialogClose}>{t("common.cancel")}</Button>
+            <Button variant="contained" type="submit">
+              {t("forgotPassword.continue")}
+            </Button>
+          </DialogActions>
+        </form>
+      )}
     </Dialog>
   );
 }
