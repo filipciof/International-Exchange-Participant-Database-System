@@ -47,3 +47,32 @@ def send_password_reset_email(user):
         from_email=None,
         recipient_list=[user.email],
     )
+
+
+def send_activation_success_email(user):
+    send_mail(
+        subject="IEPDS - Account Activated",
+        message=(
+            f"Hello,\n\n"
+            f"Your account has been successfully activated.\n\n"
+            f"You can now sign in at:\n"
+            f"{get_frontend_url()}/sign-in\n\n"
+            f"IEPDS Team"
+        ),
+        from_email=None,
+        recipient_list=[user.email],
+    )
+
+
+def send_password_reset_success_email(user):
+    send_mail(
+        subject="IEPDS - Password Changed",
+        message=(
+            f"Hello,\n\n"
+            f"Your password has been successfully changed.\n\n"
+            f"If you did not make this change, please contact us immediately.\n\n"
+            f"IEPDS Team"
+        ),
+        from_email=None,
+        recipient_list=[user.email],
+    )

@@ -20,7 +20,7 @@ from eauth.serializers import (
 )
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.exceptions import AuthenticationFailed
-from eauth.utils import send_password_reset_email
+from eauth.utils import send_password_reset_email, send_activation_success_email, send_password_reset_success_email
 
 
 class RegisterView(APIView):
@@ -157,9 +157,18 @@ class ActivateAccountView(APIView):
                 status=HTTP_400_BAD_REQUEST,
             )
 
+        is_reset = user.has_usable_password()
+
         user.set_password(password)
         user.save(update_fields=["password"])
 
+        if is_reset:
+            send_password_reset_success_email(user)
+            return Response(
+                {"detail": "Password reset successfully."}, status=HTTP_200_OK
+            )
+
+        send_activation_success_email(user)
         return Response(
             {"detail": "Account activated successfully."}, status=HTTP_200_OK
         )
