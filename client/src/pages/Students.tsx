@@ -193,10 +193,6 @@ export default function Students() {
     return <StudentDetail id={selectedId} handleClose={handleClose} />;
   }
 
-  if (currentView === "add") {
-    return <AddStudent handleClose={handleClose} />;
-  }
-
   if (currentView === "update" && selectedId) {
     return (
       <UpdateStudent
@@ -254,6 +250,13 @@ export default function Students() {
           </Button> */}
         </Box>
       </Box>
+
+      {currentView === "add" && (
+        <AddStudent
+          open
+          handleClose={handleClose}
+        />
+      )}
 
       {selectedId && (
         <DeleteConfirmationDialog

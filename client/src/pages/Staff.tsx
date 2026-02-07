@@ -67,7 +67,6 @@ export default function Staff() {
 
   const handleClose = () => {
     setSelectedId(null);
-    addStaffMutation.reset();
     updateStaffMutation.reset();
     deleteStaffMutation.reset();
     handleViewChange("list");
@@ -97,7 +96,6 @@ export default function Staff() {
     // countries,
     isLoading,
     error,
-    addStaffMutation,
     updateStaffMutation,
     deleteStaffMutation,
   } = useStaff({ paginationModel, searchInput });
@@ -111,22 +109,6 @@ export default function Staff() {
       <Typography sx={{ color: "error.main" }}>
         {t("common.error", { message: error.message })}
       </Typography>
-    );
-  }
-
-  const handleAddStaff = (staff: StaffFormData) => {
-    addStaffMutation.mutate(staff);
-  };
-
-  if (currentView === "add") {
-    return (
-      <StaffAdd
-        handleClose={handleClose}
-        handleAddStaff={handleAddStaff}
-        isLoading={addStaffMutation.isPending}
-        isSuccess={addStaffMutation.isSuccess}
-        error={addStaffMutation.error}
-      />
     );
   }
 
@@ -170,6 +152,13 @@ export default function Staff() {
           {t("staff.newStaff")}
         </Button>
       </Box>
+
+      {currentView === "add" && (
+        <StaffAdd
+          open
+          handleClose={handleClose}
+        />
+      )}
 
       {selectedId && (
         <DeleteConfirmationDialog

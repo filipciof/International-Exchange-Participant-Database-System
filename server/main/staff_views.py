@@ -1,11 +1,13 @@
-from .models import Staff
+from .models import Club, Staff
 from .serializers import (
+    CreateStaffSerializer,
     StaffSerializer,
     StaffUserAccountCreateSerializer,
     StaffUserAccountUpdateSerializer,
 )
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.db import transaction
 from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -21,6 +23,7 @@ from config.settings import MEDIA_ROOT
 from config.permissions.policy_permissions import StaffPermission
 from config.selectors.staff import staff_queryset_for
 from django.shortcuts import get_object_or_404
+from eauth.utils import send_activation_email
 import os
 from uuid import uuid4
 from django.core.files.storage import default_storage
@@ -82,23 +85,34 @@ class StaffView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        data = request.data.copy()
-
-        photo = request.FILES.get("photo")
-        if photo:
-            ext = os.path.splitext(photo.name)[1].lower() or ".bin"
-            target_name = f"{uuid4().hex}{ext}"
-            unique_name = default_storage.get_available_name(target_name)
-            photo.name = unique_name
-            data["photo"] = photo
-
-        serializer = StaffSerializer(data=data)
-
+        serializer = CreateStaffSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        serializer.save()
-        return Response(serializer.data, status=HTTP_201_CREATED)
+        data = serializer.validated_data
+        club = Club.objects.get(id=data["id_club"], is_active=True)
+
+        with transaction.atomic():
+            user = User.objects.create_user(email=data["email"], password=None)
+            user.set_unusable_password()
+            user.save(update_fields=["password"])
+
+            for name in data["groups"]:
+                group = Group.objects.get(name=name)
+                user.groups.add(group)
+
+            staff = Staff.objects.create(
+                id_user=user,
+                id_club=club,
+                first_name=data["first_name"],
+                last_name=data["last_name"],
+                is_active=True,
+            )
+
+        send_activation_email(user)
+
+        response_serializer = StaffSerializer(staff)
+        return Response(response_serializer.data, status=HTTP_201_CREATED)
 
     def patch(self, request, pk=None):
         me = request.query_params.get("me")

@@ -331,6 +331,26 @@ class ExchangeFamilySerializer(serializers.ModelSerializer):
         return representation
 
 
+class CreateStaffSerializer(serializers.Serializer):
+    first_name = serializers.CharField(max_length=50)
+    last_name = serializers.CharField(max_length=50)
+    email = serializers.EmailField()
+    id_club = serializers.IntegerField()
+    groups = serializers.MultipleChoiceField(
+        choices=["admin", "correspondent", "club_officer", "kwm_officer"]
+    )
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email is already in use.")
+        return value
+
+    def validate_id_club(self, value):
+        if not Club.objects.filter(id=value, is_active=True).exists():
+            raise serializers.ValidationError("Club does not exist.")
+        return value
+
+
 class StaffSerializer(serializers.ModelSerializer):
     club = ClubSerializer(source="id_club", read_only=True)
 

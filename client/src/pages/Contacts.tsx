@@ -220,6 +220,7 @@ export default function Contacts() {
           exclusive
           onChange={handleViewModeChange}
           aria-label="view mode"
+          size="small"
         >
           <ToggleButton value="card" aria-label={t("common.cardView")}>
             <ViewModuleIcon />

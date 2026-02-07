@@ -132,6 +132,16 @@ export const createStudentSchema = z.object({
 
 export type CreateStudentFormData = z.infer<typeof createStudentSchema>;
 
+export const createStaffSchema = z.object({
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+  email: z.email().min(1, "Email is required"),
+  id_club: z.number().min(1, "Club is required"),
+  groups: z.array(z.string()).min(1, "At least one group is required"),
+});
+
+export type CreateStaffFormData = z.infer<typeof createStaffSchema>;
+
 export type ViewType = "list" | "add" | "update" | "delete" | "detail";
 
 export type Student = {

@@ -1,5 +1,4 @@
 import {
-  Paper,
   Typography,
   TextField,
   Button,
@@ -7,13 +6,14 @@ import {
   CircularProgress,
   useMediaQuery,
   Autocomplete,
-  IconButton,
-  Box,
   ToggleButton,
   ToggleButtonGroup,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
@@ -32,12 +32,14 @@ import { useTranslation } from "react-i18next";
 import usePermissions from "../../hooks/usePermissions";
 
 type CreateStudentFormProps = {
+  open: boolean;
   title: string;
   handleClose: () => void;
   submitButtonText?: string;
 };
 
 export default function CreateStudentForm({
+  open,
   title,
   handleClose,
   submitButtonText,
@@ -178,26 +180,11 @@ export default function CreateStudentForm({
   };
 
   return (
-    <Box
-      sx={{
-        height: "100%",
-        width: "100%",
-        overflow: "hidden",
-        backgroundColor: "background.default",
-      }}
-    >
-      <Paper elevation={0}>
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
-          <IconButton onClick={onClose} edge="start">
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography variant="h5" component="h1">
-            {title}
-          </Typography>
-        </Stack>
-
-        <form noValidate onSubmit={handleSubmit(onSubmit)}>
-          <Stack spacing={1} sx={{ px: { xs: 0, md: 16 } }}>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>{title}</DialogTitle>
+      <form noValidate onSubmit={handleSubmit(onSubmit)}>
+        <DialogContent>
+          <Stack spacing={1}>
             <Stack direction={isMobile ? "column" : "row"} spacing={1}>
               <Controller
                 name="first_name"
@@ -397,23 +384,6 @@ export default function CreateStudentForm({
                 </ToggleButtonGroup>
               )}
             />
-            <Stack
-              direction="row"
-              spacing={1}
-              justifyContent="flex-end"
-              sx={{ pt: 2 }}
-            >
-              <Button variant="outlined" onClick={onClose} size="large">
-                {t("common.cancel")}
-              </Button>
-              {mutation.isPending ? (
-                <CircularProgress sx={{ color: "secondary.main" }} />
-              ) : (
-                <Button variant="contained" type="submit" size="large">
-                  {defaultSubmitButtonText}
-                </Button>
-              )}
-            </Stack>
             {mutation.error && (
               <Stack spacing={1}>
                 {handleValidationErrors((mutation.error as any).response?.data).map(
@@ -431,8 +401,20 @@ export default function CreateStudentForm({
               </Typography>
             )}
           </Stack>
-        </form>
-      </Paper>
-    </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={onClose}>
+            {t("common.cancel")}
+          </Button>
+          {mutation.isPending ? (
+            <CircularProgress sx={{ color: "secondary.main" }} />
+          ) : (
+            <Button variant="contained" type="submit">
+              {defaultSubmitButtonText}
+            </Button>
+          )}
+        </DialogActions>
+      </form>
+    </Dialog>
   );
 }
