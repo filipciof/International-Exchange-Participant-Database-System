@@ -81,3 +81,5 @@ TODO:
 
 python manage.py makemessages -l pl
 python manage.py compilemessages
+
+The app disregards region code in the language settings.
