@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import A4, landscape
@@ -292,7 +293,7 @@ class StudentView(APIView):
         )
         elements = []
         styles = getSampleStyleSheet()
-        title = Paragraph("<b>Student Export Report</b>", styles["Title"])
+        title = Paragraph(f"<b>{_('Student Export Report')}</b>", styles["Title"])
         elements.append(title)
         elements.append(Spacer(1, 12))
 
@@ -364,7 +365,7 @@ class StudentView(APIView):
                 return Response(serializer.data)
             except Student.DoesNotExist:
                 return Response(
-                    {"message": "Student profile not found for this user."},
+                    {"message": _("Student profile not found for this user.")},
                     status=HTTP_404_NOT_FOUND,
                 )
 
@@ -479,7 +480,7 @@ class StudentPhotoView(APIView):
 
         if not photo_name:
             return Response(
-                {"message": "Photo name not provided."}, status=HTTP_404_NOT_FOUND
+                {"message": _("Photo name not provided.")}, status=HTTP_404_NOT_FOUND
             )
 
         photo_location = os.path.join(MEDIA_ROOT, "student_photos/", photo_name)
@@ -489,7 +490,7 @@ class StudentPhotoView(APIView):
                 photo_data = photo.read()
         except IOError:
             return Response(
-                {"message": "Unable to read the photo file."}, status=HTTP_404_NOT_FOUND
+                {"message": _("Unable to read the photo file.")}, status=HTTP_404_NOT_FOUND
             )
 
         # File download
@@ -510,7 +511,7 @@ class StudentUserAccountView(APIView):
 
         if not student.id_user:
             return Response(
-                {"message": "Student does not have a user account."},
+                {"message": _("Student does not have a user account.")},
                 status=HTTP_404_NOT_FOUND,
             )
 
@@ -532,7 +533,7 @@ class StudentUserAccountView(APIView):
 
         return Response(
             {
-                "message": "User account updated successfully.",
+                "message": _("User account updated successfully."),
                 "email": user.email,
                 "email_verification_sent": email_verification_sent,
             }

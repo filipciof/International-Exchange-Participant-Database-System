@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode
+from django.utils.translation import gettext as _
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.status import (
@@ -41,7 +42,7 @@ class CookieTokenRefreshSerializer(TokenRefreshSerializer):
         if attrs["refresh"]:
             return super().validate(attrs)
         else:
-            raise InvalidToken("No valid token found in cookie 'refresh_token'")
+            raise InvalidToken(_("No valid token found in cookie 'refresh_token'"))
 
 
 class CookieTokenObtainPairView(TokenObtainPairView):
@@ -97,7 +98,7 @@ class LogoutView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        response = Response({"message": "Successfully logged out!"}, status=HTTP_200_OK)
+        response = Response({"message": _("Successfully logged out!")}, status=HTTP_200_OK)
         response.delete_cookie("refresh_token")
         return response
 
@@ -123,18 +124,18 @@ class ActivateAccountView(APIView):
 
         if not uid or not token:
             return Response(
-                {"detail": "Missing uid or token."},
+                {"detail": _("Missing uid or token.")},
                 status=HTTP_400_BAD_REQUEST,
             )
 
         user = self._validate_link(uid, token)
         if not user:
             return Response(
-                {"detail": "Activation link is invalid or has expired."},
+                {"detail": _("Activation link is invalid or has expired.")},
                 status=HTTP_400_BAD_REQUEST,
             )
 
-        return Response({"detail": "Valid activation link."}, status=HTTP_200_OK)
+        return Response({"detail": _("Valid activation link.")}, status=HTTP_200_OK)
 
     def post(self, request):
         serializer = ActivateAccountSerializer(data=request.data)
@@ -148,7 +149,7 @@ class ActivateAccountView(APIView):
         user = self._validate_link(uid, token)
         if not user:
             return Response(
-                {"detail": "Activation link is invalid or has expired."},
+                {"detail": _("Activation link is invalid or has expired.")},
                 status=HTTP_400_BAD_REQUEST,
             )
 
@@ -160,12 +161,12 @@ class ActivateAccountView(APIView):
         if is_reset:
             send_password_reset_success_email(user)
             return Response(
-                {"detail": "Password reset successfully."}, status=HTTP_200_OK
+                {"detail": _("Password reset successfully.")}, status=HTTP_200_OK
             )
 
         send_activation_success_email(user)
         return Response(
-            {"detail": "Account activated successfully."}, status=HTTP_200_OK
+            {"detail": _("Account activated successfully.")}, status=HTTP_200_OK
         )
 
 
@@ -181,7 +182,7 @@ class VerifyEmailChangeView(APIView):
             data = verify_email_change_token(serializer.validated_data["token"])
         except (BadSignature, SignatureExpired):
             return Response(
-                {"detail": "Verification link is invalid or has expired."},
+                {"detail": _("Verification link is invalid or has expired.")},
                 status=HTTP_400_BAD_REQUEST,
             )
 
@@ -190,14 +191,14 @@ class VerifyEmailChangeView(APIView):
             user = User.objects.get(pk=data["id_user"])
         except User.DoesNotExist:
             return Response(
-                {"detail": "User not found."},
+                {"detail": _("User not found.")},
                 status=HTTP_400_BAD_REQUEST,
             )
 
         new_email = data["new_email"]
         if User.objects.filter(email=new_email).exclude(pk=user.pk).exists():
             return Response(
-                {"detail": "This email is already in use."},
+                {"detail": _("This email is already in use.")},
                 status=HTTP_400_BAD_REQUEST,
             )
 
@@ -205,7 +206,7 @@ class VerifyEmailChangeView(APIView):
         user.save(update_fields=["email"])
 
         return Response(
-            {"detail": "Email changed successfully."}, status=HTTP_200_OK
+            {"detail": _("Email changed successfully.")}, status=HTTP_200_OK
         )
 
 
@@ -216,7 +217,7 @@ class PasswordResetView(APIView):
         email = request.data.get("email")
         if not email:
             return Response(
-                {"detail": "Email is required."}, status=HTTP_400_BAD_REQUEST
+                {"detail": _("Email is required.")}, status=HTTP_400_BAD_REQUEST
             )
 
         try:
@@ -226,5 +227,5 @@ class PasswordResetView(APIView):
             pass
 
         return Response(
-            {"detail": "Password reset email sent."}, status=HTTP_200_OK
+            {"detail": _("Password reset email sent.")}, status=HTTP_200_OK
         )

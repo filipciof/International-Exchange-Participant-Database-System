@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from .models import Club, Staff
 from .serializers import (
     CreateStaffSerializer,
@@ -50,7 +51,7 @@ class StaffView(APIView):
                 return Response(serializer.data)
             except Staff.DoesNotExist:
                 return Response(
-                    {"message": "Staff profile not found for this user."},
+                    {"message": _("Staff profile not found for this user.")},
                     status=HTTP_404_NOT_FOUND,
                 )
 
@@ -121,7 +122,7 @@ class StaffView(APIView):
                 staff = Staff.objects.get(id_user=request.user, is_active=True)
             except Staff.DoesNotExist:
                 return Response(
-                    {"message": "Staff profile not found for this user."},
+                    {"message": _("Staff profile not found for this user.")},
                     status=HTTP_404_NOT_FOUND,
                 )
         else:
@@ -172,7 +173,7 @@ class StaffPhotoView(APIView):
 
         if not photo_name:
             return Response(
-                {"message": "Photo name not provided."}, status=HTTP_404_NOT_FOUND
+                {"message": _("Photo name not provided.")}, status=HTTP_404_NOT_FOUND
             )
 
         photo_location = os.path.join(MEDIA_ROOT, "staff_photos/", photo_name)
@@ -182,7 +183,7 @@ class StaffPhotoView(APIView):
                 photo_data = photo.read()
         except IOError:
             return Response(
-                {"message": "Unable to read the photo file."}, status=HTTP_404_NOT_FOUND
+                {"message": _("Unable to read the photo file.")}, status=HTTP_404_NOT_FOUND
             )
 
         # File download
@@ -203,7 +204,7 @@ class StaffUserAccountView(APIView):
 
         if not staff.id_user:
             return Response(
-                {"message": "Staff member does not have a user account."},
+                {"message": _("Staff member does not have a user account.")},
                 status=HTTP_404_NOT_FOUND,
             )
 
@@ -232,7 +233,7 @@ class StaffUserAccountView(APIView):
 
         return Response(
             {
-                "message": "User account updated successfully.",
+                "message": _("User account updated successfully."),
                 "email": user.email,
                 "email_verification_sent": email_verification_sent,
             }

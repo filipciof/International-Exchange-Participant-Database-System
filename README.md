@@ -78,3 +78,6 @@ TODO:
 - Using zod and react hook form for editable elements in the StudentDetail.
 - Filtering students by height.
 - Removing the errors from console by catching them and doing nothing.
+
+python manage.py makemessages -l pl
+python manage.py compilemessages

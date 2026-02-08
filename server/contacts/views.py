@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -29,7 +30,7 @@ class ContactPhotoView(APIView):
 
         if not photo_name:
             return Response(
-                {"message": "Photo name not provided."}, status=HTTP_404_NOT_FOUND
+                {"message": _("Photo name not provided.")}, status=HTTP_404_NOT_FOUND
             )
 
         photo_location = os.path.join(MEDIA_ROOT, "contact_photos/", photo_name)
@@ -39,7 +40,7 @@ class ContactPhotoView(APIView):
                 photo_data = photo.read()
         except IOError:
             return Response(
-                {"message": "Unable to read the photo file."}, status=HTTP_404_NOT_FOUND
+                {"message": _("Unable to read the photo file.")}, status=HTTP_404_NOT_FOUND
             )
 
         # File download

@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from .models import (
     Club,
@@ -137,12 +138,12 @@ class CreateStudentSerializer(serializers.Serializer):
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("Email is already in use.")
+            raise serializers.ValidationError(_("Email is already in use."))
         return value
 
     def validate_id_club(self, value):
         if not Club.objects.filter(id=value, is_active=True).exists():
-            raise serializers.ValidationError("Club does not exist.")
+            raise serializers.ValidationError(_("Club does not exist."))
         return value
 
     def validate(self, attrs):
@@ -154,12 +155,12 @@ class CreateStudentSerializer(serializers.Serializer):
 
         if attrs.get("is_inbound") and is_club_from_home_country(club):
             raise serializers.ValidationError(
-                {"id_club": "Inbound students must have a foreign sending club."}
+                {"id_club": _("Inbound students must have a foreign sending club.")}
             )
 
         if not attrs.get("is_inbound") and not is_club_from_home_country(club):
             raise serializers.ValidationError(
-                {"id_club": "Outbound students must have a home country sending club."}
+                {"id_club": _("Outbound students must have a home country sending club.")}
             )
 
         if not user:
@@ -173,13 +174,13 @@ class CreateStudentSerializer(serializers.Serializer):
 
         if is_inbound and not can_create_inbound:
             raise serializers.ValidationError(
-                {"is_inbound": "You do not have permission to create inbound students."}
+                {"is_inbound": _("You do not have permission to create inbound students.")}
             )
 
         if not is_inbound and not can_create_outbound:
             raise serializers.ValidationError(
                 {
-                    "is_inbound": "You do not have permission to create outbound students."
+                    "is_inbound": _("You do not have permission to create outbound students.")
                 }
             )
 
@@ -188,7 +189,7 @@ class CreateStudentSerializer(serializers.Serializer):
             if staff and staff.id_club_id and attrs["id_club"] != staff.id_club_id:
                 raise serializers.ValidationError(
                     {
-                        "id_club": "Club officers can only create students for their own club."
+                        "id_club": _("Club officers can only create students for their own club.")
                     }
                 )
 
@@ -201,7 +202,7 @@ class StudentUserAccountUpdateSerializer(serializers.Serializer):
     def validate_email(self, value):
         user = self.context.get("user")
         if user and User.objects.filter(email=value).exclude(pk=user.pk).exists():
-            raise serializers.ValidationError("Email is already in use.")
+            raise serializers.ValidationError(_("Email is already in use."))
         return value
 
 
@@ -326,12 +327,12 @@ class CreateStaffSerializer(serializers.Serializer):
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("Email is already in use.")
+            raise serializers.ValidationError(_("Email is already in use."))
         return value
 
     def validate_id_club(self, value):
         if not Club.objects.filter(id=value, is_active=True).exists():
-            raise serializers.ValidationError("Club does not exist.")
+            raise serializers.ValidationError(_("Club does not exist."))
         return value
 
 
@@ -373,12 +374,12 @@ class StaffUserAccountUpdateSerializer(serializers.Serializer):
     def validate_email(self, value):
         user = self.context.get("user")
         if user and User.objects.filter(email=value).exclude(pk=user.pk).exists():
-            raise serializers.ValidationError("Email is already in use.")
+            raise serializers.ValidationError(_("Email is already in use."))
         return value
 
     def validate(self, attrs):
         if not attrs:
-            raise serializers.ValidationError("No data provided.")
+            raise serializers.ValidationError(_("No data provided."))
         return attrs
 
 

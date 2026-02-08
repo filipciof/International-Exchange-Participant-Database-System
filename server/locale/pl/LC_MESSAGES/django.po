@@ -1,0 +1,298 @@
+# Polish translations for IEPDS.
+# Copyright (C) 2026
+# This file is distributed under the same license as the IEPDS package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: IEPDS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-08 11:32+0000\n"
+"PO-Revision-Date: 2026-02-08 11:32+0000\n"
+"Last-Translator: \n"
+"Language-Team: Polish\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
+"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
+"n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+
+#: contacts/views.py:33 main/staff_views.py:176 main/student_views.py:483
+msgid "Photo name not provided."
+msgstr "Nie podano nazwy zdjęcia."
+
+#: contacts/views.py:43 main/staff_views.py:186 main/student_views.py:493
+msgid "Unable to read the photo file."
+msgstr "Nie udało się odczytać pliku zdjęcia."
+
+#: eauth/admin.py:12
+msgid "Personal info"
+msgstr "Dane osobowe"
+
+#: eauth/admin.py:13
+msgid "Permissions"
+msgstr "Uprawnienia"
+
+#: eauth/admin.py:16
+msgid "Important dates"
+msgstr "Ważne daty"
+
+#: eauth/models.py:18
+msgid "The Email must be set"
+msgstr "Adres email musi być podany"
+
+#: eauth/models.py:34
+msgid "Superuser must have is_staff=True."
+msgstr "Superużytkownik musi mieć is_staff=True."
+
+#: eauth/models.py:36
+msgid "Superuser must have is_superuser=True."
+msgstr "Superużytkownik musi mieć is_superuser=True."
+
+#: eauth/models.py:42
+msgid "email address"
+msgstr "adres email"
+
+#: eauth/utils.py:27
+msgid "IEPDS - Activate Your Account"
+msgstr "IEPDS - Aktywuj swoje konto"
+
+#: eauth/utils.py:29
+#, python-format
+msgid ""
+"Hello,\n"
+"\n"
+"An account has been created for you in the IEPDS system.\n"
+"\n"
+"Please click the link below to set your password and activate your account:\n"
+"%(link)s\n"
+"\n"
+"If you did not expect this email, you can safely ignore it.\n"
+"\n"
+"IEPDS Team"
+msgstr ""
+"Witaj,\n"
+"\n"
+"W systemie IEPDS zostało utworzone dla Ciebie konto.\n"
+"\n"
+"Kliknij poniższy link, aby ustawić hasło i aktywować swoje konto:\n"
+"%(link)s\n"
+"\n"
+"Jeśli nie spodziewałeś/aś się tego emaila, możesz go zignorować.\n"
+"\n"
+"Zespół IEPDS"
+
+#: eauth/utils.py:43
+msgid "IEPDS - Reset Your Password"
+msgstr "IEPDS - Zresetuj hasło"
+
+#: eauth/utils.py:45
+#, python-format
+msgid ""
+"Hello,\n"
+"\n"
+"We received a request to reset your password.\n"
+"\n"
+"Please click the link below to set a new password:\n"
+"%(link)s\n"
+"\n"
+"If you did not request this, you can safely ignore this email.\n"
+"\n"
+"IEPDS Team"
+msgstr ""
+"Witaj,\n"
+"\n"
+"Otrzymaliśmy prośbę o zresetowanie Twojego hasła.\n"
+"\n"
+"Kliknij poniższy link, aby ustawić nowe hasło:\n"
+"%(link)s\n"
+"\n"
+"Jeśli nie prosiłeś/aś o to, możesz zignorować ten email.\n"
+"\n"
+"Zespół IEPDS"
+
+#: eauth/utils.py:59
+msgid "IEPDS - Account Activated"
+msgstr "IEPDS - Konto aktywowane"
+
+#: eauth/utils.py:61
+#, python-format
+msgid ""
+"Hello,\n"
+"\n"
+"Your account has been successfully activated.\n"
+"\n"
+"You can now sign in at:\n"
+"%(link)s\n"
+"\n"
+"IEPDS Team"
+msgstr ""
+"Witaj,\n"
+"\n"
+"Twoje konto zostało pomyślnie aktywowane.\n"
+"\n"
+"Możesz teraz zalogować się na:\n"
+"%(link)s\n"
+"\n"
+"Zespół IEPDS"
+
+#: eauth/utils.py:74
+msgid "IEPDS - Password Changed"
+msgstr "IEPDS - Hasło zmienione"
+
+#: eauth/utils.py:76
+msgid ""
+"Hello,\n"
+"\n"
+"Your password has been successfully changed.\n"
+"\n"
+"If you did not make this change, please contact us immediately.\n"
+"\n"
+"IEPDS Team"
+msgstr ""
+"Witaj,\n"
+"\n"
+"Twoje hasło zostało pomyślnie zmienione.\n"
+"\n"
+"Jeśli nie dokonałeś/aś tej zmiany, skontaktuj się z nami natychmiast.\n"
+"\n"
+"Zespół IEPDS"
+
+#: eauth/utils.py:105
+msgid "IEPDS - Verify Email Change"
+msgstr "IEPDS - Zweryfikuj zmianę adresu email"
+
+#: eauth/utils.py:107
+#, python-format
+msgid ""
+"Hello,\n"
+"\n"
+"A request was made to change your account email to this address.\n"
+"\n"
+"Please click the link below to confirm the change:\n"
+"%(link)s\n"
+"\n"
+"If you did not expect this email, you can safely ignore it.\n"
+"\n"
+"IEPDS Team"
+msgstr ""
+"Witaj,\n"
+"\n"
+"Złożono prośbę o zmianę adresu email Twojego konta na ten adres.\n"
+"\n"
+"Kliknij poniższy link, aby potwierdzić zmianę:\n"
+"%(link)s\n"
+"\n"
+"Jeśli nie spodziewałeś/aś się tego emaila, możesz go zignorować.\n"
+"\n"
+"Zespół IEPDS"
+
+#: eauth/views.py:45
+msgid "No valid token found in cookie 'refresh_token'"
+msgstr "Nie znaleziono prawidłowego tokenu w ciasteczku 'refresh_token'"
+
+#: eauth/views.py:101
+msgid "Successfully logged out!"
+msgstr "Wylogowano pomyślnie!"
+
+#: eauth/views.py:127
+msgid "Missing uid or token."
+msgstr "Brak uid lub tokenu."
+
+#: eauth/views.py:134 eauth/views.py:152
+msgid "Activation link is invalid or has expired."
+msgstr "Link aktywacyjny jest nieprawidłowy lub wygasł."
+
+#: eauth/views.py:138
+msgid "Valid activation link."
+msgstr "Link aktywacyjny jest prawidłowy."
+
+#: eauth/views.py:164
+msgid "Password reset successfully."
+msgstr "Hasło zostało pomyślnie zresetowane."
+
+#: eauth/views.py:169
+msgid "Account activated successfully."
+msgstr "Konto zostało pomyślnie aktywowane."
+
+#: eauth/views.py:185
+msgid "Verification link is invalid or has expired."
+msgstr "Link weryfikacyjny jest nieprawidłowy lub wygasł."
+
+#: eauth/views.py:194
+msgid "User not found."
+msgstr "Nie znaleziono użytkownika."
+
+#: eauth/views.py:201
+msgid "This email is already in use."
+msgstr "Ten adres email jest już w użyciu."
+
+#: eauth/views.py:209
+msgid "Email changed successfully."
+msgstr "Adres email został pomyślnie zmieniony."
+
+#: eauth/views.py:220
+msgid "Email is required."
+msgstr "Email jest wymagany."
+
+#: eauth/views.py:230
+msgid "Password reset email sent."
+msgstr "Email do zresetowania hasła został wysłany."
+
+#: main/serializers.py:141 main/serializers.py:205 main/serializers.py:330
+#: main/serializers.py:377
+msgid "Email is already in use."
+msgstr "Ten email jest już w użyciu."
+
+#: main/serializers.py:146 main/serializers.py:335
+msgid "Club does not exist."
+msgstr "Klub nie istnieje."
+
+#: main/serializers.py:158
+msgid "Inbound students must have a foreign sending club."
+msgstr "Przyjeżdżający uczestnicy muszą mieć zagraniczny klub wysyłający."
+
+#: main/serializers.py:163
+msgid "Outbound students must have a home country sending club."
+msgstr "Wyjeżdżający uczestnicy muszą mieć klub wysyłający z kraju ojczystego."
+
+#: main/serializers.py:177
+msgid "You do not have permission to create inbound students."
+msgstr "Nie masz uprawnień do tworzenia uczestników przyjeżdżających."
+
+#: main/serializers.py:183
+msgid "You do not have permission to create outbound students."
+msgstr "Nie masz uprawnień do tworzenia uczestników wyjeżdżających."
+
+#: main/serializers.py:192
+msgid "Club officers can only create students for their own club."
+msgstr "Oficerowie klubowi mogą tworzyć uczestników tylko dla swojego klubu."
+
+#: main/serializers.py:382
+msgid "No data provided."
+msgstr "Nie podano danych."
+
+#: main/staff_views.py:54 main/staff_views.py:125
+msgid "Staff profile not found for this user."
+msgstr "Nie znaleziono profilu pracownika dla tego użytkownika."
+
+#: main/staff_views.py:207
+msgid "Staff member does not have a user account."
+msgstr "Pracownik nie posiada konta użytkownika."
+
+#: main/staff_views.py:236 main/student_views.py:536
+msgid "User account updated successfully."
+msgstr "Konto użytkownika zostało pomyślnie zaktualizowane."
+
+#: main/student_views.py:296
+msgid "Student Export Report"
+msgstr "Raport eksportu uczestników"
+
+#: main/student_views.py:368
+msgid "Student profile not found for this user."
+msgstr "Nie znaleziono profilu uczestnika dla tego użytkownika."
+
+#: main/student_views.py:514
+msgid "Student does not have a user account."
+msgstr "Uczestnik nie posiada konta użytkownika."
