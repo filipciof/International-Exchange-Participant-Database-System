@@ -1,6 +1,13 @@
 import axios from "axios";
 import i18n from "../i18n";
 
+export const clearAuthData = () => {
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("userGroups");
+  localStorage.removeItem("userEmail");
+  localStorage.removeItem("activeGroup");
+};
+
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: {
@@ -30,7 +37,7 @@ export const refreshAccessToken = async () => {
     localStorage.setItem("accessToken", accessToken);
     return accessToken;
   } catch (error) {
-    localStorage.clear();
+    clearAuthData();
     window.location.href = "/sign-in";
     throw new Error("Unable to refresh token");
   }

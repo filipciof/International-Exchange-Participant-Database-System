@@ -3,7 +3,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import axiosClient from "../utils/axiosClient";
+import axiosClient, { clearAuthData } from "../utils/axiosClient";
 import LanguageSwitcher from "./LanguageSwitcher";
 import GroupSwitcher from "./GroupSwitcher";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -30,12 +30,12 @@ export default function AccountMenu({ setLoading }: AccountMenuProps) {
     setLoading(true);
     try {
       await axiosClient.post("/auth/logout/");
-      localStorage.clear();
+      clearAuthData();
       navigate("/sign-in");
     } catch (err) {
       setLoading(false);
       console.error(err);
-      localStorage.clear();
+      clearAuthData();
       navigate("/sign-in");
     }
   };
