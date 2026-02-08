@@ -195,30 +195,14 @@ class CreateStudentSerializer(serializers.Serializer):
         return attrs
 
 
-class StudentUserAccountCreateSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(write_only=True, min_length=5)
-
-    def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("Email is already in use.")
-        return value
-
-
 class StudentUserAccountUpdateSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=False)
-    password = serializers.CharField(required=False, write_only=True, min_length=5)
+    email = serializers.EmailField()
 
     def validate_email(self, value):
         user = self.context.get("user")
         if user and User.objects.filter(email=value).exclude(pk=user.pk).exists():
             raise serializers.ValidationError("Email is already in use.")
         return value
-
-    def validate(self, attrs):
-        if not attrs:
-            raise serializers.ValidationError("No data provided.")
-        return attrs
 
 
 class ExchangeTypeSerializer(serializers.ModelSerializer):
@@ -379,22 +363,8 @@ class StaffSerializer(serializers.ModelSerializer):
         return representation
 
 
-class StaffUserAccountCreateSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(write_only=True, min_length=5)
-    groups = serializers.MultipleChoiceField(
-        choices=["admin", "correspondent", "club_officer", "kwm_officer"]
-    )
-
-    def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("Email is already in use.")
-        return value
-
-
 class StaffUserAccountUpdateSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False)
-    password = serializers.CharField(required=False, write_only=True, min_length=5)
     groups = serializers.MultipleChoiceField(
         choices=["admin", "correspondent", "club_officer", "kwm_officer"],
         required=False,

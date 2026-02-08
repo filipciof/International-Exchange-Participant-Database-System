@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { Box, Grid, IconButton, TextField, Button, Alert } from "@mui/material";
+import { Box, Grid, IconButton, TextField, Alert } from "@mui/material";
 import {
   Edit as EditIcon,
   Save,
   Close,
   AccountCircle,
-  Add as AddIcon,
 } from "@mui/icons-material";
 import type { Student } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
@@ -24,93 +23,59 @@ export default function EditableUserAccount({
 }: EditableUserAccountProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
-
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [emailVerificationSent, setEmailVerificationSent] = useState(false);
+  const [email, setEmail] = useState("");
 
   const hasUserAccount = Boolean(student.user_email);
 
-  const createMutation = useMutation({
-    mutationFn: async (data: { email: string; password: string }) => {
-      const response = await axiosClient.post(
-        `/students/${student.id}/user-account/`,
-        data,
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["students"] });
-      setIsEditing(false);
-      setFormData({ email: "", password: "" });
-    },
-  });
-
   const updateMutation = useMutation({
-    mutationFn: async (data: { email?: string; password?: string }) => {
+    mutationFn: async (data: { email: string }) => {
       const response = await axiosClient.patch(
         `/students/${student.id}/user-account/`,
         data,
       );
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["students"] });
       setIsEditing(false);
-      setFormData({ email: "", password: "" });
+      setEmail("");
+      if (data.email_verification_sent) {
+        setEmailVerificationSent(true);
+      }
     },
   });
 
   const handleSave = () => {
-    if (hasUserAccount) {
-      // Only send fields that have values
-      const updateData: { email?: string; password?: string } = {};
-      if (formData.email) updateData.email = formData.email;
-      if (formData.password) updateData.password = formData.password;
-      updateMutation.mutate(updateData);
-    } else {
-      createMutation.mutate(formData);
-    }
+    updateMutation.mutate({ email });
   };
 
   const handleCancel = () => {
-    setFormData({ email: "", password: "" });
+    setEmail("");
     setIsEditing(false);
   };
 
-  const handleCreate = () => {
-    setFormData({ email: "", password: "" });
-    setIsEditing(true);
-  };
-
   const handleEdit = () => {
-    setFormData({ email: student.user_email || "", password: "" });
+    setEmailVerificationSent(false);
+    setEmail(student.user_email || "");
     setIsEditing(true);
   };
 
-  const isLoading = createMutation.isPending || updateMutation.isPending;
-  const error = createMutation.error || updateMutation.error;
+  const isLoading = updateMutation.isPending;
+  const error = updateMutation.error;
 
   const actions = !isEditing ? (
     hasUserAccount ? (
       <IconButton size="small" onClick={handleEdit}>
         <EditIcon />
       </IconButton>
-    ) : (
-      <IconButton size="small" onClick={handleCreate}>
-        <AddIcon />
-      </IconButton>
-    )
+    ) : null
   ) : (
     <Box sx={{ display: "flex", gap: 1 }}>
       <IconButton
         size="small"
         onClick={handleSave}
-        disabled={
-          isLoading ||
-          (!hasUserAccount && (!formData.email || !formData.password))
-        }
+        disabled={isLoading || !email}
         color="primary"
       >
         <Save />
@@ -135,6 +100,12 @@ export default function EditableUserAccount({
         </Alert>
       )}
 
+      {emailVerificationSent && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          {t("account.emailVerificationSent")}
+        </Alert>
+      )}
+
       {!isEditing ? (
         <>
           {hasUserAccount ? (
@@ -153,57 +124,22 @@ export default function EditableUserAccount({
                 borderColor: "divider",
                 borderRadius: 1,
                 textAlign: "center",
+                color: "text.secondary",
               }}
             >
-              <Box sx={{ mb: 2, color: "text.secondary" }}>
-                {t("account.noUser")}
-              </Box>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleCreate}
-              >
-                {t("account.createUser")}
-              </Button>
+              {t("account.noUser")}
             </Box>
           )}
         </>
       ) : (
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          <TextField
-            label={t("studentForm.labels.email")}
-            fullWidth
-            value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-            disabled={isLoading}
-            required={!hasUserAccount}
-            type="email"
-            helperText={
-              hasUserAccount
-                ? // ? t("account.leaveBlankEmail")
-                  ""
-                : t("account.requiredEmail")
-            }
-          />
-          <TextField
-            label={t("account.password")}
-            fullWidth
-            type="password"
-            value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-            disabled={isLoading}
-            required={!hasUserAccount}
-            helperText={
-              hasUserAccount
-                ? t("account.leaveBlankPassword")
-                : t("account.requiredPassword")
-            }
-          />
-        </Box>
+        <TextField
+          label={t("studentForm.labels.email")}
+          fullWidth
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={isLoading}
+          type="email"
+        />
       )}
     </Section>
   );

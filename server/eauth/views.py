@@ -14,24 +14,19 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.exceptions import InvalidToken
 from eauth.serializers import (
-    UserSerializer,
     TokenObtainPairSerializer,
     ActivateAccountSerializer,
+    VerifyEmailChangeSerializer,
 )
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.exceptions import AuthenticationFailed
-from eauth.utils import send_password_reset_email, send_activation_success_email, send_password_reset_success_email
-
-
-class RegisterView(APIView):
-    http_method_names = ["post"]
-
-    def post(self, *args, **kwargs):
-        serializer = UserSerializer(data=self.request.data)
-        if serializer.is_valid():
-            get_user_model().objects.create_user(**serializer.validated_data)
-            return Response(status=HTTP_201_CREATED)
-        return Response(status=HTTP_400_BAD_REQUEST, data={"errors": serializer.errors})
+from django.core.signing import BadSignature, SignatureExpired
+from eauth.utils import (
+    send_password_reset_email,
+    send_activation_success_email,
+    send_password_reset_success_email,
+    verify_email_change_token,
+)
 
 
 class EmailTokenObtainPairView(TokenObtainPairView):
@@ -171,6 +166,46 @@ class ActivateAccountView(APIView):
         send_activation_success_email(user)
         return Response(
             {"detail": "Account activated successfully."}, status=HTTP_200_OK
+        )
+
+
+class VerifyEmailChangeView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = VerifyEmailChangeSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        try:
+            data = verify_email_change_token(serializer.validated_data["token"])
+        except (BadSignature, SignatureExpired):
+            return Response(
+                {"detail": "Verification link is invalid or has expired."},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        User = get_user_model()
+        try:
+            user = User.objects.get(pk=data["id_user"])
+        except User.DoesNotExist:
+            return Response(
+                {"detail": "User not found."},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        new_email = data["new_email"]
+        if User.objects.filter(email=new_email).exclude(pk=user.pk).exists():
+            return Response(
+                {"detail": "This email is already in use."},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        user.email = new_email
+        user.save(update_fields=["email"])
+
+        return Response(
+            {"detail": "Email changed successfully."}, status=HTTP_200_OK
         )
 
 

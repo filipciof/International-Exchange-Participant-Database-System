@@ -19,3 +19,7 @@ class ActivateAccountSerializer(serializers.Serializer):
     uid = serializers.CharField()
     token = serializers.CharField()
     password = serializers.CharField(write_only=True, min_length=5)
+
+
+class VerifyEmailChangeSerializer(serializers.Serializer):
+    token = serializers.CharField()

@@ -1,6 +1,11 @@
 from django.urls import path
 
-from .views import LogoutView, ActivateAccountView, PasswordResetView
+from .views import (
+    LogoutView,
+    ActivateAccountView,
+    PasswordResetView,
+    VerifyEmailChangeView,
+)
 from .views import CookieTokenRefreshView, CookieTokenObtainPairView
 
 urlpatterns = [
@@ -9,4 +14,5 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="logout"),
     path("activate/", ActivateAccountView.as_view(), name="activate_account"),
     path("password-reset/", PasswordResetView.as_view(), name="password_reset"),
+    path("verify-email/", VerifyEmailChangeView.as_view(), name="verify_email_change"),
 ]

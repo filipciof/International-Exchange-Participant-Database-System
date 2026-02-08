@@ -4,7 +4,6 @@ import {
   Grid,
   IconButton,
   TextField,
-  Button,
   Alert,
   MenuItem,
   Select,
@@ -18,7 +17,6 @@ import {
   Save,
   Close,
   AccountCircle,
-  Add as AddIcon,
 } from "@mui/icons-material";
 import type { Staff } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
@@ -38,10 +36,10 @@ export default function EditableUserAccount({
 }: EditableUserAccountProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
+  const [emailVerificationSent, setEmailVerificationSent] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
-    password: "",
     groups: [] as string[],
   });
 
@@ -49,106 +47,62 @@ export default function EditableUserAccount({
 
   const { canAssignGroups } = usePermissions();
 
-  const createMutation = useMutation({
-    mutationFn: async (data: {
-      email: string;
-      password: string;
-      groups: string[];
-    }) => {
-      const response = await axiosClient.post(
-        `/staff/${staff.id}/user-account/`,
-        data,
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["staff"] });
-      setIsEditing(false);
-      setFormData({ email: "", password: "", groups: [] });
-    },
-  });
-
   const updateMutation = useMutation({
-    mutationFn: async (data: {
-      email?: string;
-      password?: string;
-      groups?: string[];
-    }) => {
+    mutationFn: async (data: { email?: string; groups?: string[] }) => {
       const response = await axiosClient.patch(
         `/staff/${staff.id}/user-account/`,
         data,
       );
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["staff"] });
       setIsEditing(false);
-      setFormData({ email: "", password: "", groups: [] });
+      setFormData({ email: "", groups: [] });
+      if (data.email_verification_sent) {
+        setEmailVerificationSent(true);
+      }
     },
   });
 
   const handleSave = () => {
-    if (hasUserAccount) {
-      // Only send fields that have values
-      const updateData: {
-        email?: string;
-        password?: string;
-        groups?: string[];
-      } = {};
-      if (formData.email) updateData.email = formData.email;
-      if (formData.password) updateData.password = formData.password;
-      if (formData.groups.length > 0 && canAssignGroups)
-        updateData.groups = formData.groups;
-      updateMutation.mutate(updateData);
-    } else {
-      createMutation.mutate(formData);
-    }
+    const updateData: { email?: string; groups?: string[] } = {};
+    if (formData.email && formData.email !== staff.user_email)
+      updateData.email = formData.email;
+    if (formData.groups.length > 0 && canAssignGroups)
+      updateData.groups = formData.groups;
+    updateMutation.mutate(updateData);
   };
 
   const handleCancel = () => {
-    setFormData({ email: "", password: "", groups: [] });
+    setFormData({ email: "", groups: [] });
     setIsEditing(false);
   };
 
-  const handleCreate = () => {
-    setFormData({ email: "", password: "", groups: [] });
-    setIsEditing(true);
-  };
-
   const handleEdit = () => {
+    setEmailVerificationSent(false);
     setFormData({
       email: staff.user_email || "",
-      password: "",
       groups: staff.user_groups || [],
     });
     setIsEditing(true);
   };
 
-  const isLoading = createMutation.isPending || updateMutation.isPending;
-  const error = createMutation.error || updateMutation.error;
+  const isLoading = updateMutation.isPending;
+  const error = updateMutation.error;
 
   const actions = !isEditing ? (
     hasUserAccount ? (
       <IconButton size="small" onClick={handleEdit}>
         <EditIcon />
       </IconButton>
-    ) : (
-      <IconButton size="small" onClick={handleCreate}>
-        <AddIcon />
-      </IconButton>
-    )
+    ) : null
   ) : (
     <Box sx={{ display: "flex", gap: 1 }}>
       <IconButton
         size="small"
         onClick={handleSave}
-        disabled={
-          isLoading ||
-          (!hasUserAccount &&
-            (!formData.email ||
-              !formData.password ||
-              formData.groups.length === 0))
-        }
+        disabled={isLoading}
         color="primary"
       >
         <Save />
@@ -168,8 +122,14 @@ export default function EditableUserAccount({
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error instanceof Error
-            ? t("common.error", error.message)
+            ? t("common.error", { message: error.message })
             : t("common.unknownError")}
+        </Alert>
+      )}
+
+      {emailVerificationSent && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          {t("account.emailVerificationSent")}
         </Alert>
       )}
 
@@ -198,18 +158,10 @@ export default function EditableUserAccount({
                 borderColor: "divider",
                 borderRadius: 1,
                 textAlign: "center",
+                color: "text.secondary",
               }}
             >
-              <Box sx={{ mb: 2, color: "text.secondary" }}>
-                {t("account.noUser")}
-              </Box>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleCreate}
-              >
-                {t("account.createUser")}
-              </Button>
+              {t("account.noUser")}
             </Box>
           )}
         </>
@@ -223,35 +175,11 @@ export default function EditableUserAccount({
               setFormData({ ...formData, email: e.target.value })
             }
             disabled={isLoading}
-            required={!hasUserAccount}
             type="email"
-            helperText={
-              hasUserAccount
-                ? // ? t("account.leaveBlankEmail")
-                  ""
-                : t("account.requiredEmail")
-            }
-          />
-          <TextField
-            label={t("account.password")}
-            fullWidth
-            type="password"
-            value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-            disabled={isLoading}
-            required={!hasUserAccount}
-            helperText={
-              hasUserAccount
-                ? t("account.leaveBlankPassword")
-                : t("account.requiredPassword")
-            }
           />
           <FormControl
             fullWidth
-            required={!hasUserAccount}
-            disabled={isLoading || (hasUserAccount && !canAssignGroups)}
+            disabled={isLoading || !canAssignGroups}
           >
             <InputLabel id="group-select-label">
               {t("account.groups")}
@@ -288,7 +216,7 @@ export default function EditableUserAccount({
                 {t("account.kwm_officer")}
               </MenuItem>
             </Select>
-            {hasUserAccount && !canAssignGroups && (
+            {!canAssignGroups && (
               <Box
                 sx={{
                   fontSize: "0.75rem",

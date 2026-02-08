@@ -82,7 +82,8 @@
     "kwm_officer": "Oficer KWM",
     "onlyAdmin": "Tylko adminowie mogą zmieniać grupy.",
     "student": "Uczestnik",
-    "denyAccess": "Odmowa dostępu!"
+    "denyAccess": "Odmowa dostępu!",
+    "emailVerificationSent": "Email weryfikacyjny został wysłany na nowy adres."
   },
   "notes": {
     "noNotes": "Brak notatek.",
@@ -129,7 +130,9 @@
     "activationError": "Coś poszło nie tak. Link aktywacyjny może być nieprawidłowy lub wygasł.",
     "resetPassword": "Zresetuj hasło",
     "resetSuccess": "Twoje hasło zostało zresetowane! Przekierowanie do logowania...",
-    "resetError": "Coś poszło nie tak. Link do resetowania hasła może być nieprawidłowy lub wygasł."
+    "resetError": "Coś poszło nie tak. Link do resetowania hasła może być nieprawidłowy lub wygasł.",
+    "emailChangeSuccess": "Twój email został pomyślnie zmieniony! Przekierowanie do logowania...",
+    "emailChangeError": "Coś poszło nie tak. Link weryfikacyjny może być nieprawidłowy lub wygasł."
   },
   "forgotPassword": {
     "title": "Zresetuj hasło",

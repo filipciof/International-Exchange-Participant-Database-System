@@ -8,7 +8,6 @@ from .models import Student, GENDER_MAP, LANG_PROF_MAP, Club, Exchange
 from .serializers import (
     CreateStudentSerializer,
     StudentSerializer,
-    StudentUserAccountCreateSerializer,
     StudentUserAccountUpdateSerializer,
 )
 from django.contrib.auth import get_user_model
@@ -34,7 +33,7 @@ from config.selectors.student import student_queryset_for
 from config.permissions.base import is_correspondent, is_kwm_officer
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from eauth.utils import send_activation_email
+from eauth.utils import send_activation_email, send_email_change_verification
 
 User = get_user_model()
 
@@ -505,38 +504,6 @@ class StudentPhotoView(APIView):
 class StudentUserAccountView(APIView):
     permission_classes = [StudentPermission]
 
-    def post(self, request, pk=None):
-        student = get_object_or_404(Student, pk=pk, is_active=True)
-
-        if student.id_user:
-            return Response(
-                {"message": "Student already has a user account."},
-                status=HTTP_400_BAD_REQUEST,
-            )
-
-        serializer = StudentUserAccountCreateSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-
-        email = serializer.validated_data["email"]
-        password = serializer.validated_data["password"]
-
-        user = User.objects.create_user(
-            email=email,
-            password=password,
-        )
-
-        student_group = Group.objects.get(name="student")
-        user.groups.add(student_group)
-
-        student.id_user = user
-        student.save(update_fields=["id_user"])
-
-        return Response(
-            {"message": "User account created successfully.", "email": user.email},
-            status=HTTP_201_CREATED,
-        )
-
     def patch(self, request, pk=None):
         student = get_object_or_404(Student, pk=pk, is_active=True)
         self.check_object_permissions(request, student)
@@ -556,18 +523,17 @@ class StudentUserAccountView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        email = serializer.validated_data.get("email")
-        password = serializer.validated_data.get("password")
+        email = serializer.validated_data["email"]
 
-        if email and email != user.email:
-            user.email = email
-            user.username = email
-
-        if password:
-            user.set_password(password)
-
-        user.save()
+        email_verification_sent = False
+        if email != user.email:
+            send_email_change_verification(user, email)
+            email_verification_sent = True
 
         return Response(
-            {"message": "User account updated successfully.", "email": user.email}
+            {
+                "message": "User account updated successfully.",
+                "email": user.email,
+                "email_verification_sent": email_verification_sent,
+            }
         )

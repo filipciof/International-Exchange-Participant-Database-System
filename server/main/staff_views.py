@@ -2,7 +2,6 @@ from .models import Club, Staff
 from .serializers import (
     CreateStaffSerializer,
     StaffSerializer,
-    StaffUserAccountCreateSerializer,
     StaffUserAccountUpdateSerializer,
 )
 from django.contrib.auth import get_user_model
@@ -23,7 +22,7 @@ from config.settings import MEDIA_ROOT
 from config.permissions.policy_permissions import StaffPermission
 from config.selectors.staff import staff_queryset_for
 from django.shortcuts import get_object_or_404
-from eauth.utils import send_activation_email
+from eauth.utils import send_activation_email, send_email_change_verification
 import os
 from uuid import uuid4
 from django.core.files.storage import default_storage
@@ -198,40 +197,6 @@ class StaffPhotoView(APIView):
 class StaffUserAccountView(APIView):
     permission_classes = [StaffPermission]
 
-    def post(self, request, pk=None):
-        staff = get_object_or_404(Staff, pk=pk, is_active=True)
-
-        if staff.id_user:
-            return Response(
-                {"message": "Staff member already has a user account."},
-                status=HTTP_400_BAD_REQUEST,
-            )
-
-        serializer = StaffUserAccountCreateSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-
-        email = serializer.validated_data["email"]
-        password = serializer.validated_data["password"]
-        group_names = serializer.validated_data["groups"]
-
-        user = User.objects.create_user(
-            email=email,
-            password=password,
-        )
-
-        for name in group_names:
-            group = Group.objects.get(name=name)
-            user.groups.add(group)
-
-        staff.id_user = user
-        staff.save(update_fields=["id_user"])
-
-        return Response(
-            {"message": "User account created successfully.", "email": user.email},
-            status=HTTP_201_CREATED,
-        )
-
     def patch(self, request, pk=None):
         staff = get_object_or_404(Staff, pk=pk, is_active=True)
         self.check_object_permissions(request, staff)
@@ -252,7 +217,6 @@ class StaffUserAccountView(APIView):
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
         email = serializer.validated_data.get("email")
-        password = serializer.validated_data.get("password")
         group_names = serializer.validated_data.get("groups")
 
         if group_names:
@@ -261,14 +225,15 @@ class StaffUserAccountView(APIView):
                 group = Group.objects.get(name=name)
                 user.groups.add(group)
 
+        email_verification_sent = False
         if email and email != user.email:
-            user.email = email
-
-        if password:
-            user.set_password(password)
-
-        user.save()
+            send_email_change_verification(user, email)
+            email_verification_sent = True
 
         return Response(
-            {"message": "User account updated successfully.", "email": user.email}
+            {
+                "message": "User account updated successfully.",
+                "email": user.email,
+                "email_verification_sent": email_verification_sent,
+            }
         )

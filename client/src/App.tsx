@@ -12,6 +12,7 @@ import Families from "./pages/Families";
 import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import ActivateAccount from "./pages/ActivateAccount";
+import VerifyEmailChange from "./pages/VerifyEmailChange";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UserProfile from "./pages/UserProfile";
 import Contacts from "./pages/Contacts";
@@ -27,6 +28,7 @@ function App() {
         <Routes>
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/activate/:uid/:token" element={<ActivateAccount />} />
+          <Route path="/verify-email/:token" element={<VerifyEmailChange />} />
 
           <Route
             path="/"

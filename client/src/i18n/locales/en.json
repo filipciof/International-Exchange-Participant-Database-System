@@ -97,7 +97,8 @@
     "kwm_officer": "KWM Officer",
     "onlyAdmin": "Only admins can change groups.",
     "student": "Student",
-    "denyAccess": "Access denied!"
+    "denyAccess": "Access denied!",
+    "emailVerificationSent": "A verification email has been sent to the new address."
   },
   "navigation": {
     "home": "Home",
@@ -129,7 +130,9 @@
     "activationError": "Something went wrong. The activation link may be invalid or expired.",
     "resetPassword": "Reset Password",
     "resetSuccess": "Your password has been reset! Redirecting to sign in...",
-    "resetError": "Something went wrong. The reset link may be invalid or expired."
+    "resetError": "Something went wrong. The reset link may be invalid or expired.",
+    "emailChangeSuccess": "Your email has been changed successfully! Redirecting to sign in...",
+    "emailChangeError": "Something went wrong. The verification link may be invalid or expired."
   },
   "forgotPassword": {
     "title": "Reset password",
