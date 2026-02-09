@@ -26,9 +26,10 @@ export default function EditableHeader({ club }: EditableHeaderProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(club.name || "");
+  const [number, setNumber] = useState(club.number || "");
 
   const updateMutation = useMutation({
-    mutationFn: async (data: { name: string }) => {
+    mutationFn: async (data: { name: string; number: string }) => {
       const response = await axiosClient.patch(`/clubs/${club.id}/`, data);
       return response.data;
     },
@@ -39,11 +40,12 @@ export default function EditableHeader({ club }: EditableHeaderProps) {
   });
 
   const handleSave = () => {
-    updateMutation.mutate({ name });
+    updateMutation.mutate({ name, number });
   };
 
   const handleCancel = () => {
     setName(club.name || "");
+    setNumber(club.number || "");
     setIsEditing(false);
   };
 
@@ -108,25 +110,41 @@ export default function EditableHeader({ club }: EditableHeaderProps) {
                   variant="h6"
                   sx={{ color: "rgba(255,255,255,0.9)", mb: 1 }}
                 >
-                  {t("clubForm.district")} {club.district}
+                  {t("clubForm.number")}: {club.number} | {t("clubForm.district")} {club.district}
                 </Typography>
               </>
             ) : (
-              <TextField
-                fullWidth
-                size="small"
-                label={t("clubForm.clubName")}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                sx={{
-                  "& .MuiInputBase-root": { bgcolor: "white" },
-                  "& .MuiInputLabel-root": {
-                    bgcolor: "white",
-                    px: 0.5,
-                    borderRadius: 0.5,
-                  },
-                }}
-              />
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label={t("clubForm.clubName")}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  sx={{
+                    "& .MuiInputBase-root": { bgcolor: "white" },
+                    "& .MuiInputLabel-root": {
+                      bgcolor: "white",
+                      px: 0.5,
+                      borderRadius: 0.5,
+                    },
+                  }}
+                />
+                <TextField
+                  size="small"
+                  label={t("clubForm.number")}
+                  value={number}
+                  onChange={(e) => setNumber(e.target.value)}
+                  sx={{
+                    "& .MuiInputBase-root": { bgcolor: "white" },
+                    "& .MuiInputLabel-root": {
+                      bgcolor: "white",
+                      px: 0.5,
+                      borderRadius: 0.5,
+                    },
+                  }}
+                />
+              </Box>
             )}
           </Box>
         </Box>

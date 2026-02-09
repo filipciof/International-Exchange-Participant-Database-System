@@ -67,6 +67,7 @@ export default function ClubForm({
     resolver: zodResolver(clubSchema),
     defaultValues: initialData || {
       name: "",
+      number: "",
       id_district: undefined,
       city: "",
     },
@@ -96,6 +97,7 @@ export default function ClubForm({
   const onSubmit = (data: ClubFormData) => {
     const clubData = {
       name: data.name,
+      number: data.number,
       id_district: data.id_district,
       city: data.city || "",
     };
@@ -225,6 +227,21 @@ export default function ClubForm({
                     fullWidth
                     error={!!errors.name}
                     helperText={errors.name?.message}
+                    size="small"
+                  />
+                )}
+              />
+              <Controller
+                name="number"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label={t("clubForm.number")}
+                    variant="outlined"
+                    fullWidth
+                    error={!!errors.number}
+                    helperText={errors.number?.message}
                     size="small"
                   />
                 )}

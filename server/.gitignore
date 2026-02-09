@@ -9,3 +9,5 @@ media/contact_photos/*.jpg
 *.sql
 media/
 *.mo
+create_test_db.py
+clubs.json

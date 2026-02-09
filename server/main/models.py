@@ -31,8 +31,9 @@ class Club(models.Model):
     id_district = models.ForeignKey(
         District, null=True, on_delete=models.SET_NULL, db_column="id_district"
     )
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=60)
     city = models.CharField(max_length=30, blank=True, default="")
+    number = models.CharField(unique=True, validators=[RegexValidator(regex=r"^\d+$")])
 
     is_active = models.BooleanField(default=True)
 

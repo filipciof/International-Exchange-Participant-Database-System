@@ -35,6 +35,11 @@ export default function ClubList({
       width: 200,
     },
     {
+      field: "number",
+      headerName: t("clubForm.number"),
+      width: 100,
+    },
+    {
       field: "country",
       headerName: t("clubForm.country"),
       width: 150,

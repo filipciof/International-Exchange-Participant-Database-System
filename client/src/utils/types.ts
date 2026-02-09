@@ -192,6 +192,7 @@ export type Student = {
 export type Club = {
   id: number;
   name: string;
+  number: string;
   country: string;
   id_country: number;
   id_district: number;
@@ -201,6 +202,7 @@ export type Club = {
 
 export const clubSchema = z.object({
   name: z.string().min(1, "Club name is required"),
+  number: z.string().min(1, "Club number is required"),
   id_district: z.number().nullable().optional(),
   city: z.string().optional(),
 });

@@ -358,6 +358,7 @@
   },
   "clubForm": {
     "clubName": "Nazwa klubu",
+    "number": "ID klubu",
     "country": "Kraj",
     "district": "Dystrykt",
     "city": "Miasto"
