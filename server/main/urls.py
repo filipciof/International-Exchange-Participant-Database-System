@@ -1,19 +1,20 @@
+from django.http import Http404
 from django.urls import path
-from .views import (
-    not_found_view,
-    ClubView,
-    DocumentView,
-    ExchangeFamilyView,
-    FamilyView,
-    FamilyMemberView,
-    CountryView,
-    DistrictView,
-    ExchangeTypeView,
-    ExchangeView,
-)
-from .student_views import StudentView, StudentPhotoView, StudentUserAccountView
-from .staff_views import StaffView, StaffPhotoView, StaffUserAccountView
 from config.settings import DEBUG
+from main.views import (
+    CountryView, DistrictView, ClubView,
+    FamilyView, FamilyMemberView,
+    StudentView, StudentUserAccountView, StudentPhotoView,
+    ExchangeView, ExchangeFamilyView, ExchangeTypeView,
+    DocumentView,
+    StaffView, StaffUserAccountView, StaffPhotoView,
+    ContactView, ContactPhotoView,
+)
+
+
+def not_found_view(request):
+    raise Http404("Not Found")
+
 
 not_found_url = path("", not_found_view, name="root-not-found")
 
@@ -41,6 +42,9 @@ urlpatterns = [
     path("staff/<int:pk>/", StaffView.as_view()),
     path("staff/<int:pk>/user-account/", StaffUserAccountView.as_view()),
     path("staff/photos/", StaffPhotoView.as_view()),
+    path("contacts/", ContactView.as_view()),
+    path("contacts/<int:pk>/", ContactView.as_view()),
+    path("contacts/photos/", ContactPhotoView.as_view()),
 ]
 
 if DEBUG is False:

@@ -62,7 +62,6 @@ INSTALLED_APPS = [
     "phonenumber_field",
     "main",
     "eauth",
-    "contacts",
 ]
 
 MIDDLEWARE = [

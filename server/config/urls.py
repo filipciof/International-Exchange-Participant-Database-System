@@ -23,7 +23,6 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("", include("main.urls")),
     path("auth/", include("eauth.urls")),
-    path("contacts/", include("contacts.urls"))
 ]
 
 if DEBUG is True:
