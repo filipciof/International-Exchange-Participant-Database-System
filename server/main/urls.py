@@ -2,7 +2,7 @@ from django.http import Http404
 from django.urls import path
 from config.settings import DEBUG
 from main.views import (
-    CountryView, DistrictView, ClubView,
+    CountryView, DistrictView, ClubListView, ClubDetailView,
     FamilyView, FamilyMemberView,
     StudentView, StudentUserAccountView, StudentPhotoView,
     ExchangeView, ExchangeFamilyView, ExchangeTypeView,
@@ -21,8 +21,8 @@ not_found_url = path("", not_found_view, name="root-not-found")
 urlpatterns = [
     path("countries/", CountryView.as_view()),
     path("districts/", DistrictView.as_view()),
-    path("clubs/", ClubView.as_view()),
-    path("clubs/<int:pk>/", ClubView.as_view()),
+    path("clubs/", ClubListView.as_view()),
+    path("clubs/<int:pk>/", ClubDetailView.as_view()),
     path("families/", FamilyView.as_view()),
     path("families/<int:pk>/", FamilyView.as_view()),
     path("family-members/", FamilyMemberView.as_view()),

@@ -29,7 +29,7 @@ export default function UpdateClub({
   const { data: club, isLoading: isClubLoading } = useQuery({
     queryKey: ["clubs", id],
     queryFn: async () => {
-      const response = await axiosClient.get(`/clubs/?id=${id}`);
+      const response = await axiosClient.get(`/clubs/${id}/`);
       return response.data;
     },
   });
