@@ -29,7 +29,7 @@ export default function UpdateStudent({
   const { data: student, isLoading: isStudentLoading } = useQuery({
     queryKey: ["students", id],
     queryFn: async () => {
-      const response = await axiosClient.get(`/students/?id=${id}`);
+      const response = await axiosClient.get(`/students/${id}/`);
       return response.data;
     },
   });

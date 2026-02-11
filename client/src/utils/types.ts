@@ -183,7 +183,7 @@ export type Student = {
   insurance_type: string;
   insurance_serial_number: string;
   insurance_amount: string;
-  photo: string;
+  has_photo: boolean;
   notes: string;
   user_email: string;
   is_inbound: boolean;

@@ -30,23 +30,22 @@ export default function StudentProfile({}: StudentProfileProps) {
   } = useQuery({
     queryKey: ["students", "me"],
     queryFn: async () => {
-      const response = await axiosClient.get("/students/?me=true");
+      const response = await axiosClient.get("/students/me/");
       return response.data;
     },
     retry: false,
   });
 
   const { data: imageUrl, isLoading: isImageLoading } = useQuery({
-    queryKey: ["studentPhoto", student?.photo],
+    queryKey: ["studentPhoto", student?.id],
     queryFn: async () => {
-      const photoName = student.photo.split("/")[3];
       const response = await axiosClient.get(
-        `/students/photos/?photo_name=${photoName}`,
+        `/students/${student.id}/photo/`,
         { responseType: "blob" },
       );
       return URL.createObjectURL(response.data);
     },
-    enabled: Boolean(student?.photo),
+    enabled: Boolean(student?.has_photo),
     staleTime: Infinity,
   });
 

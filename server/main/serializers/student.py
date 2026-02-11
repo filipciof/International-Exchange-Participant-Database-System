@@ -18,7 +18,10 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = "__all__"
-        extra_kwargs = {"is_active": {"required": False, "default": True}}
+        extra_kwargs = {
+            "is_active": {"required": False, "default": True},
+            "photo": {"write_only": True},
+        }
 
     def validate(self, attrs):
         if self.instance and self.instance.id_user is not None:
@@ -29,6 +32,7 @@ class StudentSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
 
+        representation["has_photo"] = bool(instance.photo)
         representation["country_of_birth"] = (
             instance.id_country_of_birth.name if instance.id_country_of_birth else ""
         )

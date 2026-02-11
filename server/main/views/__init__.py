@@ -11,4 +11,7 @@ from .staff import (
     StaffListView, StaffDetailView, StaffMeView,
     StaffPhotoView, StaffUserAccountView,
 )
-from .student import StudentView, StudentPhotoView, StudentUserAccountView
+from .student import (
+    StudentListView, StudentDetailView, StudentMeView,
+    StudentExportView, StudentPhotoView, StudentUserAccountView,
+)

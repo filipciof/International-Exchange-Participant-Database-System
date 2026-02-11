@@ -70,7 +70,7 @@ export function useStudents({
     mutationFn: async (format: "csv" | "pdf") => {
       const params = getStudentParams();
       params.append("export_format", format);
-      const response = await axiosClient.get(`/students/?${params.toString()}`, {
+      const response = await axiosClient.get(`/students/export/?${params.toString()}`, {
         responseType: 'blob',
       });
 

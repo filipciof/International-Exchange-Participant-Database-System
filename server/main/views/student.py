@@ -1,257 +1,291 @@
 from django.utils.translation import gettext as _
+from django_filters import rest_framework as filters
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from typing import Any, Generator
+from django.http import FileResponse
 from django.http.response import HttpResponse, StreamingHttpResponse
+from django.db.models import Q
+from django.db import transaction
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from rest_framework.generics import (
+    GenericAPIView,
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
 from main.models import Club, Student, Exchange, GENDER_MAP, LANG_PROF_MAP
 from main.serializers import (
     CreateStudentSerializer,
     StudentSerializer,
     StudentUserAccountUpdateSerializer,
 )
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
-from django.http import HttpResponse, StreamingHttpResponse
-from config.settings import MEDIA_ROOT
-import os
-from uuid import uuid4
-from django.core.files.storage import default_storage
-import io
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
-from django.db.models import Q
-from rest_framework.status import (
-    HTTP_404_NOT_FOUND,
-    HTTP_201_CREATED,
-    HTTP_400_BAD_REQUEST,
-    HTTP_204_NO_CONTENT,
-)
 from main.permissions import StudentPermission, is_correspondent, is_kwm_officer
 from main.selectors import student_queryset_for
-from django.db import transaction
 from django.shortcuts import get_object_or_404
 from eauth.utils import send_activation_email, send_email_change_verification
+import io
 
 User = get_user_model()
 
 
-class Echo:
-    """An object that implements just the write method of the file-like
-    interface.
-    """
+STUDENT_EXPORT_HEADERS = [
+    "First name",
+    "Middle name",
+    "Last name",
+    "Nickname",
+    "Gender",
+    "Date of birth",
+    "Country of birth",
+    "City of birth",
+    "City of residence",
+    "Address",
+    "Height",
+    "Shirt size",
+    "Dietary restrictions",
+    "First language",
+    "Second language",
+    "Second language proficiency",
+    "Third language",
+    "Third language proficiency",
+    "Country of departure",
+    "Country of passport",
+    "Passport number",
+    "Passport expiration date",
+    "First parent full name",
+    "First parent email",
+    "Second parent full name",
+    "Second parent email",
+    "Polish phone number",
+    "Insurance company",
+    "Insurance type",
+    "Insurance serial number",
+    "Insurance amount",
+    "Notes",
+]
 
+
+def _extract_student_data(student) -> list:
+    return [
+        student.first_name,
+        student.middle_name,
+        student.last_name,
+        student.nick_name,
+        GENDER_MAP.get(student.gender, "unknown"),
+        student.date_of_birth,
+        (student.id_country_of_birth.name if student.id_country_of_birth else ""),
+        student.city_of_birth,
+        student.city_of_residence,
+        student.address,
+        student.height,
+        student.shirt_size,
+        student.dietary_restrictions,
+        student.first_language,
+        student.second_language,
+        LANG_PROF_MAP.get(student.second_language_proficiency, ""),
+        student.third_language,
+        LANG_PROF_MAP.get(student.third_language_proficiency, ""),
+        (
+            student.id_country_of_departure.name
+            if student.id_country_of_departure
+            else ""
+        ),
+        (student.id_country_of_passport.name if student.id_country_of_passport else ""),
+        student.passport_number,
+        student.passport_expiration_date,
+        student.first_parent_full_name,
+        student.first_parent_email,
+        student.second_parent_full_name,
+        student.second_parent_email,
+        student.polish_phone_number,
+        student.insurance_company,
+        student.insurance_type,
+        student.insurance_serial_number,
+        student.insurance_amount,
+        student.notes,
+    ]
+
+
+class Echo:
     def write(self, value):
-        """Write the value by returning it, instead of storing in a buffer."""
         return value
 
 
-class StudentView(APIView):
+class StudentFilter(filters.FilterSet):
+    search = filters.CharFilter(method="filter_search")
+    search_field = filters.CharFilter(method="noop")
+    start_year = filters.NumberFilter(method="filter_start_year")
+    is_inbound = filters.BooleanFilter()
+    gender = filters.BaseInFilter(field_name="gender")
+    shirt_size = filters.BaseInFilter(field_name="shirt_size")
+    country_of_birth = filters.NumberFilter(field_name="id_country_of_birth")
+    country_of_departure = filters.NumberFilter(field_name="id_country_of_departure")
+    country_of_passport = filters.NumberFilter(field_name="id_country_of_passport")
+    date_of_birth_before = filters.DateFilter(
+        field_name="date_of_birth", lookup_expr="lte"
+    )
+    date_of_birth_after = filters.DateFilter(
+        field_name="date_of_birth", lookup_expr="gte"
+    )
+    passport_expiration_date_before = filters.DateFilter(
+        field_name="passport_expiration_date", lookup_expr="lte"
+    )
+    passport_expiration_date_after = filters.DateFilter(
+        field_name="passport_expiration_date", lookup_expr="gte"
+    )
+
+    class Meta:
+        model = Student
+        fields = []
+
+    def noop(self, queryset, name, value):
+        return queryset
+
+    def filter_start_year(self, queryset, name, value):
+        return queryset.filter(
+            exchange__start_date__year=value, exchange__is_active=True
+        ).distinct()
+
+    def filter_search(self, queryset, name, value):
+        search_fields = self.request.GET.getlist("search_field")
+        if not search_fields:
+            search_fields = [
+                "first_name",
+                "middle_name",
+                "last_name",
+                "nick_name",
+                "city_of_birth",
+                "city_of_residence",
+                "address",
+                "dietary_restrictions",
+                "first_language",
+                "second_language",
+                "third_language",
+                "passport_number",
+                "first_parent_full_name",
+                "first_parent_email",
+                "second_parent_full_name",
+                "second_parent_email",
+                "polish_phone_number",
+                "insurance_company",
+                "insurance_type",
+                "insurance_serial_number",
+                "notes",
+            ]
+
+        query = Q()
+        for field in search_fields:
+            query |= Q(**{f"{field}__icontains": value})
+        return queryset.filter(query)
+
+
+class StudentListView(ListCreateAPIView):
+    serializer_class = StudentSerializer
+    permission_classes = [StudentPermission]
+    filterset_class = StudentFilter
+
+    def get_queryset(self):
+        return student_queryset_for(self.request.user).order_by("-id")
+
+    def create(self, request, *args, **kwargs):
+        serializer = CreateStudentSerializer(
+            data=request.data, context={"user": request.user}
+        )
+        serializer.is_valid(raise_exception=True)
+
+        data = serializer.validated_data
+        club = Club.objects.get(id=data["id_club"], is_active=True)
+
+        with transaction.atomic():
+            user = User.objects.create_user(email=data["email"], password=None)
+            user.set_unusable_password()
+            user.save(update_fields=["password"])
+            student_group = Group.objects.get(name="student")
+            user.groups.add(student_group)
+
+            student = Student.objects.create(
+                id_user=user,
+                first_name=data["first_name"],
+                last_name=data["last_name"],
+                is_inbound=data["is_inbound"],
+                is_active=True,
+            )
+
+            exchange_kwargs = {
+                "id_student": student,
+                "id_sending_club": club,
+                "is_active": True,
+            }
+
+            if is_correspondent(request.user) or is_kwm_officer(request.user):
+                exchange_kwargs["id_counsellor"] = request.user.id_staff
+
+            Exchange.objects.create(**exchange_kwargs)
+
+        send_activation_email(user)
+
+        response_serializer = StudentSerializer(student)
+        return Response(response_serializer.data, status=HTTP_201_CREATED)
+
+
+class StudentDetailView(RetrieveUpdateDestroyAPIView):
+    serializer_class = StudentSerializer
+    permission_classes = [StudentPermission]
+    queryset = Student.objects.filter(is_active=True)
+
+    def perform_destroy(self, instance):
+        if instance.id_user:
+            instance.id_user.is_active = False
+            instance.id_user.save(update_fields=["is_active"])
+        instance.is_active = False
+        instance.save(update_fields=["is_active"])
+
+
+class StudentMeView(GenericAPIView):
+    serializer_class = StudentSerializer
     permission_classes = [StudentPermission]
 
-    STUDENT_EXPORT_HEADERS = [
-        "First name",
-        "Middle name",
-        "Last name",
-        "Nickname",
-        "Gender",
-        "Date of birth",
-        "Country of birth",
-        "City of birth",
-        "City of residence",
-        "Address",
-        "Height",
-        "Shirt size",
-        "Dietary restrictions",
-        "First language",
-        "Second language",
-        "Second language proficiency",
-        "Third language",
-        "Third language proficiency",
-        "Country of departure",
-        "Country of passport",
-        "Passport number",
-        "Passport expiration date",
-        "First parent full name",
-        "First parent email",
-        "Second parent full name",
-        "Second parent email",
-        "Polish phone number",
-        "Insurance company",
-        "Insurance type",
-        "Insurance serial number",
-        "Insurance amount",
-        "Notes",
-    ]
+    def get_object(self):
+        return get_object_or_404(Student, id_user=self.request.user, is_active=True)
 
-    def __extract_student_data(self, student) -> list:
-        return [
-            student.first_name,
-            student.middle_name,
-            student.last_name,
-            student.nick_name,
-            GENDER_MAP.get(student.gender, "unknown"),
-            student.date_of_birth,
-            (student.id_country_of_birth.name if student.id_country_of_birth else ""),
-            student.city_of_birth,
-            student.city_of_residence,
-            student.address,
-            student.height,
-            student.shirt_size,
-            student.dietary_restrictions,
-            student.first_language,
-            student.second_language,
-            LANG_PROF_MAP.get(student.second_language_proficiency, ""),
-            student.third_language,
-            LANG_PROF_MAP.get(student.third_language_proficiency, ""),
-            (
-                student.id_country_of_departure.name
-                if student.id_country_of_departure
-                else ""
-            ),
-            (
-                student.id_country_of_passport.name
-                if student.id_country_of_passport
-                else ""
-            ),
-            student.passport_number,
-            student.passport_expiration_date,
-            student.first_parent_full_name,
-            student.first_parent_email,
-            student.second_parent_full_name,
-            student.second_parent_email,
-            student.polish_phone_number,
-            student.insurance_company,
-            student.insurance_type,
-            student.insurance_serial_number,
-            student.insurance_amount,
-            student.notes,
-        ]
+    def get(self, request):
+        student = self.get_object()
+        serializer = self.get_serializer(student)
+        return Response(serializer.data)
 
-    def __get_filtered_students(self, request):
-        students = student_queryset_for(request.user).order_by("-id")
-        exchange_start_year = request.query_params.get("start_year")
+    def patch(self, request):
+        student = self.get_object()
+        self.check_object_permissions(request, student)
+        serializer = self.get_serializer(student, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
-        if exchange_start_year:
-            try:
-                year = int(exchange_start_year)
-                students = students.filter(
-                    exchange__start_date__year=year, exchange__is_active=True
-                )
-            except (ValueError, TypeError):
-                pass
 
-        is_inbound = request.query_params.get("is_inbound")
+class StudentExportView(GenericAPIView):
+    permission_classes = [StudentPermission]
+    filterset_class = StudentFilter
 
-        if is_inbound is not None:
-            if is_inbound.lower() in ("true", "1"):
-                students = students.filter(is_inbound=True)
-            elif is_inbound.lower() in ("false", "0"):
-                students = students.filter(is_inbound=False)
+    def get_queryset(self):
+        return student_queryset_for(self.request.user).order_by("-id")
 
-        if exchange_start_year:
-            students = students.distinct()
+    def get(self, request):
+        queryset = self.filter_queryset(self.get_queryset())
+        export_format = request.query_params.get("export_format")
 
-        search = request.query_params.get("search")
+        if export_format == "csv":
+            return self._export_csv(queryset)
+        elif export_format == "pdf":
+            return self._export_pdf(queryset, request)
 
-        if search:
-            search_query = Q()
-            search_fields_param = request.query_params.getlist("search_field")
+        return Response(status=400)
 
-            if search_fields_param:
-                search_fields = search_fields_param
-            else:
-                search_fields = [
-                    "first_name",
-                    "middle_name",
-                    "last_name",
-                    "nick_name",
-                    "city_of_birth",
-                    "city_of_residence",
-                    "address",
-                    "dietary_restrictions",
-                    "first_language",
-                    "second_language",
-                    "third_language",
-                    "passport_number",
-                    "first_parent_full_name",
-                    "first_parent_email",
-                    "second_parent_full_name",
-                    "second_parent_email",
-                    "polish_phone_number",
-                    "insurance_company",
-                    "insurance_type",
-                    "insurance_serial_number",
-                    "notes",
-                ]
-
-            for field in search_fields:
-                search_query |= Q(**{f"{field}__icontains": search})
-
-            students = students.filter(search_query)
-
-        genders = request.query_params.getlist("gender")
-        if genders:
-            gender_query = Q()
-            for gender in genders:
-                try:
-                    gender_value = int(gender)
-                    gender_query |= Q(gender=gender_value)
-                except (ValueError, TypeError):
-                    pass
-            if gender_query:
-                students = students.filter(gender_query)
-
-        shirt_sizes = request.query_params.getlist("shirt_size")
-        if shirt_sizes:
-            shirt_size_query = Q()
-            for size in shirt_sizes:
-                shirt_size_query |= Q(shirt_size=size)
-            students = students.filter(shirt_size_query)
-
-        country_of_birth = request.query_params.get("country_of_birth")
-        country_of_departure = request.query_params.get("country_of_departure")
-        country_of_passport = request.query_params.get("country_of_passport")
-
-        if country_of_birth:
-            students = students.filter(id_country_of_birth=country_of_birth)
-
-        if country_of_departure:
-            students = students.filter(id_country_of_departure=country_of_departure)
-
-        if country_of_passport:
-            students = students.filter(id_country_of_passport=country_of_passport)
-
-        date_of_birth_before = request.query_params.get("date_of_birth_before")
-        date_of_birth_after = request.query_params.get("date_of_birth_after")
-        passport_expiration_date_before = request.query_params.get(
-            "passport_expiration_date_before"
-        )
-        passport_expiration_date_after = request.query_params.get(
-            "passport_expiration_date_after"
-        )
-
-        if date_of_birth_before:
-            students = students.filter(date_of_birth__lte=date_of_birth_before)
-
-        if date_of_birth_after:
-            students = students.filter(date_of_birth__gte=date_of_birth_after)
-
-        if passport_expiration_date_before:
-            students = students.filter(
-                passport_expiration_date__lte=passport_expiration_date_before
-            )
-
-        if passport_expiration_date_after:
-            students = students.filter(
-                passport_expiration_date__gte=passport_expiration_date_after
-            )
-
-        return students
-
-    def __export_csv(self, students) -> StreamingHttpResponse:
+    def _export_csv(self, students) -> StreamingHttpResponse:
         import csv
 
         students = students.select_related(
@@ -261,10 +295,10 @@ class StudentView(APIView):
         def generate_rows() -> Generator[Any, Any, None]:
             pseudo_buffer = Echo()
             writer = csv.writer(pseudo_buffer)
-            yield writer.writerow(self.STUDENT_EXPORT_HEADERS)
+            yield writer.writerow(STUDENT_EXPORT_HEADERS)
 
             for student in students.iterator(chunk_size=1000):
-                yield writer.writerow(self.__extract_student_data(student))
+                yield writer.writerow(_extract_student_data(student))
 
         response = StreamingHttpResponse(
             streaming_content=generate_rows(), content_type="text/csv"
@@ -272,14 +306,14 @@ class StudentView(APIView):
         response["Content-Disposition"] = 'attachment; filename="students.csv"'
         return response
 
-    def __export_pdf(self, students, request) -> HttpResponse:
+    def _export_pdf(self, students, request) -> HttpResponse:
         students = students.select_related(
             "id_country_of_birth", "id_country_of_departure", "id_country_of_passport"
         )
 
         paginator = PageNumberPagination()
         paginator.page_size = min(int(request.query_params.get("page_size", 25)), 100)
-        result_page = paginator.paginate_queryset(students, request, view=self)
+        result_page = paginator.paginate_queryset(students, request)
 
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(
@@ -297,8 +331,8 @@ class StudentView(APIView):
         elements.append(Spacer(1, 12))
 
         column_indices = [
-            self.STUDENT_EXPORT_HEADERS.index(col)
-            for col in self.STUDENT_EXPORT_HEADERS
+            STUDENT_EXPORT_HEADERS.index(col)
+            for col in STUDENT_EXPORT_HEADERS
             if col
             not in [
                 "Middle name",
@@ -309,13 +343,11 @@ class StudentView(APIView):
                 "Dietary restrictions",
             ]
         ]
-        filtered_headers = [self.STUDENT_EXPORT_HEADERS[i] for i in column_indices]
-        # table_data = [self.STUDENT_EXPORT_HEADERS]
+        filtered_headers = [STUDENT_EXPORT_HEADERS[i] for i in column_indices]
         table_data = [filtered_headers]
 
         for student in result_page:
-            # table_data.append(self.__extract_student_data(student))
-            row = self.__extract_student_data(student)
+            row = _extract_student_data(student)
             table_data.append([row[i] for i in column_indices])
 
         table_data = list(map(lambda x: x[:10], table_data))
@@ -347,167 +379,24 @@ class StudentView(APIView):
         response["Content-Disposition"] = "attachment; filename='students.pdf'"
         return response
 
-    def get(self, request) -> Response | StreamingHttpResponse:
-        students = self.__get_filtered_students(request)
 
-        id = request.query_params.get("id")
-        if id:
-            student = students.get(id=id, is_active=True)
-            serializer = StudentSerializer(student)
-            return Response(serializer.data)
-
-        me = request.query_params.get("me")
-        if me and me.lower() in ("true", "1"):
-            try:
-                student = Student.objects.get(id_user=request.user, is_active=True)
-                serializer = StudentSerializer(student)
-                return Response(serializer.data)
-            except Student.DoesNotExist:
-                return Response(
-                    {"message": _("Student profile not found for this user.")},
-                    status=HTTP_404_NOT_FOUND,
-                )
-
-        export_format = request.query_params.get("export_format")
-        if export_format == "csv":
-            return self.__export_csv(students)
-        elif export_format == "pdf":
-            return self.__export_pdf(students, request)
-
-        paginator = PageNumberPagination()
-        paginator.page_size = min(int(request.query_params.get("page_size", 25)), 100)
-        result_page = paginator.paginate_queryset(students, request, view=self)
-        serializer = StudentSerializer(result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
-
-    def post(self, request):
-        serializer = CreateStudentSerializer(
-            data=request.data, context={"user": request.user}
-        )
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-
-        data = serializer.validated_data
-        first_name = data["first_name"]
-        last_name = data["last_name"]
-        email = data["email"]
-        id_club = data["id_club"]
-        is_inbound = data["is_inbound"]
-
-        club = Club.objects.get(id=id_club, is_active=True)
-
-        with transaction.atomic():
-            # 1. Create User with unusable password
-            user = User.objects.create_user(email=email, password=None)
-            user.set_unusable_password()
-            user.save(update_fields=["password"])
-            student_group = Group.objects.get(name="student")
-            user.groups.add(student_group)
-
-            # 2. Create Student linked to User
-            student = Student.objects.create(
-                id_user=user,
-                first_name=first_name,
-                last_name=last_name,
-                is_inbound=is_inbound,
-                is_active=True,
-            )
-
-            # 3. Create Exchange with id_sending_club set to the form's club
-            exchange_kwargs = {
-                "id_student": student,
-                "id_sending_club": club,
-                "is_active": True,
-            }
-
-            # Set counsellor if creator is correspondent/kwm_officer
-            if is_correspondent(request.user) or is_kwm_officer(request.user):
-                exchange_kwargs["id_counsellor"] = request.user.id_staff
-
-            Exchange.objects.create(**exchange_kwargs)
-
-        send_activation_email(user)
-
-        response_serializer = StudentSerializer(student)
-        return Response(response_serializer.data, status=HTTP_201_CREATED)
-
-    def delete(self, request, pk=None):
-        student = get_object_or_404(Student, pk=pk, is_active=True)
-        self.check_object_permissions(request, student)
-
-        if student.id_user:
-            student.id_user.is_active = False
-            student.id_user.save(update_fields=["is_active"])
-
-        student.is_active = False
-        student.save(update_fields=["is_active"])
-        return Response(status=HTTP_204_NO_CONTENT)
-
-    def patch(self, request, pk=None):
-        student = get_object_or_404(Student, pk=pk, is_active=True)
-        self.check_object_permissions(request, student)
-
-        data = request.data.copy()
-
-        photo = request.FILES.get("photo")
-        if photo:
-            if student.photo:
-                old_photo_path = os.path.join(MEDIA_ROOT, str(student.photo))
-                if os.path.exists(old_photo_path):
-                    os.remove(old_photo_path)
-
-            ext = os.path.splitext(photo.name)[1].lower() or ".bin"
-            target_name = f"{uuid4().hex}{ext}"
-            unique_name = default_storage.get_available_name(target_name)
-            photo.name = unique_name
-            data["photo"] = photo
-
-        serializer = StudentSerializer(student, data=data, partial=True)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-
-        student = serializer.save()
-        return Response(serializer.data)
-
-
-class StudentPhotoView(APIView):
+class StudentPhotoView(GenericAPIView):
     permission_classes = [StudentPermission]
+    queryset = Student.objects.filter(is_active=True)
 
-    def get(self, request) -> Response | HttpResponse:
-        photo_name = request.query_params.get("photo_name", None)
-
-        if not photo_name:
-            return Response(
-                {"message": _("Photo name not provided.")}, status=HTTP_404_NOT_FOUND
-            )
-
-        photo_location = os.path.join(MEDIA_ROOT, "student_photos/", photo_name)
-
-        try:
-            with open(photo_location, "rb") as photo:
-                photo_data = photo.read()
-        except IOError:
-            return Response(
-                {"message": _("Unable to read the photo file.")},
-                status=HTTP_404_NOT_FOUND,
-            )
-
-        # File download
-
-        # response = HttpResponse(photo_data, content_type="application/octet-stream")
-        # response["Content-Disposition"] = f"attachment; filename={photo_name}"
-        # return response
-
-        return HttpResponse(photo_data, content_type="image/jpeg")
+    def get(self, request, pk):
+        student = self.get_object()
+        if not student.photo:
+            return FileResponse(status=404)
+        return FileResponse(student.photo.open())
 
 
-class StudentUserAccountView(APIView):
+class StudentUserAccountView(GenericAPIView):
     permission_classes = [StudentPermission]
+    queryset = Student.objects.filter(is_active=True)
 
-    def patch(self, request, pk=None):
-        student = get_object_or_404(Student, pk=pk, is_active=True)
-        self.check_object_permissions(request, student)
+    def patch(self, request, pk):
+        student = self.get_object()
 
         if not student.id_user:
             return Response(
@@ -521,8 +410,7 @@ class StudentUserAccountView(APIView):
             data=request.data,
             context={"user": user},
         )
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
 
         email = serializer.validated_data["email"]
 
