@@ -358,7 +358,7 @@ export type Document = {
   id_family: number | null;
   id_district: number | null;
   name: string;
-  file: string;
+  has_file: boolean;
   description: string;
   uploaded_at: string;
 }

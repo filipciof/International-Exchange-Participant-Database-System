@@ -90,7 +90,7 @@ export default function EditableDocuments({
   };
 
   const handleDownload = async (document: Document) => {
-    const response = await axiosClient.get(document.file, {
+    const response = await axiosClient.get(`/documents/${document.id}/file/`, {
       responseType: "blob",
     });
     const url = URL.createObjectURL(response.data);
@@ -180,7 +180,7 @@ export default function EditableDocuments({
                             justifyContent: "flex-end",
                           }}
                         >
-                          {document.file && (
+                          {document.has_file && (
                             <IconButton
                               size="small"
                               onClick={() => handleDownload(document)}
