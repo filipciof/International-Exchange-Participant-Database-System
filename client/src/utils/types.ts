@@ -256,7 +256,7 @@ export type Staff = {
   gender_name: string;
   email: string;
   phone: string;
-  photo: string;
+  has_photo: boolean;
   notes: string;
   user_email: string;
   user_groups: string[];

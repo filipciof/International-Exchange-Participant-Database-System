@@ -28,22 +28,21 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
   } = useQuery({
     queryKey: ["staff", id],
     queryFn: async () => {
-      const response = await axiosClient.get(`/staff/?id=${id}`);
+      const response = await axiosClient.get(`/staff/${id}/`);
       return response.data;
     },
   });
 
   const { data: imageUrl, isLoading } = useQuery({
-    queryKey: ["staffPhoto", staff?.photo],
+    queryKey: ["staffPhoto", id],
     queryFn: async () => {
-      const photoName = staff.photo.split("/")[3];
       const response = await axiosClient.get(
-        `/staff/photos/?photo_name=${photoName}`,
+        `/staff/${id}/photo/`,
         { responseType: "blob" },
       );
       return URL.createObjectURL(response.data);
     },
-    enabled: !!staff?.photo,
+    enabled: !!staff?.has_photo,
     staleTime: Infinity,
   });
 

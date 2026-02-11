@@ -86,7 +86,7 @@ export default function CreateStudentForm({
   const { data: currentStaff } = useQuery<Staff>({
     queryKey: ["staff", "me"],
     queryFn: async () => {
-      const response = await axiosClient.get("/staff/?me=true");
+      const response = await axiosClient.get("/staff/me/");
       return response.data;
     },
     enabled: hasLockedSendingClub,

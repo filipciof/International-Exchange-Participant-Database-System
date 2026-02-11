@@ -7,5 +7,8 @@ from .exchange import (
     ExchangeFamilyListView, ExchangeFamilyDetailView,
 )
 from .family import FamilyListView, FamilyDetailView, FamilyMemberListView, FamilyMemberDetailView
-from .staff import StaffView, StaffUserAccountView, StaffPhotoView
+from .staff import (
+    StaffListView, StaffDetailView, StaffMeView,
+    StaffPhotoView, StaffUserAccountView,
+)
 from .student import StudentView, StudentPhotoView, StudentUserAccountView

@@ -5,7 +5,10 @@ Django==5.2.7
 django-cors-headers==4.9.0
 django-filter==25.2
 django-phonenumber-field==8.3.0
+django-stubs==5.2.9
+django-stubs-ext==5.2.9
 djangorestframework==3.16.1
+djangorestframework-stubs==3.16.8
 djangorestframework_simplejwt==5.5.1
 Faker==37.11.0
 phonenumberslite==9.0.16
@@ -16,5 +19,7 @@ PyJWT==2.10.1
 python-decouple==3.8
 reportlab==4.4.7
 sqlparse==0.5.3
+types-PyYAML==6.0.12.20250915
+typing_extensions==4.15.0
 tzdata==2025.2
 Unidecode==1.4.0

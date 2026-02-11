@@ -33,7 +33,10 @@ class StaffSerializer(serializers.ModelSerializer):
     class Meta:
         model = Staff
         fields = "__all__"
-        extra_kwargs = {"is_active": {"required": False, "default": True}}
+        extra_kwargs = {
+            "is_active": {"required": False, "default": True},
+            "photo": {"write_only": True},
+        }
 
     def validate(self, attrs):
         if self.instance and self.instance.id_user is not None:
@@ -43,6 +46,7 @@ class StaffSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        representation["has_photo"] = bool(instance.photo)
         representation["gender_name"] = GENDER_MAP.get(instance.gender, "unknown")
         representation["user_email"] = (
             instance.id_user.email if instance.id_user else ""

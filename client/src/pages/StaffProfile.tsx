@@ -25,23 +25,22 @@ export default function StaffProfile({}: StaffProfileProps) {
   } = useQuery({
     queryKey: ["staff", "me"],
     queryFn: async () => {
-      const response = await axiosClient.get("/staff/?me=true");
+      const response = await axiosClient.get("/staff/me/");
       return response.data;
     },
     retry: false,
   });
 
   const { data: imageUrl, isLoading: isImageLoading } = useQuery({
-    queryKey: ["staffPhoto", staff?.photo],
+    queryKey: ["staffPhoto", staff?.id],
     queryFn: async () => {
-      const photoName = staff.photo.split("/")[3];
       const response = await axiosClient.get(
-        `/staff/photos/?photo_name=${photoName}`,
+        `/staff/${staff.id}/photo/`,
         { responseType: "blob" },
       );
       return URL.createObjectURL(response.data);
     },
-    enabled: !!staff?.photo,
+    enabled: !!staff?.has_photo,
     staleTime: Infinity,
   });
 
@@ -106,14 +105,14 @@ export default function StaffProfile({}: StaffProfileProps) {
             genderName={staff.gender_name}
             email={staff.email}
             phone={staff.phone}
-            endpoint="/staff/?me=true"
+            endpoint="/staff/me/"
             queryKey="staff"
           />
           <EditableClubInfo staff={staff} />
           <EditableUserAccount staff={staff} />
           <EditableNotes
             notes={staff.notes}
-            endpoint="/staff/?me=true"
+            endpoint="/staff/me/"
             queryKey="staff"
             title={t("staff.steps.additionalInfo")}
             placeholder={t("notes.addStaffNotes")}
@@ -129,7 +128,7 @@ export default function StaffProfile({}: StaffProfileProps) {
           genderName={staff.gender_name}
           email={staff.email}
           phone={staff.phone}
-          endpoint="/staff/?me=true"
+          endpoint="/staff/me/"
           queryKey="staff"
         />
       )}
@@ -149,7 +148,7 @@ export default function StaffProfile({}: StaffProfileProps) {
       {activeTab === 5 && (
         <EditableNotes
           notes={staff.notes}
-          endpoint="/staff/?me=true"
+          endpoint="/staff/me/"
           queryKey="staff"
           title={t("staff.steps.additionalInfo")}
           placeholder={t("notes.addStaffNotes")}

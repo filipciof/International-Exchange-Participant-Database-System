@@ -44,7 +44,7 @@ export function useStaffMutations() {
 
   const addMyStaffProfileMutation = useMutation({
     mutationFn: async (data: StaffFormData) => {
-      const response = await axiosClient.post("/staff/?me=true", data, {
+      const response = await axiosClient.post("/staff/me/", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       return response.data;
@@ -56,7 +56,7 @@ export function useStaffMutations() {
 
   const updateMyStaffProfileMutation = useMutation({
     mutationFn: async (data: StaffFormData) => {
-      const response = await axiosClient.patch("/staff/?me=true", data, {
+      const response = await axiosClient.patch("/staff/me/", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       return response.data;

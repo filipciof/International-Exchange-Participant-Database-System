@@ -27,7 +27,7 @@ export default function StaffUpdate({
   const { data: staff, isLoading: isStaffLoading } = useQuery({
     queryKey: ["staff", id],
     queryFn: async () => {
-      const response = await axiosClient.get(`/staff/?id=${id}`);
+      const response = await axiosClient.get(`/staff/${id}/`);
       return response.data;
     },
   });
