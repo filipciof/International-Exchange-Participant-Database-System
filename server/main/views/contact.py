@@ -10,8 +10,6 @@ from main.models import Contact, ContactDistrict
 from main.serializers import ContactSerializer
 from main.permissions import ContactPermission
 from main.selectors import contact_queryset_for
-import os
-from config.settings import MEDIA_ROOT
 
 CONTACT_GROUPS = ["lt", "f2f", "camp", "none"]
 
@@ -90,14 +88,7 @@ class ContactDetailView(RetrieveUpdateDestroyAPIView):
     queryset = Contact.objects.filter(is_active=True)
 
     def perform_update(self, serializer):
-        photo = self.request.FILES.get("photo")
-        if photo and serializer.instance.photo:
-            old_path = os.path.join(MEDIA_ROOT, str(serializer.instance.photo))
-            if os.path.exists(old_path):
-                os.remove(old_path)
-
         contact = serializer.save()
-
         if "multipart" in self.request.content_type:
             id_districts = self.request.data.getlist("id_districts")
         else:
