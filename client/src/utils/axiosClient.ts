@@ -14,6 +14,7 @@ const axiosClient = axios.create({
     "Content-Type": "application/json",
   },
   withCredentials: true,
+  formSerializer: { indexes: null },
 });
 
 axiosClient.interceptors.request.use(

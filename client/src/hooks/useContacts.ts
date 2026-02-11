@@ -35,7 +35,7 @@ export function useContacts({
       });
 
       if (selectedCountryId) {
-        params.append("country", selectedCountryId.toString());
+        params.append("id_country", selectedCountryId.toString());
       }
 
       selectedGroups.forEach((group) => {

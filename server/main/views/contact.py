@@ -1,179 +1,114 @@
-from django.utils.translation import gettext as _
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.status import (
-    HTTP_404_NOT_FOUND,
-    HTTP_201_CREATED,
-    HTTP_204_NO_CONTENT,
-    HTTP_400_BAD_REQUEST,
+from django_filters import rest_framework as filters
+from django.db.models import Q
+from rest_framework.generics import (
+    GenericAPIView,
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
 )
-from config.settings import MEDIA_ROOT
-import os
-from django.http import HttpResponse
+from django.http import FileResponse
 from main.models import Contact, ContactDistrict
 from main.serializers import ContactSerializer
-from uuid import uuid4
-from django.core.files.storage import default_storage
-from rest_framework.pagination import PageNumberPagination
-from django.db.models import Q
 from main.permissions import ContactPermission
 from main.selectors import contact_queryset_for
-from django.shortcuts import get_object_or_404
+import os
+from config.settings import MEDIA_ROOT
+
+CONTACT_GROUPS = ["lt", "f2f", "camp", "none"]
 
 
-class ContactPhotoView(APIView):
+class ContactFilter(filters.FilterSet):
+    search = filters.CharFilter(method="filter_search")
+    group = filters.MultipleChoiceFilter(
+        choices=[(g, g) for g in CONTACT_GROUPS],
+        method="filter_group",
+    )
+
+    class Meta:
+        model = Contact
+        fields = ["id_country"]
+
+    def filter_search(self, queryset, name, value):
+        return queryset.filter(
+            Q(first_name__icontains=value)
+            | Q(middle_name__icontains=value)
+            | Q(last_name__icontains=value)
+            | Q(email__icontains=value)
+            | Q(phone__icontains=value)
+            | Q(notes__icontains=value)
+        )
+
+    def filter_group(self, queryset, name, value):
+        group_query = Q()
+        for group in value:
+            if group == "lt":
+                group_query |= Q(is_longterm=True)
+            elif group == "f2f":
+                group_query |= Q(is_family_to_family=True)
+            elif group == "camp":
+                group_query |= Q(is_camp=True)
+            elif group == "none":
+                group_query |= Q(
+                    is_longterm=False, is_family_to_family=False, is_camp=False
+                )
+        return queryset.filter(group_query)
+
+
+class ContactPhotoView(GenericAPIView):
     permission_classes = [ContactPermission]
+    queryset = Contact.objects.filter(is_active=True)
 
-    def get(self, request, format=None):
-        photo_name = request.query_params.get("photo_name", None)
-
-        if not photo_name:
-            return Response(
-                {"message": _("Photo name not provided.")}, status=HTTP_404_NOT_FOUND
-            )
-
-        photo_location = os.path.join(MEDIA_ROOT, "contact_photos/", photo_name)
-
-        try:
-            with open(photo_location, "rb") as photo:
-                photo_data = photo.read()
-        except IOError:
-            return Response(
-                {"message": _("Unable to read the photo file.")}, status=HTTP_404_NOT_FOUND
-            )
-
-        # File download
-
-        # response = HttpResponse(photo_data, content_type="application/octet-stream")
-        # response["Content-Disposition"] = f"attachment; filename={photo_name}"
-        # return response
-
-        return HttpResponse(photo_data, content_type="image/jpeg")
+    def get(self, request, pk):
+        contact = self.get_object()
+        if not contact.photo:
+            return FileResponse(status=404)
+        return FileResponse(contact.photo.open())
 
 
-class ContactView(APIView):
+class ContactListView(ListCreateAPIView):
+    serializer_class = ContactSerializer
     permission_classes = [ContactPermission]
+    filterset_class = ContactFilter
 
-    def get(self, request, format=None):
-        contacts = contact_queryset_for(request.user).order_by("-id")
+    def get_queryset(self):
+        return contact_queryset_for(self.request.user).order_by("-id")
 
-        id = request.query_params.get("id")
-        if id:
-            contact = contacts.get(id=id)
-            serializer = ContactSerializer(contact)
-            return Response(serializer.data)
-
-        country = request.query_params.get("country")
-        if country:
-            contacts = contacts.filter(id_country=country)
-
-        groups = request.query_params.getlist("group")
-        if groups:
-            group_query = Q()
-
-            for group in groups:
-                if group == "lt":
-                    group_query |= Q(is_longterm=True)
-                elif group == "f2f":
-                    group_query |= Q(is_family_to_family=True)
-                elif group == "camp":
-                    group_query |= Q(is_camp=True)
-                elif group == "none":
-                    group_query |= Q(
-                        is_longterm=False, is_family_to_family=False, is_camp=False
-                    )
-
-            contacts = contacts.filter(group_query)
-
-        search = request.query_params.get("search")
-        if search:
-            search_query = Q()
-
-            search_fields = [
-                "first_name",
-                "middle_name",
-                "last_name",
-                "email",
-                "phone",
-                "notes",
-            ]
-
-            for field in search_fields:
-                search_query |= Q(**{f"{field}__icontains": search})
-
-            contacts = contacts.filter(search_query)
-
-        paginator = PageNumberPagination()
-        paginator.page_size = min(int(request.query_params.get("page_size", 25)), 100)
-        result_page = paginator.paginate_queryset(contacts, request, view=self)
-        serializer = ContactSerializer(result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
-
-    def post(self, request):
-        data = request.data.copy()
-
-        photo = request.FILES.get("photo")
-        if photo:
-            ext = os.path.splitext(photo.name)[1].lower() or ".bin"
-            target_name = f"{uuid4().hex}{ext}"
-            unique_name = default_storage.get_available_name(target_name)
-            photo.name = unique_name
-            data["photo"] = photo
-
-        serializer = ContactSerializer(data=data)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-
+    def perform_create(self, serializer):
         contact = serializer.save()
-        id_districts = data.getlist("id_districts[]", [])
+        if "multipart" in self.request.content_type:
+            id_districts = self.request.data.getlist("id_districts", [])
+        else:
+            id_districts = self.request.data.get("id_districts", [])
         for id_district in id_districts:
             ContactDistrict.objects.create(
                 id_contact=contact, id_district_id=id_district
             )
 
-        return Response(serializer.data, status=HTTP_201_CREATED)
 
-    def patch(self, request, pk=None):
-        contact = get_object_or_404(Contact, pk=pk, is_active=True)
-        self.check_object_permissions(request, contact)
+class ContactDetailView(RetrieveUpdateDestroyAPIView):
+    serializer_class = ContactSerializer
+    permission_classes = [ContactPermission]
+    queryset = Contact.objects.filter(is_active=True)
 
-        data = request.data.copy()
-
-        photo = request.FILES.get("photo")
-        if photo:
-            if contact.photo:
-                old_photo_path = os.path.join(MEDIA_ROOT, str(contact.photo))
-                if os.path.exists(old_photo_path):
-                    os.remove(old_photo_path)
-
-            ext = os.path.splitext(photo.name)[1].lower() or ".bin"
-            target_name = f"{uuid4().hex}{ext}"
-            unique_name = default_storage.get_available_name(target_name)
-            photo.name = unique_name
-            data["photo"] = photo
-
-        serializer = ContactSerializer(contact, data=data, partial=True)
-
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+    def perform_update(self, serializer):
+        photo = self.request.FILES.get("photo")
+        if photo and serializer.instance.photo:
+            old_path = os.path.join(MEDIA_ROOT, str(serializer.instance.photo))
+            if os.path.exists(old_path):
+                os.remove(old_path)
 
         contact = serializer.save()
 
-        id_districts = data.get("id_districts", None)
-        if id_districts is not None:
+        if "multipart" in self.request.content_type:
+            id_districts = self.request.data.getlist("id_districts")
+        else:
+            id_districts = self.request.data.get("id_districts")
+        if id_districts:
             ContactDistrict.objects.filter(id_contact=contact).delete()
-
             for id_district in id_districts:
                 ContactDistrict.objects.create(
                     id_contact=contact, id_district_id=id_district
                 )
 
-        return Response(serializer.data)
-
-    def delete(self, request, pk=None):
-        contact = get_object_or_404(Contact, pk=pk, is_active=True)
-        self.check_object_permissions(request, contact)
-        contact.is_active = False
-        contact.save(update_fields=["is_active"])
-        return Response(status=HTTP_204_NO_CONTENT)
+    def perform_destroy(self, instance):
+        instance.is_active = False
+        instance.save(update_fields=["is_active"])

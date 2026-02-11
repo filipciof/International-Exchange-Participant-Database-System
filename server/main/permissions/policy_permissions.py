@@ -23,6 +23,8 @@ class PolicyPermission(BasePermission):
         return False
 
     def has_permission(self, request, view) -> bool:
+        if not request.user or not request.user.is_authenticated:
+            return False
         if request.method == "POST":
             return self.policy.can_create(request.user, request.data)
         return True

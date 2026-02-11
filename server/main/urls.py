@@ -8,7 +8,7 @@ from main.views import (
     ExchangeView, ExchangeFamilyView, ExchangeTypeView,
     DocumentView,
     StaffView, StaffUserAccountView, StaffPhotoView,
-    ContactView, ContactPhotoView,
+    ContactListView, ContactDetailView, ContactPhotoView,
 )
 
 
@@ -42,9 +42,9 @@ urlpatterns = [
     path("staff/<int:pk>/", StaffView.as_view()),
     path("staff/<int:pk>/user-account/", StaffUserAccountView.as_view()),
     path("staff/photos/", StaffPhotoView.as_view()),
-    path("contacts/", ContactView.as_view()),
-    path("contacts/<int:pk>/", ContactView.as_view()),
-    path("contacts/photos/", ContactPhotoView.as_view()),
+    path("contacts/", ContactListView.as_view()),
+    path("contacts/<int:pk>/", ContactDetailView.as_view()),
+    path("contacts/<int:pk>/photo/", ContactPhotoView.as_view()),
 ]
 
 if DEBUG is False:

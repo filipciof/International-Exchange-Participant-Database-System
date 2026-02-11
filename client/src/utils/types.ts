@@ -56,7 +56,7 @@ export type Contact = {
   is_longterm: boolean;
   is_family_to_family: boolean;
   is_camp: boolean;
-  photo: string;
+  has_photo: boolean;
   notes: string;
 };
 

@@ -29,22 +29,21 @@ export default function ContactDetail({ id, handleClose }: ContactDetailProps) {
   const { data: contact, isLoading: isContactLoading } = useQuery({
     queryKey: ["contacts", id],
     queryFn: async () => {
-      const response = await axiosClient.get(`/contacts/?id=${id}`);
+      const response = await axiosClient.get(`/contacts/${id}/`);
       return response.data;
     },
   });
 
   const { data: imageUrl, isLoading } = useQuery({
-    queryKey: ["contactPhoto", contact?.photo],
+    queryKey: ["contactPhoto", id],
     queryFn: async () => {
-      const photoName = contact.photo.split("/")[3];
       const response = await axiosClient.get(
-        `/contacts/photos/?photo_name=${photoName}`,
+        `/contacts/${id}/photo/`,
         { responseType: "blob" },
       );
       return URL.createObjectURL(response.data);
     },
-    enabled: !!contact?.photo,
+    enabled: !!contact?.has_photo,
     staleTime: Infinity,
   });
 

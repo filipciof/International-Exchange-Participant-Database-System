@@ -1,5 +1,5 @@
 from .club import CountryView, DistrictView, ClubListView, ClubDetailView
-from .contact import ContactView, ContactPhotoView
+from .contact import ContactListView, ContactDetailView, ContactPhotoView
 from .document import DocumentView
 from .exchange import ExchangeView, ExchangeTypeView, ExchangeFamilyView
 from .family import FamilyView, FamilyMemberView

@@ -17,16 +17,15 @@ export default function ContactCard({
   onDelete: (id: number) => void;
 }) {
   const { data: imageUrl, isLoading } = useQuery({
-    queryKey: ["contactPhoto", contact.photo],
+    queryKey: ["contactPhoto", contact.id],
     queryFn: async () => {
-      const photoName = contact.photo.split("/")[3];
       const response = await axiosClient.get(
-        `/contacts/photos/?photo_name=${photoName}`,
+        `/contacts/${contact.id}/photo/`,
         { responseType: "blob" }
       );
       return URL.createObjectURL(response.data);
     },
-    enabled: !!contact.photo,
+    enabled: !!contact.has_photo,
     staleTime: Infinity,
   });
 

@@ -6,10 +6,14 @@ class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
         fields = "__all__"
-        extra_kwargs = {"is_active": {"required": False, "default": True}}
+        extra_kwargs = {
+            "is_active": {"required": False, "default": True},
+            "photo": {"write_only": True},
+        }
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        representation["has_photo"] = bool(instance.photo)
 
         representation["country"] = (
             instance.id_country.name if instance.id_country else None

@@ -29,7 +29,7 @@ export default function UpdateContact({
   const { data: contact, isLoading: isContactLoading } = useQuery({
     queryKey: ["contacts", id],
     queryFn: async () => {
-      const response = await axiosClient.get(`/contacts/?id=${id}`);
+      const response = await axiosClient.get(`/contacts/${id}/`);
       return response.data;
     },
   });
