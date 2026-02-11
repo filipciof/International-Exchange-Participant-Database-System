@@ -27,7 +27,7 @@ export default function UpdateFamily({
   const { data: family, isLoading: isFamilyLoading } = useQuery({
     queryKey: ["families", id],
     queryFn: async () => {
-      const response = await axiosClient.get(`/families/?id=${id}`);
+      const response = await axiosClient.get(`/families/${id}/`);
       return response.data;
     },
   });

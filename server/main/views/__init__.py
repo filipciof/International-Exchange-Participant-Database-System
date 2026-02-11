@@ -6,6 +6,6 @@ from .exchange import (
     ExchangeListView, ExchangeDetailView,
     ExchangeFamilyListView, ExchangeFamilyDetailView,
 )
-from .family import FamilyView, FamilyMemberView
+from .family import FamilyListView, FamilyDetailView, FamilyMemberListView, FamilyMemberDetailView
 from .staff import StaffView, StaffUserAccountView, StaffPhotoView
 from .student import StudentView, StudentPhotoView, StudentUserAccountView
