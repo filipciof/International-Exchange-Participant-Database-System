@@ -298,7 +298,7 @@ export default function StudentForm({
               >
                 {Gender.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
-                    {option.label}
+                    {t(`gender.${option.label}`)}
                   </MenuItem>
                 ))}
               </TextField>

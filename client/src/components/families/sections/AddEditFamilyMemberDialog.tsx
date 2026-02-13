@@ -1,5 +1,4 @@
 import {
-  Autocomplete,
   Button,
   Checkbox,
   Dialog,
@@ -7,6 +6,7 @@ import {
   DialogContent,
   DialogTitle,
   FormControlLabel,
+  MenuItem,
   Stack,
   TextField,
   Typography,
@@ -51,7 +51,9 @@ export default function AddEditFamilyMemberDialog({
       fullWidth
     >
       <DialogTitle>
-        {editingMember ? t("families.editFamilyMember") : t("families.addFamilyMember")}
+        {editingMember
+          ? t("families.editFamilyMember")
+          : t("families.addFamilyMember")}
       </DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
@@ -91,26 +93,25 @@ export default function AddEditFamilyMemberDialog({
             }
             size="small"
           />
-          <Autocomplete
-            options={Gender}
-            getOptionLabel={(option) => option.label}
-            value={Gender.find((g) => g.value === formData.gender) || null}
-            onChange={(_, newValue) => {
+          <TextField
+            select
+            fullWidth
+            label={t("gender.gender")}
+            value={formData.gender}
+            onChange={(e) =>
               setFormData({
                 ...formData,
-                gender: newValue ? newValue.value : undefined,
-              });
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t("gender.gender")}
-                variant="outlined"
-                fullWidth
-                size="small"
-              />
-            )}
-          />
+                gender: Number(e.target.value),
+              })
+            }
+            size="small"
+          >
+            {Gender.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {t(`gender.${option.label}`)}
+              </MenuItem>
+            ))}
+          </TextField>
           <DatePicker
             label={t("families.dateOfBirth")}
             format="YYYY-MM-DD"
