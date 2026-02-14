@@ -94,7 +94,6 @@ export default function Clubs() {
 
   const {
     clubs,
-    countries,
     isLoading,
     error,
     addClubMutation,
@@ -126,7 +125,6 @@ export default function Clubs() {
         isLoading={addClubMutation.isPending}
         isSuccess={addClubMutation.isSuccess}
         error={addClubMutation.error}
-        countries={countries}
       />
     );
   }
@@ -145,7 +143,6 @@ export default function Clubs() {
         isLoading={updateClubMutation.isPending}
         isSuccess={updateClubMutation.isSuccess}
         error={updateClubMutation.error}
-        countries={countries}
         id={selectedId}
       />
     );

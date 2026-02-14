@@ -1,5 +1,5 @@
 import ClubForm from "./ClubForm";
-import type { ClubFormData, Country } from "../../utils/types";
+import type { ClubFormData } from "../../utils/types";
 import { useTranslation } from "react-i18next";
 
 type ClubAddProps = {
@@ -8,7 +8,6 @@ type ClubAddProps = {
   isLoading: boolean;
   isSuccess: boolean;
   error: any | null;
-  countries: Country[];
 };
 
 export default function ClubAdd({
@@ -17,7 +16,6 @@ export default function ClubAdd({
   isLoading,
   isSuccess,
   error,
-  countries,
 }: ClubAddProps) {
   const { t } = useTranslation();
 
@@ -29,7 +27,6 @@ export default function ClubAdd({
       isLoading={isLoading}
       isSuccess={isSuccess}
       error={error}
-      countries={countries}
       submitButtonText={t("common.add")}
     />
   );

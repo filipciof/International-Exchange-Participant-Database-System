@@ -1,5 +1,5 @@
 import ClubForm from "./ClubForm";
-import type { ClubFormData, Country } from "../../utils/types";
+import type { ClubFormData } from "../../utils/types";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../utils/axiosClient";
 import Loading from "../Loading";
@@ -11,7 +11,6 @@ type UpdateClubProps = {
   isLoading: boolean;
   isSuccess: boolean;
   error: any | null;
-  countries: Country[];
   id: number;
 };
 
@@ -21,7 +20,6 @@ export default function UpdateClub({
   isLoading,
   isSuccess,
   error,
-  countries,
   id,
 }: UpdateClubProps) {
   const { t } = useTranslation();
@@ -46,7 +44,6 @@ export default function UpdateClub({
       isLoading={isLoading}
       isSuccess={isSuccess}
       error={error}
-      countries={countries}
       initialData={club}
       submitButtonText={t("common.update")}
     />
