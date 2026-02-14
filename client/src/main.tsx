@@ -3,6 +3,7 @@ import "@fontsource/lato/400.css";
 import "@fontsource/lato/700.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import "./i18n";
 import App from "./App.tsx";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./utils/theme.ts";
@@ -12,7 +13,6 @@ import queryClient from "./utils/queryClient.ts";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { NuqsAdapter } from "nuqs/adapters/react";
-import "./i18n";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

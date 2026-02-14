@@ -14,7 +14,7 @@ import {
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import type { FamilyMember, FamilyMemberFormData } from "../../../utils/types";
-import { Gender } from "../../../utils/types";
+import { getGenderOptions } from "../../../utils/types";
 import { handleValidationErrors } from "../../../utils/handleValidationErrors";
 import { useTranslation } from "react-i18next";
 
@@ -106,9 +106,9 @@ export default function AddEditFamilyMemberDialog({
             }
             size="small"
           >
-            {Gender.map((option) => (
+            {getGenderOptions().map((option) => (
               <MenuItem key={option.value} value={option.value}>
-                {t(`gender.${option.label}`)}
+                {option.label}
               </MenuItem>
             ))}
           </TextField>

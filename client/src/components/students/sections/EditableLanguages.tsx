@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, Grid, IconButton, TextField, MenuItem } from "@mui/material";
 import { Edit as EditIcon, Save, Close, Language } from "@mui/icons-material";
 import type { Student } from "../../../utils/types";
-import { LanguageProficiency } from "../../../utils/types";
+import { getLanguageProficiencyOptions } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
@@ -168,9 +168,9 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
               <MenuItem value="">
                 <em>—</em>
               </MenuItem>
-              {LanguageProficiency.map((level) => (
-                <MenuItem key={level.value} value={level.value}>
-                  {t(`languageProficiency.${level.label}`)}
+              {getLanguageProficiencyOptions().map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
                 </MenuItem>
               ))}
             </TextField>
@@ -204,9 +204,9 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
               <MenuItem value="">
                 <em>—</em>
               </MenuItem>
-              {LanguageProficiency.map((level) => (
-                <MenuItem key={level.value} value={level.value}>
-                  {t(`languageProficiency.${level.label}`)}
+              {getLanguageProficiencyOptions().map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
                 </MenuItem>
               ))}
             </TextField>

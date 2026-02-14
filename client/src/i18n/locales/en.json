@@ -430,6 +430,19 @@
     },
     "noPrograms": "No assigned programs."
   },
+  "schema": {
+    "firstNameRequired": "First name is required",
+    "middleNameRequired": "Middle name is required",
+    "lastNameRequired": "Last name is required",
+    "emailRequired": "Email is required",
+    "countryRequired": "Country is required",
+    "clubRequired": "Club is required",
+    "clubNameRequired": "Club name is required",
+    "clubNumberRequired": "Club number is required",
+    "familyNameRequired": "Family name is required",
+    "groupRequired": "At least one group is required",
+    "documentNameRequired": "Document name is required"
+  },
   "contactForm": {
     "firstName": "First Name",
     "middleName": "Middle Name",

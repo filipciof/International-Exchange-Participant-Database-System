@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, Grid, IconButton, TextField, Autocomplete, MenuItem } from "@mui/material";
 import { Edit as EditIcon, Save, Close, Person } from "@mui/icons-material";
 import type { Student, Country } from "../../../utils/types";
-import { Gender, ShirtSize } from "../../../utils/types";
+import { getGenderOptions, ShirtSize } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
@@ -244,9 +244,9 @@ export default function EditablePersonalInfo({
                 })
               }
             >
-              {Gender.map((option) => (
+              {getGenderOptions().map((option) => (
                 <MenuItem key={option.value} value={option.value}>
-                  {t(`gender.${option.label}`)}
+                  {option.label}
                 </MenuItem>
               ))}
             </TextField>

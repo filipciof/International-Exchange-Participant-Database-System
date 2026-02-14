@@ -26,20 +26,20 @@ export type District = {
   number: number;
 };
 
-export const Gender = [
+export const getGenderOptions = () => [
   { value: 0, label: i18next.t("gender.male") },
   { value: 1, label: i18next.t("gender.female") },
   { value: 2, label: i18next.t("gender.nonbinary") },
 ];
 
-export const LanguageProficiency = [
+export const getLanguageProficiencyOptions = () => [
   { value: 0, label: i18next.t("languageProficiency.beginner") },
   { value: 1, label: i18next.t("languageProficiency.conversational") },
   { value: 2, label: i18next.t("languageProficiency.advanced") },
   { value: 3, label: i18next.t("languageProficiency.fluent") },
 ];
 
-export const Groups = [
+export const getGroupOptions = () => [
   { value: "admin", label: i18next.t("account.admin") },
   { value: "correspondent", label: i18next.t("account.correspondent") },
   { value: "club_officer", label: i18next.t("account.club_officer") },
@@ -73,10 +73,10 @@ export type ContactFormData = ContactFormInputs & {
 };
 
 export const contactSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
+  first_name: z.string().min(1, i18next.t("schema.firstNameRequired")),
   middle_name: z.string().optional(),
-  last_name: z.string().min(1, "Last name is required"),
-  id_country: z.number().min(1, "Country is required"),
+  last_name: z.string().min(1, i18next.t("schema.lastNameRequired")),
+  id_country: z.number().min(1, i18next.t("schema.countryRequired")),
   id_districts: z.array(z.number()).nullable().optional(),
   gender: z.number().nullable().optional(),
   email: z.email().or(z.literal("")),
@@ -90,9 +90,9 @@ export const contactSchema = z.object({
 export type ContactFormInputs = z.infer<typeof contactSchema>;
 
 export const studentSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
+  first_name: z.string().min(1, i18next.t("schema.firstNameRequired")),
   middle_name: z.string().optional(),
-  last_name: z.string().min(1, "Last name is required"),
+  last_name: z.string().min(1, i18next.t("schema.lastNameRequired")),
   nick_name: z.string().optional(),
   gender: z.number().nullable().optional(),
   date_of_birth: z.string().nullable().optional(),
@@ -131,25 +131,25 @@ export type StudentFormData = StudentFormInputs & {
 };
 
 export const createStudentSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  email: z.email().min(1, "Email is required"),
+  first_name: z.string().min(1, i18next.t("schema.firstNameRequired")),
+  last_name: z.string().min(1, i18next.t("schema.lastNameRequired")),
+  email: z.email().min(1, i18next.t("schema.emailRequired")),
   id_country: z.number().nullable().optional(),
   id_district: z.number().nullable().optional(),
-  id_club: z.number().min(1, "Club is required"),
+  id_club: z.number().min(1, i18next.t("schema.clubRequired")),
   is_inbound: z.boolean(),
 });
 
 export type CreateStudentFormData = z.infer<typeof createStudentSchema>;
 
 export const createStaffSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  email: z.email().min(1, "Email is required"),
+  first_name: z.string().min(1, i18next.t("schema.firstNameRequired")),
+  last_name: z.string().min(1, i18next.t("schema.lastNameRequired")),
+  email: z.email().min(1, i18next.t("schema.emailRequired")),
   id_country: z.number().nullable().optional(),
   id_district: z.number().nullable().optional(),
-  id_club: z.number().min(1, "Club is required"),
-  groups: z.array(z.string()).min(1, "At least one group is required"),
+  id_club: z.number().min(1, i18next.t("schema.clubRequired")),
+  groups: z.array(z.string()).min(1, i18next.t("schema.groupRequired")),
 });
 
 export type CreateStaffFormData = z.infer<typeof createStaffSchema>;
@@ -213,8 +213,8 @@ export type Club = {
 };
 
 export const clubSchema = z.object({
-  name: z.string().min(1, "Club name is required"),
-  number: z.string().min(1, "Club number is required"),
+  name: z.string().min(1, i18next.t("schema.clubNameRequired")),
+  number: z.string().min(1, i18next.t("schema.clubNumberRequired")),
   id_country: z.number().nullable().optional(),
   id_district: z.number().nullable().optional(),
   city: z.string().optional(),
@@ -280,9 +280,9 @@ export const staffSchema = z.object({
   id_district: z.number().nullable().optional(),
   id_club: z.number().nullable().optional(),
   position: z.string().optional(),
-  first_name: z.string().min(1, "First name is required"),
+  first_name: z.string().min(1, i18next.t("schema.firstNameRequired")),
   middle_name: z.string().optional(),
-  last_name: z.string().min(1, "Last name is required"),
+  last_name: z.string().min(1, i18next.t("schema.lastNameRequired")),
   gender: z.number().nullable().optional(),
   email: z.email().or(z.literal("")),
   phone: z.string().optional(),
@@ -309,7 +309,7 @@ export const familySchema = z.object({
   id_country: z.number().nullable().optional(),
   id_district: z.number().nullable().optional(),
   id_club: z.number().nullable().optional(),
-  name: z.string().min(1, "Family name is required"),
+  name: z.string().min(1, i18next.t("schema.familyNameRequired")),
   city: z.string().optional(),
   address: z.string().optional(),
   notes: z.string().optional(),
@@ -335,9 +335,9 @@ export type FamilyMember = {
 
 export const familyMemberSchema = z.object({
   id_family: z.number().nullable().optional(),
-  first_name: z.string().min(1, "First name is required"),
-  middle_name: z.string().min(1, "Middle name is required"),
-  last_name: z.string().min(1, "Last name is required"),
+  first_name: z.string().min(1, i18next.t("schema.firstNameRequired")),
+  middle_name: z.string().min(1, i18next.t("schema.middleNameRequired")),
+  last_name: z.string().min(1, i18next.t("schema.lastNameRequired")),
   gender: z.number().nullable().optional(),
   date_of_birth: z.string().nullable().optional(),
   email: z.email().or(z.literal("")),
@@ -386,7 +386,7 @@ export const documentSchema = z.object({
   id_club: z.number().nullable().optional(),
   id_family: z.number().nullable().optional(),
   id_district: z.number().nullable().optional(),
-  name: z.string().min(1, "Document name is required"),
+  name: z.string().min(1, i18next.t("schema.documentNameRequired")),
   description: z.string().optional(),
 });
 

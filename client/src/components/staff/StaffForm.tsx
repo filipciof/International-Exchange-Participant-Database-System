@@ -11,7 +11,7 @@ import type {
   District,
   Staff,
 } from "../../utils/types";
-import { staffSchema, Gender } from "../../utils/types";
+import { staffSchema, getGenderOptions } from "../../utils/types";
 import { useTranslation } from "react-i18next";
 import useCountryDistrictClub from "../../hooks/useCountryDistrictClub";
 import {
@@ -130,7 +130,7 @@ export default function StaffForm({
           name="gender"
           control={control}
           label={t("staffForm.gender")}
-          options={Gender}
+          options={getGenderOptions()}
         />
       </Stack>
       <Stack direction={isMobile ? "column" : "row"} spacing={1}>

@@ -19,7 +19,7 @@ import type {
   PaginationModel,
   SearchableField,
 } from "../../utils/types";
-import { Gender, ShirtSize } from "../../utils/types";
+import { getGenderOptions, ShirtSize } from "../../utils/types";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
@@ -226,13 +226,13 @@ export default function StudentFilter({
                   },
                 }}
               >
-                {Gender.map((gender) => (
+                {getGenderOptions().map((option) => (
                   <ToggleButton
-                    key={gender.value}
-                    value={gender.value.toString()}
-                    aria-label={gender.label}
+                    key={option.value}
+                    value={option.value.toString()}
+                    aria-label={option.label}
                   >
-                    {t(`gender.${gender.label}`)}
+                    {option.label}
                   </ToggleButton>
                 ))}
               </ToggleButtonGroup>

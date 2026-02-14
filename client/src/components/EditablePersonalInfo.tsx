@@ -7,7 +7,7 @@ import queryClient from "../utils/queryClient";
 import Section from "./Section";
 import InfoItem from "./InfoItem";
 import { useTranslation } from "react-i18next";
-import { Gender } from "../utils/types";
+import { getGenderOptions } from "../utils/types";
 
 type EditablePersonalInfoProps = {
   gender: number;
@@ -137,9 +137,9 @@ export default function EditablePersonalInfo({
                 })
               }
             >
-              {Gender.map((option) => (
+              {getGenderOptions().map((option) => (
                 <MenuItem key={option.value} value={option.value}>
-                  {t(`gender.${option.label}`)}
+                  {option.label}
                 </MenuItem>
               ))}
             </TextField>

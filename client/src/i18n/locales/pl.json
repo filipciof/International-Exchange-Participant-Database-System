@@ -430,6 +430,19 @@
     },
     "noPrograms": "Brak przypisanych programów."
   },
+  "schema": {
+    "firstNameRequired": "Imię jest wymagane",
+    "middleNameRequired": "Drugie imię jest wymagane",
+    "lastNameRequired": "Nazwisko jest wymagane",
+    "emailRequired": "Email jest wymagany",
+    "countryRequired": "Kraj jest wymagany",
+    "clubRequired": "Klub jest wymagany",
+    "clubNameRequired": "Nazwa klubu jest wymagana",
+    "clubNumberRequired": "Numer klubu jest wymagany",
+    "familyNameRequired": "Nazwisko rodziny jest wymagane",
+    "groupRequired": "Wymagana jest co najmniej jedna grupa",
+    "documentNameRequired": "Nazwa dokumentu jest wymagana"
+  },
   "contactForm": {
     "firstName": "Imię",
     "middleName": "Drugie imię",

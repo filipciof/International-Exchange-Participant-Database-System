@@ -9,7 +9,7 @@ import type {
   Country,
   District,
 } from "../../utils/types";
-import { contactSchema, Gender } from "../../utils/types";
+import { contactSchema, getGenderOptions } from "../../utils/types";
 import { useTranslation } from "react-i18next";
 import useCountryDistrictClub from "../../hooks/useCountryDistrictClub";
 import {
@@ -119,7 +119,7 @@ export default function ContactForm({
           name="gender"
           control={control}
           label={t("contactForm.gender")}
-          options={Gender}
+          options={getGenderOptions()}
         />
       </Stack>
       <Stack direction={isMobile ? "column" : "row"} spacing={1}>

@@ -10,7 +10,7 @@ import type {
   Country,
   District,
 } from "../../utils/types";
-import { createStaffSchema, Groups } from "../../utils/types";
+import { createStaffSchema, getGroupOptions } from "../../utils/types";
 import axiosClient from "../../utils/axiosClient";
 import { useTranslation } from "react-i18next";
 import useCountryDistrictClub from "../../hooks/useCountryDistrictClub";
@@ -168,7 +168,7 @@ export default function CreateStaffForm({
         <ControlledMultiSelect
           name="groups"
           control={control}
-          options={Groups}
+          options={getGroupOptions()}
           label={t("account.groups")}
           required
         />
