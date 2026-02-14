@@ -5,7 +5,6 @@ import type {
   Student,
 } from "../../utils/types";
 import { Box, IconButton, Tooltip } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useTranslation } from "react-i18next";
 import useDataGridLocale from "../../hooks/useDataGridLocale";
@@ -25,7 +24,6 @@ export default function StudentList({
   paginationModel,
   setPaginationModel,
   isLoading,
-  onEdit,
   onDelete,
   onRowClick,
 }: StudentListProps) {
@@ -112,15 +110,6 @@ export default function StudentList({
           sx={{ display: "flex", gap: 1, alignItems: "center", height: "100%" }}
           onClick={(e) => e.stopPropagation()}
         >
-          <Tooltip title={t("common.edit")}>
-            <IconButton
-              size="small"
-              onClick={() => onEdit?.(params.row.id)}
-              color="primary"
-            >
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
           <Tooltip title={t("common.delete")}>
             <IconButton
               size="small"

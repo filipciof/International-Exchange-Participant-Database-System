@@ -3,10 +3,9 @@ import StudentList from "../components/students/StudentList";
 import Loading from "../components/Loading";
 import { Box, Button, Typography, CircularProgress } from "@mui/material";
 import MyPagination from "../components/MyPagination";
-import type { StudentFormData, ViewType } from "../utils/types";
+import type { ViewType } from "../utils/types";
 import StudentDetail from "../components/students/StudentDetail";
 import AddStudent from "../components/students/StudentAdd";
-import UpdateStudent from "../components/students/StudentUpdate";
 import AddIcon from "@mui/icons-material/Add";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useStudents } from "../hooks/useStudents";
@@ -178,33 +177,8 @@ export default function Students() {
     }
   };
 
-  const handleUpdateOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("update");
-  };
-
-  const handleUpdateStudent = (data: StudentFormData) => {
-    if (selectedId) {
-      updateStudentMutation.mutate({ id: selectedId, data });
-    }
-  };
-
   if (currentView === "detail" && selectedId) {
     return <StudentDetail id={selectedId} handleClose={handleClose} />;
-  }
-
-  if (currentView === "update" && selectedId) {
-    return (
-      <UpdateStudent
-        handleClose={handleClose}
-        handleUpdateStudent={handleUpdateStudent}
-        isLoading={updateStudentMutation.isPending}
-        isSuccess={updateStudentMutation.isSuccess}
-        error={updateStudentMutation.error}
-        countries={countries}
-        id={selectedId}
-      />
-    );
   }
 
   return (
@@ -231,7 +205,9 @@ export default function Students() {
             onClick={() => exportStudentsMutation.mutate("csv")}
             disabled={exportStudentsMutation.isPending}
           >
-            {exportStudentsMutation.isPending ? t("common.exporting") : t("common.export")}
+            {exportStudentsMutation.isPending
+              ? t("common.exporting")
+              : t("common.export")}
           </Button>
 
           {/* <Button
@@ -251,12 +227,7 @@ export default function Students() {
         </Box>
       </Box>
 
-      {currentView === "add" && (
-        <AddStudent
-          open
-          handleClose={handleClose}
-        />
-      )}
+      {currentView === "add" && <AddStudent open handleClose={handleClose} />}
 
       {selectedId && (
         <DeleteConfirmationDialog
@@ -327,7 +298,6 @@ export default function Students() {
         paginationModel={paginationModel}
         setPaginationModel={setPaginationModel}
         isLoading={isLoading}
-        onEdit={handleUpdateOpen}
         onDelete={handleDeleteOpen}
         onRowClick={handleDetailOpen}
       />
