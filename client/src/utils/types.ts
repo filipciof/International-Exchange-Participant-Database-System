@@ -292,6 +292,8 @@ export type Family = {
 };
 
 export const familySchema = z.object({
+  id_country: z.number().nullable().optional(),
+  id_district: z.number().nullable().optional(),
   id_club: z.number().nullable().optional(),
   name: z.string().min(1, "Family name is required"),
   city: z.string().optional(),
