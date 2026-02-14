@@ -1,5 +1,5 @@
 import ContactForm from "./ContactForm";
-import type { ContactFormData, Country } from "../../utils/types";
+import type { ContactFormData } from "../../utils/types";
 import { useTranslation } from "react-i18next";
 
 type ContactAddProps = {
@@ -8,7 +8,6 @@ type ContactAddProps = {
   isLoading: boolean;
   isSuccess: boolean;
   error: any | null;
-  countries: Country[];
 };
 
 export default function ContactAdd({
@@ -17,7 +16,6 @@ export default function ContactAdd({
   isLoading,
   isSuccess,
   error,
-  countries,
 }: ContactAddProps) {
   const { t } = useTranslation();
 
@@ -29,7 +27,6 @@ export default function ContactAdd({
       isLoading={isLoading}
       isSuccess={isSuccess}
       error={error}
-      countries={countries}
       submitButtonText={t("common.add")}
     />
   );

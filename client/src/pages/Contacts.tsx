@@ -185,7 +185,6 @@ export default function Contacts() {
         isLoading={addContactMutation.isPending}
         isSuccess={addContactMutation.isSuccess}
         error={addContactMutation.error}
-        countries={countries}
       />
     );
   }
@@ -198,7 +197,6 @@ export default function Contacts() {
         isLoading={updateContactMutation.isPending}
         isSuccess={updateContactMutation.isSuccess}
         error={updateContactMutation.error}
-        countries={countries}
         id={selectedId}
       />
     );

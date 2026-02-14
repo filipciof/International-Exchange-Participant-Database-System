@@ -1,0 +1,85 @@
+import {
+  Autocomplete,
+  TextField,
+  CircularProgress,
+  type TextFieldProps,
+} from "@mui/material";
+import {
+  Controller,
+  type Control,
+  type FieldValues,
+  type Path,
+} from "react-hook-form";
+
+type ControlledMultiAutocompleteProps<T extends FieldValues, Option> = {
+  name: Path<T>;
+  control: Control<T>;
+  options: Option[];
+  getOptionLabel: (option: Option) => string;
+  getOptionValue: (option: Option) => number | string;
+  label: string;
+  loading?: boolean;
+  disabled?: boolean;
+  textFieldProps?: Omit<TextFieldProps, "label">;
+};
+
+export default function ControlledMultiAutocomplete<
+  T extends FieldValues,
+  Option,
+>({
+  name,
+  control,
+  options,
+  getOptionLabel,
+  getOptionValue,
+  label,
+  loading,
+  disabled,
+  textFieldProps,
+}: ControlledMultiAutocompleteProps<T, Option>) {
+  return (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field, fieldState: { error } }) => (
+        <Autocomplete
+          multiple
+          value={options.filter((o) =>
+            (field.value as (number | string)[])?.includes(getOptionValue(o)),
+          )}
+          onChange={(_event, newValue) => {
+            field.onChange(newValue.map((v) => getOptionValue(v)));
+          }}
+          options={options}
+          getOptionLabel={getOptionLabel}
+          loading={loading}
+          disabled={disabled}
+          fullWidth
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={label}
+              error={!!error}
+              helperText={error?.message}
+              size="small"
+              slotProps={{
+                input: {
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {loading ? (
+                        <CircularProgress color="inherit" size={20} />
+                      ) : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                },
+              }}
+              {...textFieldProps}
+            />
+          )}
+        />
+      )}
+    />
+  );
+}
