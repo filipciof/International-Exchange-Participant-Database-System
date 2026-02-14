@@ -134,6 +134,8 @@ export const createStudentSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
   email: z.email().min(1, "Email is required"),
+  id_country: z.number().nullable().optional(),
+  id_district: z.number().nullable().optional(),
   id_club: z.number().min(1, "Club is required"),
   is_inbound: z.boolean(),
 });
