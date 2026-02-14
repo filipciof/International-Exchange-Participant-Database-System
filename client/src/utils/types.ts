@@ -264,6 +264,8 @@ export type Staff = {
 };
 
 export const staffSchema = z.object({
+  id_country: z.number().nullable().optional(),
+  id_district: z.number().nullable().optional(),
   id_club: z.number().nullable().optional(),
   position: z.string().optional(),
   first_name: z.string().min(1, "First name is required"),
