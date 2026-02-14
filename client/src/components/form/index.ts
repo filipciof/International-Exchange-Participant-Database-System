@@ -6,3 +6,4 @@ export { default as ControlledCheckbox } from "./ControlledCheckbox";
 export { default as ControlledDatePicker } from "./ControlledDatePicker";
 export { default as FileUploadButton } from "./FileUploadButton";
 export { default as FormShell } from "./FormShell";
+export { default as ControlledMultiSelect } from "./ControlledMultiSelect";

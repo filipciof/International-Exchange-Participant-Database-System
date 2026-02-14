@@ -1,4 +1,5 @@
 import { z } from "zod";
+import i18next from "i18next";
 
 export type PaginatedData<T> = {
   count: number;
@@ -26,16 +27,23 @@ export type District = {
 };
 
 export const Gender = [
-  { value: 0, label: "male" },
-  { value: 1, label: "female" },
-  { value: 2, label: "nonbinary" },
+  { value: 0, label: i18next.t("gender.male") },
+  { value: 1, label: i18next.t("gender.female") },
+  { value: 2, label: i18next.t("gender.nonbinary") },
 ];
 
 export const LanguageProficiency = [
-  { value: 0, label: "beginner" },
-  { value: 1, label: "conversational" },
-  { value: 2, label: "advanced" },
-  { value: 3, label: "fluent" },
+  { value: 0, label: i18next.t("languageProficiency.beginner") },
+  { value: 1, label: i18next.t("languageProficiency.conversational") },
+  { value: 2, label: i18next.t("languageProficiency.advanced") },
+  { value: 3, label: i18next.t("languageProficiency.fluent") },
+];
+
+export const Groups = [
+  { value: "admin", label: i18next.t("account.admin") },
+  { value: "correspondent", label: i18next.t("account.correspondent") },
+  { value: "club_officer", label: i18next.t("account.club_officer") },
+  { value: "kwm_officer", label: i18next.t("account.kwm_officer") },
 ];
 
 export const ShirtSize = ["XS", "S", "M", "L", "XL", "XXL"];
@@ -136,6 +144,8 @@ export const createStaffSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
   email: z.email().min(1, "Email is required"),
+  id_country: z.number().nullable().optional(),
+  id_district: z.number().nullable().optional(),
   id_club: z.number().min(1, "Club is required"),
   groups: z.array(z.string()).min(1, "At least one group is required"),
 });
@@ -301,7 +311,7 @@ export const familySchema = z.object({
   city: z.string().optional(),
   address: z.string().optional(),
   notes: z.string().optional(),
-})
+});
 
 export type FamilyFormData = z.infer<typeof familySchema>;
 
@@ -332,7 +342,7 @@ export const familyMemberSchema = z.object({
   phone: z.string().optional(),
   is_head_of_family: z.boolean(),
   occupation: z.string().optional(),
-})
+});
 
 export type FamilyMemberFormData = z.infer<typeof familyMemberSchema>;
 
@@ -366,7 +376,7 @@ export type Document = {
   has_file: boolean;
   description: string;
   uploaded_at: string;
-}
+};
 
 export const documentSchema = z.object({
   id_student: z.number().nullable().optional(),
@@ -382,7 +392,7 @@ export type DocumentFormInputs = z.infer<typeof documentSchema>;
 
 export type DocumentFormData = DocumentFormInputs & {
   file: File | null;
-}
+};
 
 export type SearchableField = {
   value: string;

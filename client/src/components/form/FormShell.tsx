@@ -21,6 +21,7 @@ type FormShellProps = {
   error: any | null;
   submitButtonText?: string;
   children: ReactNode;
+  variant?: "page" | "dialog";
 };
 
 export default function FormShell({
@@ -32,8 +33,55 @@ export default function FormShell({
   error,
   submitButtonText,
   children,
+  variant = "page",
 }: FormShellProps) {
   const { t } = useTranslation();
+  const isDialog = variant === "dialog";
+
+  const form = (
+    <form noValidate onSubmit={onSubmit}>
+      <Stack spacing={1} sx={isDialog ? { p: 2 } : { px: { xs: 0, md: 16 } }}>
+        {children}
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent="flex-end"
+          sx={{ pt: 2 }}
+        >
+          <Button variant="outlined" onClick={onClose} size="large">
+            {t("common.cancel")}
+          </Button>
+          {isLoading ? (
+            <CircularProgress sx={{ color: "secondary.main" }} />
+          ) : (
+            <Button variant="contained" type="submit" size="large">
+              {submitButtonText || t("common.submit")}
+            </Button>
+          )}
+        </Stack>
+        {error && (
+          <Stack spacing={1}>
+            {handleValidationErrors(error.response?.data).map(
+              (errorMessage: string, index: number) => (
+                <Typography key={index} sx={{ color: "error.main" }}>
+                  {errorMessage}
+                </Typography>
+              ),
+            )}
+          </Stack>
+        )}
+        {isSuccess && (
+          <Typography sx={{ color: "success.main" }}>
+            {t("common.success")}
+          </Typography>
+        )}
+      </Stack>
+    </form>
+  );
+
+  if (isDialog) {
+    return form;
+  }
 
   return (
     <Box
@@ -60,45 +108,7 @@ export default function FormShell({
             </Typography>
           </Stack>
         )}
-
-        <form noValidate onSubmit={onSubmit}>
-          <Stack spacing={1} sx={{ px: { xs: 0, md: 16 } }}>
-            {children}
-            <Stack
-              direction="row"
-              spacing={1}
-              justifyContent="flex-end"
-              sx={{ pt: 2 }}
-            >
-              <Button variant="outlined" onClick={onClose} size="large">
-                {t("common.cancel")}
-              </Button>
-              {isLoading ? (
-                <CircularProgress sx={{ color: "secondary.main" }} />
-              ) : (
-                <Button variant="contained" type="submit" size="large">
-                  {submitButtonText || t("common.submit")}
-                </Button>
-              )}
-            </Stack>
-            {error && (
-              <Stack spacing={1}>
-                {handleValidationErrors(error.response?.data).map(
-                  (errorMessage: string, index: number) => (
-                    <Typography key={index} sx={{ color: "error.main" }}>
-                      {errorMessage}
-                    </Typography>
-                  ),
-                )}
-              </Stack>
-            )}
-            {isSuccess && (
-              <Typography sx={{ color: "success.main" }}>
-                {t("common.success")}
-              </Typography>
-            )}
-          </Stack>
-        </form>
+        {form}
       </Paper>
     </Box>
   );
