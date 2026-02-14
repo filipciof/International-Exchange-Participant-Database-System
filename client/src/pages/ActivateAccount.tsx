@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useQueryState, parseAsStringLiteral } from "nuqs";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import TextField from "@mui/material/TextField";
@@ -15,6 +16,7 @@ import { styled } from "@mui/material/styles";
 import axiosClient from "../utils/axiosClient";
 import Loading from "../components/Loading";
 import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -136,6 +138,9 @@ export default function ActivateAccount() {
   if (linkInvalid) {
     return (
       <ActivateContainer direction="column" justifyContent="space-between">
+        <Box sx={{ position: "absolute", top: 16, right: 16 }}>
+          <LanguageSwitcher />
+        </Box>
         <Card
           variant="outlined"
           sx={{ width: { xs: "200px", sm: "300px", md: "500px" } }}
@@ -151,6 +156,9 @@ export default function ActivateAccount() {
   if (success) {
     return (
       <ActivateContainer direction="column" justifyContent="space-between">
+        <Box sx={{ position: "absolute", top: 16, right: 16 }}>
+          <LanguageSwitcher />
+        </Box>
         <Card
           variant="outlined"
           sx={{ width: { xs: "200px", sm: "300px", md: "500px" } }}

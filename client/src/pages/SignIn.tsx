@@ -18,6 +18,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
 import { useTranslation } from "react-i18next";
 import { setActiveGroup } from "../hooks/usePermissions";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -169,6 +170,9 @@ export default function SignIn() {
   return (
     <>
       <SignInContainer direction="column" justifyContent="space-between">
+        <Box sx={{ position: "absolute", top: 16, right: 16 }}>
+          <LanguageSwitcher />
+        </Box>
         <Card
           variant="outlined"
           sx={{ width: { xs: "200px", sm: "300px", md: "500px" } }}

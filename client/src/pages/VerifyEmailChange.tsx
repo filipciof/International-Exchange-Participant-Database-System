@@ -7,6 +7,8 @@ import { styled } from "@mui/material/styles";
 import axiosClient from "../utils/axiosClient";
 import Loading from "../components/Loading";
 import { useTranslation } from "react-i18next";
+import Box from "@mui/material/Box";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -75,6 +77,9 @@ export default function VerifyEmailChange() {
 
   return (
     <Container direction="column" justifyContent="space-between">
+      <Box sx={{ position: "absolute", top: 16, right: 16 }}>
+        <LanguageSwitcher />
+      </Box>
       <Card
         variant="outlined"
         sx={{ width: { xs: "200px", sm: "300px", md: "500px" } }}
