@@ -24,15 +24,15 @@ def _make_link(user, mode="activate"):
 
 def send_activation_email(user):
     send_mail(
-        subject=_("IEPDS - Activate Your Account"),
+        subject=_("RYE District 2231 - Activate Your Account"),
         message=_(
             "Hello,\n\n"
-            "An account has been created for you in the IEPDS system.\n\n"
+            "An account has been created for you in the Rotary District 2231 Youth Exchange Management Service.\n\n"
             "Please click the link below to set your password and activate your account:\n"
             "%(link)s\n\n"
-            "If you did not expect this email, you can safely ignore it.\n\n"
-            "IEPDS Team"
-        ) % {"link": _make_link(user, "activate")},
+            "If you did not expect this email, you can safely ignore it."
+        )
+        % {"link": _make_link(user, "activate")},
         from_email=None,
         recipient_list=[user.email],
     )
@@ -40,15 +40,15 @@ def send_activation_email(user):
 
 def send_password_reset_email(user):
     send_mail(
-        subject=_("IEPDS - Reset Your Password"),
+        subject=_("RYE District 2231 - Reset Your Password"),
         message=_(
             "Hello,\n\n"
             "We received a request to reset your password.\n\n"
             "Please click the link below to set a new password:\n"
             "%(link)s\n\n"
-            "If you did not request this, you can safely ignore this email.\n\n"
-            "IEPDS Team"
-        ) % {"link": _make_link(user, "reset")},
+            "If you did not request this, you can safely ignore this email."
+        )
+        % {"link": _make_link(user, "reset")},
         from_email=None,
         recipient_list=[user.email],
     )
@@ -56,14 +56,14 @@ def send_password_reset_email(user):
 
 def send_activation_success_email(user):
     send_mail(
-        subject=_("IEPDS - Account Activated"),
+        subject=_("RYE District 2231 - Account Activated"),
         message=_(
             "Hello,\n\n"
             "Your account has been successfully activated.\n\n"
             "You can now sign in at:\n"
-            "%(link)s\n\n"
-            "IEPDS Team"
-        ) % {"link": f"{get_frontend_url()}/sign-in"},
+            "%(link)s"
+        )
+        % {"link": f"{get_frontend_url()}/sign-in"},
         from_email=None,
         recipient_list=[user.email],
     )
@@ -71,12 +71,11 @@ def send_activation_success_email(user):
 
 def send_password_reset_success_email(user):
     send_mail(
-        subject=_("IEPDS - Password Changed"),
+        subject=_("RYE District 2231 - Password Changed"),
         message=_(
             "Hello,\n\n"
             "Your password has been successfully changed.\n\n"
-            "If you did not make this change, please contact us immediately.\n\n"
-            "IEPDS Team"
+            "If you did not make this change, please contact us immediately."
         ),
         from_email=None,
         recipient_list=[user.email],
@@ -102,15 +101,15 @@ def send_email_change_verification(user, new_email):
     token = make_email_change_token(user.pk, new_email)
     link = f"{get_frontend_url()}/verify-email/{token}"
     send_mail(
-        subject=_("IEPDS - Verify Email Change"),
+        subject=_("RYE District 2231 - Verify Email Change"),
         message=_(
             "Hello,\n\n"
             "A request was made to change your account email to this address.\n\n"
             "Please click the link below to confirm the change:\n"
             "%(link)s\n\n"
-            "If you did not expect this email, you can safely ignore it.\n\n"
-            "IEPDS Team"
-        ) % {"link": link},
+            "If you did not expect this email, you can safely ignore it."
+        )
+        % {"link": link},
         from_email=None,
         recipient_list=[new_email],
     )

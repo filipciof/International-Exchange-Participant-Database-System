@@ -1,6 +1,5 @@
-# Polish translations for IEPDS.
+# Polish translations for Rotary District 2231 Youth Exchange Management Service.
 # Copyright (C) 2026
-# This file is distributed under the same license as the IEPDS package.
 #
 msgid ""
 msgstr ""
@@ -55,37 +54,33 @@ msgid "email address"
 msgstr "adres email"
 
 #: eauth/utils.py:27
-msgid "IEPDS - Activate Your Account"
-msgstr "IEPDS - Aktywuj swoje konto"
+msgid "RYE District 2231 - Activate Your Account"
+msgstr "RYE Dystrykt 2231 - Aktywuj swoje konto"
 
 #: eauth/utils.py:29
 #, python-format
 msgid ""
 "Hello,\n"
 "\n"
-"An account has been created for you in the IEPDS system.\n"
+"An account has been created for you in the Rotary District 2231 Youth Exchange Management Service.\n"
 "\n"
 "Please click the link below to set your password and activate your account:\n"
 "%(link)s\n"
 "\n"
-"If you did not expect this email, you can safely ignore it.\n"
-"\n"
-"IEPDS Team"
+"If you did not expect this email, you can safely ignore it."
 msgstr ""
 "Witaj,\n"
 "\n"
-"W systemie IEPDS zostało utworzone dla Ciebie konto.\n"
+"W serwisie RYE Dystryktu 2231 zostało utworzone dla Ciebie konto.\n"
 "\n"
 "Kliknij poniższy link, aby ustawić hasło i aktywować swoje konto:\n"
 "%(link)s\n"
 "\n"
-"Jeśli nie spodziewałeś/aś się tego emaila, możesz go zignorować.\n"
-"\n"
-"Zespół IEPDS"
+"Jeśli nie spodziewałeś/aś się tego emaila, możesz go zignorować."
 
 #: eauth/utils.py:43
-msgid "IEPDS - Reset Your Password"
-msgstr "IEPDS - Zresetuj hasło"
+msgid "RYE District 2231 - Reset Your Password"
+msgstr "RYE Dystrykt 2231 - Zresetuj hasło"
 
 #: eauth/utils.py:45
 #, python-format
@@ -97,9 +92,7 @@ msgid ""
 "Please click the link below to set a new password:\n"
 "%(link)s\n"
 "\n"
-"If you did not request this, you can safely ignore this email.\n"
-"\n"
-"IEPDS Team"
+"If you did not request this, you can safely ignore this email."
 msgstr ""
 "Witaj,\n"
 "\n"
@@ -108,13 +101,11 @@ msgstr ""
 "Kliknij poniższy link, aby ustawić nowe hasło:\n"
 "%(link)s\n"
 "\n"
-"Jeśli nie prosiłeś/aś o to, możesz zignorować ten email.\n"
-"\n"
-"Zespół IEPDS"
+"Jeśli nie prosiłeś/aś o to, możesz zignorować ten email."
 
 #: eauth/utils.py:59
-msgid "IEPDS - Account Activated"
-msgstr "IEPDS - Konto aktywowane"
+msgid "RYE District 2231 - Account Activated"
+msgstr "RYE Dystrykt 2231 - Konto aktywowane"
 
 #: eauth/utils.py:61
 #, python-format
@@ -124,22 +115,18 @@ msgid ""
 "Your account has been successfully activated.\n"
 "\n"
 "You can now sign in at:\n"
-"%(link)s\n"
-"\n"
-"IEPDS Team"
+"%(link)s"
 msgstr ""
 "Witaj,\n"
 "\n"
 "Twoje konto zostało pomyślnie aktywowane.\n"
 "\n"
 "Możesz teraz zalogować się na:\n"
-"%(link)s\n"
-"\n"
-"Zespół IEPDS"
+"%(link)s"
 
 #: eauth/utils.py:74
-msgid "IEPDS - Password Changed"
-msgstr "IEPDS - Hasło zmienione"
+msgid "RYE District 2231 - Password Changed"
+msgstr "RYE Dystrykt 2231 - Hasło zmienione"
 
 #: eauth/utils.py:76
 msgid ""
@@ -147,21 +134,17 @@ msgid ""
 "\n"
 "Your password has been successfully changed.\n"
 "\n"
-"If you did not make this change, please contact us immediately.\n"
-"\n"
-"IEPDS Team"
+"If you did not make this change, please contact us immediately."
 msgstr ""
 "Witaj,\n"
 "\n"
 "Twoje hasło zostało pomyślnie zmienione.\n"
 "\n"
-"Jeśli nie dokonałeś/aś tej zmiany, skontaktuj się z nami natychmiast.\n"
-"\n"
-"Zespół IEPDS"
+"Jeśli nie dokonałeś/aś tej zmiany, skontaktuj się z nami natychmiast."
 
 #: eauth/utils.py:105
-msgid "IEPDS - Verify Email Change"
-msgstr "IEPDS - Zweryfikuj zmianę adresu email"
+msgid "RYE District 2231 - Verify Email Change"
+msgstr "RYE Dystrykt 2231 - Potwierdź zmianę adresu email"
 
 #: eauth/utils.py:107
 #, python-format
@@ -173,9 +156,7 @@ msgid ""
 "Please click the link below to confirm the change:\n"
 "%(link)s\n"
 "\n"
-"If you did not expect this email, you can safely ignore it.\n"
-"\n"
-"IEPDS Team"
+"If you did not expect this email, you can safely ignore it."
 msgstr ""
 "Witaj,\n"
 "\n"
@@ -184,9 +165,7 @@ msgstr ""
 "Kliknij poniższy link, aby potwierdzić zmianę:\n"
 "%(link)s\n"
 "\n"
-"Jeśli nie spodziewałeś/aś się tego emaila, możesz go zignorować.\n"
-"\n"
-"Zespół IEPDS"
+"Jeśli nie spodziewałeś/aś się tego emaila, możesz go zignorować."
 
 #: eauth/views.py:45
 msgid "No valid token found in cookie 'refresh_token'"
