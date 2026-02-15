@@ -5,59 +5,15 @@ import { useQuery } from "@tanstack/react-query";
 import { useQueryState, parseAsStringLiteral } from "nuqs";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
-import MuiCard from "@mui/material/Card";
-import { styled } from "@mui/material/styles";
 import axiosClient from "../utils/axiosClient";
 import Loading from "../components/Loading";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../components/LanguageSwitcher";
-
-const Card = styled(MuiCard)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "column",
-  alignSelf: "center",
-  width: "100%",
-  padding: theme.spacing(4),
-  gap: theme.spacing(2),
-  margin: "auto",
-  [theme.breakpoints.up("sm")]: {
-    maxWidth: "450px",
-  },
-  boxShadow:
-    "hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px",
-  ...theme.applyStyles("dark", {
-    boxShadow:
-      "hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px",
-  }),
-}));
-
-const ActivateContainer = styled(Stack)(({ theme }) => ({
-  minHeight: "100%",
-  padding: theme.spacing(2),
-  [theme.breakpoints.up("sm")]: {
-    padding: theme.spacing(4),
-  },
-  "&::before": {
-    content: '""',
-    display: "block",
-    position: "absolute",
-    zIndex: -1,
-    inset: 0,
-    backgroundImage:
-      "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))",
-    backgroundRepeat: "no-repeat",
-    ...theme.applyStyles("dark", {
-      backgroundImage:
-        "radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))",
-    }),
-  },
-}));
 
 export default function ActivateAccount() {
   const { t } = useTranslation();
@@ -135,55 +91,32 @@ export default function ActivateAccount() {
 
   if (isValidating || submitting) return <Loading />;
 
-  if (linkInvalid) {
-    return (
-      <ActivateContainer direction="column" justifyContent="space-between">
-        <Box sx={{ position: "absolute", top: 16, right: 16 }}>
-          <LanguageSwitcher />
-        </Box>
-        <Card
-          variant="outlined"
-          sx={{ width: { xs: "200px", sm: "300px", md: "500px" } }}
-        >
-          <Typography sx={{ color: "error.main" }}>
-            {t(isReset ? "auth.resetError" : "auth.activationError")}
-          </Typography>
-        </Card>
-      </ActivateContainer>
-    );
-  }
+  const renderContent = () => {
+    if (linkInvalid) {
+      return (
+        <Typography sx={{ color: "error.main", textAlign: "center" }}>
+          {t(isReset ? "auth.resetError" : "auth.activationError")}
+        </Typography>
+      );
+    }
 
-  if (success) {
-    return (
-      <ActivateContainer direction="column" justifyContent="space-between">
-        <Box sx={{ position: "absolute", top: 16, right: 16 }}>
-          <LanguageSwitcher />
-        </Box>
-        <Card
-          variant="outlined"
-          sx={{ width: { xs: "200px", sm: "300px", md: "500px" } }}
-        >
-          <Typography variant="h5" sx={{ color: "success.main" }}>
-            {t(isReset ? "auth.resetSuccess" : "auth.activationSuccess")}
-          </Typography>
-        </Card>
-      </ActivateContainer>
-    );
-  }
-
-  return (
-    <ActivateContainer direction="column" justifyContent="space-between">
-      <Card
-        variant="outlined"
-        sx={{ width: { xs: "200px", sm: "300px", md: "500px" } }}
-      >
+    if (success) {
+      return (
         <Typography
-          component="h1"
-          variant="h4"
-          sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
+          variant="h5"
+          sx={{ color: "success.main", textAlign: "center" }}
         >
+          {t(isReset ? "auth.resetSuccess" : "auth.activationSuccess")}
+        </Typography>
+      );
+    }
+
+    return (
+      <>
+        <Typography variant="h4" fontWeight={700} sx={{ textAlign: "center" }}>
           {t(isReset ? "auth.resetPassword" : "auth.activateAccount")}
         </Typography>
+
         <Box
           component="form"
           onSubmit={handleSubmit}
@@ -227,16 +160,52 @@ export default function ActivateAccount() {
               color={confirmError ? "error" : "primary"}
             />
           </FormControl>
-          <Button type="submit" fullWidth variant="contained">
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            size="large"
+            sx={{ mt: 1 }}
+          >
             {t(isReset ? "auth.resetPassword" : "auth.activateAccount")}
           </Button>
           {error && (
-            <Typography sx={{ color: "error.main" }}>
+            <Typography sx={{ color: "error.main", textAlign: "center" }}>
               {t(isReset ? "auth.resetError" : "auth.activationError")}
             </Typography>
           )}
         </Box>
-      </Card>
-    </ActivateContainer>
+      </>
+    );
+  };
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        position: "fixed",
+        inset: 0,
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        p: { xs: 3, sm: 6 },
+      }}
+    >
+      <Box sx={{ position: "absolute", top: 16, right: 16 }}>
+        <LanguageSwitcher />
+      </Box>
+
+      <Stack spacing={3} sx={{ width: "100%", maxWidth: 400, mb: "5vh" }}>
+        <Box sx={{ textAlign: "center" }}>
+          <img
+            src="/logo.png"
+            alt="Rotary Youth Exchange"
+            style={{ height: 64, marginBottom: 16 }}
+          />
+        </Box>
+
+        {renderContent()}
+      </Stack>
+    </Box>
   );
 }
