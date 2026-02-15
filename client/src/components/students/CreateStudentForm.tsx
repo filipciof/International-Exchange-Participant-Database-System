@@ -215,19 +215,17 @@ export default function CreateStudentForm({
             }
             loading={isLoadingDistricts}
           />
-          <ControlledAutocomplete
-            name="id_club"
-            control={control}
-            options={clubs}
-            getOptionLabel={(c: Club) => c.name}
-            getOptionValue={(c: Club) => c.id}
-            label={t("staffForm.club")}
-            disabled={
-              hasLockedSendingClub || !selectedDistrict || isLoadingClubs
-            }
-            loading={isLoadingClubs}
-          />
         </Stack>
+        <ControlledAutocomplete
+          name="id_club"
+          control={control}
+          options={clubs}
+          getOptionLabel={(c: Club) => c.name}
+          getOptionValue={(c: Club) => c.id}
+          label={t("staffForm.club")}
+          disabled={hasLockedSendingClub || !selectedDistrict || isLoadingClubs}
+          loading={isLoadingClubs}
+        />
         <Controller
           name="is_inbound"
           control={control}

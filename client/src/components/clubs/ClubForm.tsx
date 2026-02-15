@@ -41,17 +41,16 @@ export default function ClubForm({
 
   const { canCreateHomeCountryClubs } = usePermissions();
 
-  const { control, handleSubmit, reset, watch } =
-    useForm<ClubFormData>({
-      resolver: zodResolver(clubSchema),
-      defaultValues: initialData || {
-        name: "",
-        number: "",
-        id_country: undefined,
-        id_district: undefined,
-        city: "",
-      },
-    });
+  const { control, handleSubmit, reset, watch } = useForm<ClubFormData>({
+    resolver: zodResolver(clubSchema),
+    defaultValues: initialData || {
+      name: "",
+      number: "",
+      id_country: undefined,
+      id_district: undefined,
+      city: "",
+    },
+  });
 
   const selectedCountry = watch("id_country");
 
@@ -88,6 +87,18 @@ export default function ClubForm({
       submitButtonText={submitButtonText}
     >
       <Stack direction={isMobile ? "column" : "row"} spacing={1}>
+        <ControlledTextField
+          name="name"
+          control={control}
+          label={t("clubForm.clubName")}
+        />
+        <ControlledTextField
+          name="number"
+          control={control}
+          label={t("clubForm.number")}
+        />
+      </Stack>
+      <Stack direction={isMobile ? "column" : "row"} spacing={1}>
         <ControlledAutocomplete
           name="id_country"
           control={control}
@@ -107,23 +118,11 @@ export default function ClubForm({
           loading={isLoadingDistricts}
         />
       </Stack>
-      <Stack direction={isMobile ? "column" : "row"} spacing={1}>
-        <ControlledTextField
+      <ControlledTextField
           name="city"
           control={control}
           label={t("clubForm.city")}
         />
-        <ControlledTextField
-          name="name"
-          control={control}
-          label={t("clubForm.clubName")}
-        />
-        <ControlledTextField
-          name="number"
-          control={control}
-          label={t("clubForm.number")}
-        />
-      </Stack>
     </FormShell>
   );
 }

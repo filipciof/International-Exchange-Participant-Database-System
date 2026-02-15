@@ -3,7 +3,13 @@ import { useTheme } from "@mui/material/styles";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { FamilyFormData, Country, District, Club, Family } from "../../utils/types";
+import type {
+  FamilyFormData,
+  Country,
+  District,
+  Club,
+  Family,
+} from "../../utils/types";
 import { familySchema } from "../../utils/types";
 import { useTranslation } from "react-i18next";
 import useCountryDistrictClub from "../../hooks/useCountryDistrictClub";
@@ -118,17 +124,17 @@ export default function FamilyForm({
           disabled={!selectedCountry || isLoadingDistricts}
           loading={isLoadingDistricts}
         />
-        <ControlledAutocomplete
-          name="id_club"
-          control={control}
-          options={clubs}
-          getOptionLabel={(c: Club) => c.name}
-          getOptionValue={(c: Club) => c.id}
-          label={t("familyForm.club")}
-          disabled={!selectedDistrict || isLoadingClubs}
-          loading={isLoadingClubs}
-        />
       </Stack>
+      <ControlledAutocomplete
+        name="id_club"
+        control={control}
+        options={clubs}
+        getOptionLabel={(c: Club) => c.name}
+        getOptionValue={(c: Club) => c.id}
+        label={t("familyForm.club")}
+        disabled={!selectedDistrict || isLoadingClubs}
+        loading={isLoadingClubs}
+      />
       <Stack direction={isMobile ? "column" : "row"} spacing={1}>
         <ControlledTextField
           name="city"

@@ -154,17 +154,17 @@ export default function CreateStaffForm({
             disabled={!selectedCountry || isLoadingDistricts}
             loading={isLoadingDistricts}
           />
-          <ControlledAutocomplete
-            name="id_club"
-            control={control}
-            options={clubs}
-            getOptionLabel={(c: Club) => c.name}
-            getOptionValue={(c: Club) => c.id}
-            label={t("staffForm.club")}
-            disabled={!selectedDistrict || isLoadingClubs}
-            loading={isLoadingClubs}
-          />
         </Stack>
+        <ControlledAutocomplete
+          name="id_club"
+          control={control}
+          options={clubs}
+          getOptionLabel={(c: Club) => c.name}
+          getOptionValue={(c: Club) => c.id}
+          label={t("staffForm.club")}
+          disabled={!selectedDistrict || isLoadingClubs}
+          loading={isLoadingClubs}
+        />
         <ControlledMultiSelect
           name="groups"
           control={control}
