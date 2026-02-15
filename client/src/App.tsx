@@ -18,9 +18,16 @@ import UserProfile from "./pages/UserProfile";
 import Contacts from "./pages/Contacts";
 import Staff from "./pages/Staff";
 import usePermissions from "./hooks/usePermissions";
+import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 
 function App() {
   const permissions = usePermissions();
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    document.title = t("common.pageTitle");
+  }, [t]);
 
   return (
     <>

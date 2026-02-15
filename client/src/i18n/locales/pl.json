@@ -1,5 +1,6 @@
 {
   "common": {
+    "pageTitle": "RYE – Serwis do zarządzania wymianami młodzieży Rotary Dystryktu 2231",
     "logout": "Wyloguj",
     "cancel": "Anuluj",
     "close": "Zamknij",
@@ -113,13 +114,15 @@
     "polish": "Polski"
   },
   "auth": {
+    "welcome": "Witaj ponownie!",
+    "welcomeSubtitle": "Zaloguj się do serwisu RYE Dystryktu 2231.",
     "signIn": "Zaloguj się",
     "email": "Email",
     "password": "Hasło",
     "emailPlaceholder": "twoj@email.com",
     "passwordPlaceholder": "••••••",
     "rememberMe": "Zapamiętaj mnie",
-    "forgotPassword": "Zapomniałeś hasła?",
+    "forgotPassword": "Zapomniałeś/aś hasła?",
     "invalidCredentials": "Nieprawidłowe dane logowania",
     "emailError": "Proszę podać prawidłowy adres email.",
     "passwordError": "Hasło musi mieć co najmniej 5 znaków.",

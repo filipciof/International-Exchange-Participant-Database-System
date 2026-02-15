@@ -1,5 +1,6 @@
 {
   "common": {
+    "pageTitle": "RYE – Rotary District 2231 Youth Exchange Management Service",
     "logout": "Logout",
     "cancel": "Cancel",
     "close": "Close",
@@ -113,6 +114,8 @@
     "polish": "Polski"
   },
   "auth": {
+    "welcome": "Welcome back!",
+    "welcomeSubtitle": "Sign in to the RYE District 2231 service.",
     "signIn": "Sign in",
     "email": "Email",
     "password": "Password",

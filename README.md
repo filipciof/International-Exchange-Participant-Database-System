@@ -15,6 +15,8 @@ Resources:
 - Lists of countries:
   - https://stefangabos.github.io/world_countries/
   - https://datahub.io/core/country-list
+- Sign-in picture:
+  - https://unsplash.com/photos/group-of-people-sitting-on-bench-near-trees-duting-daytime-Q_Sei-TqSlc
 
 Django admin app migrations:
 .venv/lib/python<version>/site-packages/django/contrib/admin/migrations/

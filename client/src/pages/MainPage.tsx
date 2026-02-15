@@ -53,7 +53,7 @@ export default function MainPage() {
             )}
 
             <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}>
-              <img src="/logo.png" alt="Rotary Youth Exchange" height={40} />
+              <img src="/logo.png" alt="Rotary Youth Exchange" height={48} />
             </Box>
 
             <AccountMenu setLoading={setLoading} />
