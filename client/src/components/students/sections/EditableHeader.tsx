@@ -101,8 +101,9 @@ export default function EditableHeader({
     <Card
       sx={{
         mb: 3,
-        bgcolor: "primary.main",
+        bgcolor: isEditing ? "background.paper" : "primary.main",
         opacity: 0.9,
+        transition: "background-color 0.3s ease",
       }}
     >
       <CardContent>
@@ -121,7 +122,6 @@ export default function EditableHeader({
                 size="small"
                 onClick={handleSave}
                 disabled={updateMutation.isPending}
-                sx={{ color: "white" }}
               >
                 <Save />
               </IconButton>
@@ -129,7 +129,6 @@ export default function EditableHeader({
                 size="small"
                 onClick={handleCancel}
                 disabled={updateMutation.isPending}
-                sx={{ color: "white" }}
               >
                 <Close />
               </IconButton>
@@ -162,14 +161,14 @@ export default function EditableHeader({
             <Box sx={{ flex: 1, minWidth: 200 }}>
               <Typography
                 variant="h4"
-                sx={{ color: "white", fontWeight: 700, mb: 1 }}
+                sx={{ color: isEditing ? "text.primary" : "white", fontWeight: 700, mb: 1 }}
               >
                 {fullName}
               </Typography>
               {student.nick_name && (
                 <Typography
                   variant="h6"
-                  sx={{ color: "rgba(255,255,255,0.9)", mb: 1 }}
+                  sx={{ color: isEditing ? "text.secondary" : "rgba(255,255,255,0.9)", mb: 1 }}
                 >
                   "{student.nick_name}"
                 </Typography>
@@ -210,14 +209,6 @@ export default function EditableHeader({
                     onChange={(e) =>
                       setFormData({ ...formData, first_name: e.target.value })
                     }
-                    sx={{
-                      "& .MuiInputBase-root": { bgcolor: "white" },
-                      "& .MuiInputLabel-root": {
-                        bgcolor: "white",
-                        px: 0.5,
-                        borderRadius: 0.5,
-                      },
-                    }}
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 4 }}>
@@ -229,14 +220,6 @@ export default function EditableHeader({
                     onChange={(e) =>
                       setFormData({ ...formData, middle_name: e.target.value })
                     }
-                    sx={{
-                      "& .MuiInputBase-root": { bgcolor: "white" },
-                      "& .MuiInputLabel-root": {
-                        bgcolor: "white",
-                        px: 0.5,
-                        borderRadius: 0.5,
-                      },
-                    }}
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 4 }}>
@@ -249,14 +232,6 @@ export default function EditableHeader({
                     onChange={(e) =>
                       setFormData({ ...formData, last_name: e.target.value })
                     }
-                    sx={{
-                      "& .MuiInputBase-root": { bgcolor: "white" },
-                      "& .MuiInputLabel-root": {
-                        bgcolor: "white",
-                        px: 0.5,
-                        borderRadius: 0.5,
-                      },
-                    }}
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 4 }}>
@@ -268,14 +243,6 @@ export default function EditableHeader({
                     onChange={(e) =>
                       setFormData({ ...formData, nick_name: e.target.value })
                     }
-                    sx={{
-                      "& .MuiInputBase-root": { bgcolor: "white" },
-                      "& .MuiInputLabel-root": {
-                        bgcolor: "white",
-                        px: 0.5,
-                        borderRadius: 0.5,
-                      },
-                    }}
                   />
                 </Grid>
                 <Grid size={{ xs: 12 }}>
@@ -284,7 +251,6 @@ export default function EditableHeader({
                     component="label"
                     startIcon={<CloudUploadIcon />}
                     fullWidth
-                    sx={{ bgcolor: "white" }}
                   >
                     {photo ? photo.name : t("common.uploadPhoto")}
                     <input

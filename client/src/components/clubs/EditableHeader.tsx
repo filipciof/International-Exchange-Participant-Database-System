@@ -53,8 +53,9 @@ export default function EditableHeader({ club }: EditableHeaderProps) {
     <Card
       sx={{
         mb: 3,
-        bgcolor: "primary.main",
+        bgcolor: isEditing ? "background.paper" : "primary.main",
         opacity: 0.9,
+        transition: "background-color 0.3s ease",
       }}
     >
       <CardContent>
@@ -73,7 +74,6 @@ export default function EditableHeader({ club }: EditableHeaderProps) {
                 size="small"
                 onClick={handleSave}
                 disabled={updateMutation.isPending}
-                sx={{ color: "white" }}
               >
                 <Save />
               </IconButton>
@@ -81,7 +81,6 @@ export default function EditableHeader({ club }: EditableHeaderProps) {
                 size="small"
                 onClick={handleCancel}
                 disabled={updateMutation.isPending}
-                sx={{ color: "white" }}
               >
                 <Close />
               </IconButton>
@@ -121,28 +120,12 @@ export default function EditableHeader({ club }: EditableHeaderProps) {
                   label={t("clubForm.clubName")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  sx={{
-                    "& .MuiInputBase-root": { bgcolor: "white" },
-                    "& .MuiInputLabel-root": {
-                      bgcolor: "white",
-                      px: 0.5,
-                      borderRadius: 0.5,
-                    },
-                  }}
                 />
                 <TextField
                   size="small"
                   label={t("clubForm.number")}
                   value={number}
                   onChange={(e) => setNumber(e.target.value)}
-                  sx={{
-                    "& .MuiInputBase-root": { bgcolor: "white" },
-                    "& .MuiInputLabel-root": {
-                      bgcolor: "white",
-                      px: 0.5,
-                      borderRadius: 0.5,
-                    },
-                  }}
                 />
               </Box>
             )}
