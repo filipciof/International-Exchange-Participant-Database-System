@@ -143,7 +143,7 @@ export default function EditableClubInfo({
       actions={actions}
     >
       {!isEditing ? (
-        <Grid container spacing={3}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
           {club && (
             <>
               <InfoItem label={t("clubForm.country")} value={club.country} />
@@ -165,10 +165,11 @@ export default function EditableClubInfo({
           )}
         </Grid>
       ) : (
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12 }}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Autocomplete
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               value={selectedCountry}
               onChange={(_event, newValue) => {
                 setCountry(newValue?.id || null);
@@ -182,9 +183,10 @@ export default function EditableClubInfo({
               )}
             />
           </Grid>
-          <Grid size={{ xs: 12 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Autocomplete
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               value={selectedDistrict}
               onChange={(_event, newValue) => {
                 setDistrict(newValue?.id || null);
@@ -215,9 +217,10 @@ export default function EditableClubInfo({
               )}
             />
           </Grid>
-          <Grid size={{ xs: 12 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Autocomplete
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               value={selectedClub}
               onChange={(_event, newValue) =>
                 setFormData({
@@ -251,10 +254,10 @@ export default function EditableClubInfo({
             />
           </Grid>
           {showPosition && (
-            <Grid size={{ xs: 12 }}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
-                fullWidth
                 size="small"
+                sx={{ maxWidth: 400, width: "100%" }}
                 label={t("staffForm.position")}
                 value={formData.position}
                 onChange={(e) =>

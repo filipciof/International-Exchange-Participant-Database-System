@@ -79,20 +79,19 @@ export default function EditableLocation({ family }: EditableLocationProps) {
       actions={actions}
     >
       {!isEditing ? (
-        <Grid container spacing={3}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
           <InfoItem label={t("familyForm.city")} value={formData.city} />
           <InfoItem
             label={t("familyForm.address")}
             value={formData.address}
-            fullWidth
           />
         </Grid>
       ) : (
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12 }}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("familyForm.city")}
               value={formData.city}
               onChange={(e) =>
@@ -100,10 +99,10 @@ export default function EditableLocation({ family }: EditableLocationProps) {
               }
             />
           </Grid>
-          <Grid size={{ xs: 12 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("familyForm.address")}
               value={formData.address}
               onChange={(e) =>

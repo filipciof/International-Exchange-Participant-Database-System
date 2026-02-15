@@ -92,8 +92,8 @@ export default function EditableParentInfo({
       actions={actions}
     >
       {!isEditing ? (
-        <Grid container spacing={3}>
-          <Grid size={{ xs: 12, md: 6 }}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Box sx={{ p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
               <Typography
                 variant="subtitle2"
@@ -114,7 +114,7 @@ export default function EditableParentInfo({
               />
             </Box>
           </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Box sx={{ p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
               <Typography
                 variant="subtitle2"
@@ -141,8 +141,8 @@ export default function EditableParentInfo({
           />
         </Grid>
       ) : (
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, md: 6 }}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Box sx={{ p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
               <Typography
                 variant="subtitle2"
@@ -152,8 +152,8 @@ export default function EditableParentInfo({
                 {t("studentForm.labels.firstParent")}
               </Typography>
               <TextField
-                fullWidth
                 size="small"
+                sx={{ maxWidth: 400, width: "100%" }}
                 label={t("studentForm.labels.fullName")}
                 value={formData.first_parent_full_name}
                 onChange={(e) =>
@@ -165,8 +165,8 @@ export default function EditableParentInfo({
                 sx={{ mb: 2 }}
               />
               <TextField
-                fullWidth
                 size="small"
+                sx={{ maxWidth: 400, width: "100%" }}
                 label={t("studentForm.labels.email")}
                 type="email"
                 value={formData.first_parent_email}
@@ -179,7 +179,7 @@ export default function EditableParentInfo({
               />
             </Box>
           </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Box sx={{ p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
               <Typography
                 variant="subtitle2"
@@ -189,8 +189,8 @@ export default function EditableParentInfo({
                 {t("studentForm.labels.secondParent")}
               </Typography>
               <TextField
-                fullWidth
                 size="small"
+                sx={{ maxWidth: 400, width: "100%" }}
                 label={t("studentForm.labels.fullName")}
                 value={formData.second_parent_full_name}
                 onChange={(e) =>
@@ -202,8 +202,8 @@ export default function EditableParentInfo({
                 sx={{ mb: 2 }}
               />
               <TextField
-                fullWidth
                 size="small"
+                sx={{ maxWidth: 400, width: "100%" }}
                 label={t("studentForm.labels.email")}
                 type="email"
                 value={formData.second_parent_email}
@@ -216,10 +216,10 @@ export default function EditableParentInfo({
               />
             </Box>
           </Grid>
-          <Grid size={{ xs: 12 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("students.searchFields.polishPhoneNumber")}
               value={formData.polish_phone_number}
               onChange={(e) =>

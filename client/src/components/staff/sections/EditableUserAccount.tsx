@@ -136,7 +136,7 @@ export default function EditableUserAccount({
       {!isEditing ? (
         <>
           {hasUserAccount ? (
-            <Grid container spacing={3}>
+            <Grid container rowSpacing={2} columnSpacing={8}>
               <InfoItem label={t("staffForm.email")} value={staff.user_email} />
               <InfoItem
                 label={t("account.groups")}
@@ -166,19 +166,24 @@ export default function EditableUserAccount({
           )}
         </>
       ) : (
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          <TextField
-            label={t("staffForm.email")}
-            fullWidth
-            value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-            disabled={isLoading}
-            type="email"
-          />
+        <Grid container rowSpacing={2} columnSpacing={8}>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              label={t("staffForm.email")}
+              size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+              disabled={isLoading}
+              type="email"
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
           <FormControl
-            fullWidth
+            sx={{ maxWidth: 400, width: "100%" }}
+            size="small"
             disabled={isLoading || !canAssignGroups}
           >
             <InputLabel id="group-select-label">
@@ -229,7 +234,8 @@ export default function EditableUserAccount({
               </Box>
             )}
           </FormControl>
-        </Box>
+          </Grid>
+        </Grid>
       )}
     </Section>
   );

@@ -92,7 +92,7 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
       actions={actions}
     >
       {!isEditing ? (
-        <Grid container spacing={3}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
           <InfoItem
             label={t("students.searchFields.firstLanguage")}
             value={student.first_language}
@@ -127,11 +127,11 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
           />
         </Grid>
       ) : (
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 4 }}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("students.searchFields.firstLanguage")}
               value={formData.first_language}
               onChange={(e) =>
@@ -139,10 +139,11 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
               }
             />
           </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
+          <Grid size={{ xs: 12, sm: 6 }} />
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("students.searchFields.secondLanguage")}
               value={formData.second_language}
               onChange={(e) =>
@@ -150,10 +151,10 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
               }
             />
           </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               select
               label={t("studentForm.labels.secondLanguageProficiency")}
               value={formData.second_language_proficiency ?? ""}
@@ -177,8 +178,8 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("students.searchFields.thirdLanguage")}
               value={formData.third_language}
               onChange={(e) =>
@@ -188,8 +189,8 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               select
               label={t("studentForm.labels.thirdLanguageProficiency")}
               value={formData.third_language_proficiency ?? ""}

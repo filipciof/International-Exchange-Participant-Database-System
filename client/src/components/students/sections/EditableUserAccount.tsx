@@ -109,7 +109,7 @@ export default function EditableUserAccount({
       {!isEditing ? (
         <>
           {hasUserAccount ? (
-            <Grid container spacing={3}>
+            <Grid container rowSpacing={2} columnSpacing={8}>
               <InfoItem
                 label={t("studentForm.labels.email")}
                 value={student.user_email}
@@ -134,7 +134,8 @@ export default function EditableUserAccount({
       ) : (
         <TextField
           label={t("studentForm.labels.email")}
-          fullWidth
+          sx={{ maxWidth: 400, width: "100%" }}
+          size="small"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={isLoading}

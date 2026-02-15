@@ -88,7 +88,7 @@ export default function EditableInsurance({ student }: EditableInsuranceProps) {
       actions={actions}
     >
       {!isEditing ? (
-        <Grid container spacing={3}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
           <InfoItem
             label={t("students.searchFields.insuranceCompany")}
             value={student.insurance_company}
@@ -111,11 +111,11 @@ export default function EditableInsurance({ student }: EditableInsuranceProps) {
           />
         </Grid>
       ) : (
-        <Grid container spacing={2}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("students.searchFields.insuranceCompany")}
               value={formData.insurance_company}
               onChange={(e) =>
@@ -128,8 +128,8 @@ export default function EditableInsurance({ student }: EditableInsuranceProps) {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("students.searchFields.insuranceType")}
               value={formData.insurance_type}
               onChange={(e) =>
@@ -139,8 +139,8 @@ export default function EditableInsurance({ student }: EditableInsuranceProps) {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("students.searchFields.insuranceSerialNumber")}
               value={formData.insurance_serial_number}
               onChange={(e) =>
@@ -153,8 +153,8 @@ export default function EditableInsurance({ student }: EditableInsuranceProps) {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("studentForm.labels.insuranceCoverage")}
               value={formData.insurance_amount}
               onChange={(e) =>

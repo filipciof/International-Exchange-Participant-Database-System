@@ -94,7 +94,7 @@ export default function EditableTravelDocs({
       actions={actions}
     >
       {!isEditing ? (
-        <Grid container spacing={3}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
           <InfoItem
             label={t("studentForm.labels.countryOfDeparture")}
             value={student.country_of_departure}
@@ -113,10 +113,11 @@ export default function EditableTravelDocs({
           />
         </Grid>
       ) : (
-        <Grid container spacing={2}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
           <Grid size={{ xs: 12, sm: 6 }}>
             <Autocomplete
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               value={selectedDepartureCountry}
               onChange={(_event, newValue) =>
                 setFormData({
@@ -137,6 +138,7 @@ export default function EditableTravelDocs({
           <Grid size={{ xs: 12, sm: 6 }}>
             <Autocomplete
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               value={selectedPassportCountry}
               onChange={(_event, newValue) =>
                 setFormData({
@@ -156,8 +158,8 @@ export default function EditableTravelDocs({
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("students.searchFields.passportNumber")}
               value={formData.passport_number}
               onChange={(e) =>
@@ -167,6 +169,8 @@ export default function EditableTravelDocs({
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <DatePicker
+              slotProps={{ textField: { size: "small" } }}
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("students.searchFields.passportExpiration")}
               format="YYYY-MM-DD"
               value={

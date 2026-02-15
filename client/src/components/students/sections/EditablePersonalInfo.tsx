@@ -104,7 +104,7 @@ export default function EditablePersonalInfo({
       actions={actions}
     >
       {!isEditing ? (
-        <Grid container spacing={3}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
           <InfoItem
             label={t("studentForm.labels.dateOfBirth")}
             value={student.date_of_birth}
@@ -124,12 +124,6 @@ export default function EditablePersonalInfo({
           <InfoItem
             label={t("students.searchFields.address")}
             value={student.address}
-            fullWidth
-          />
-          <InfoItem
-            label={t("students.searchFields.dietaryRestrictions")}
-            value={student.dietary_restrictions}
-            fullWidth
           />
           <InfoItem
             label={t("staffForm.gender")}
@@ -143,11 +137,17 @@ export default function EditablePersonalInfo({
             label={t("studentForm.labels.shirtSize")}
             value={student.shirt_size}
           />
+          <InfoItem
+            label={t("students.searchFields.dietaryRestrictions")}
+            value={student.dietary_restrictions}
+          />
         </Grid>
       ) : (
-        <Grid container spacing={2}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
           <Grid size={{ xs: 12, sm: 6 }}>
             <DatePicker
+              slotProps={{ textField: { size: "small" } }}
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("studentForm.labels.dateOfBirth")}
               format="YYYY-MM-DD"
               value={
@@ -164,6 +164,7 @@ export default function EditablePersonalInfo({
           <Grid size={{ xs: 12, sm: 6 }}>
             <Autocomplete
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               value={selectedCountry}
               onChange={(_event, newValue) =>
                 setFormData({
@@ -183,8 +184,8 @@ export default function EditablePersonalInfo({
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("students.searchFields.cityOfBirth")}
               value={formData.city_of_birth}
               onChange={(e) =>
@@ -194,8 +195,8 @@ export default function EditablePersonalInfo({
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("students.searchFields.cityOfResidence")}
               value={formData.city_of_residence}
               onChange={(e) =>
@@ -203,10 +204,10 @@ export default function EditablePersonalInfo({
               }
             />
           </Grid>
-          <Grid size={{ xs: 12 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("students.searchFields.address")}
               value={formData.address}
               onChange={(e) =>
@@ -214,26 +215,10 @@ export default function EditablePersonalInfo({
               }
             />
           </Grid>
-          <Grid size={{ xs: 12 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
-              label={t("students.searchFields.dietaryRestrictions")}
-              value={formData.dietary_restrictions}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  dietary_restrictions: e.target.value,
-                })
-              }
-              multiline
-              rows={2}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
-            <TextField
-              fullWidth
-              size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               select
               label={t("staffForm.gender")}
               value={formData.gender}
@@ -251,10 +236,10 @@ export default function EditablePersonalInfo({
               ))}
             </TextField>
           </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("studentForm.labels.height")}
               type="number"
               value={formData.height}
@@ -269,10 +254,10 @@ export default function EditablePersonalInfo({
               }}
             />
           </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               select
               label={t("studentForm.labels.shirtSize")}
               value={formData.shirt_size}
@@ -289,6 +274,22 @@ export default function EditablePersonalInfo({
                 </MenuItem>
               ))}
             </TextField>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
+              label={t("students.searchFields.dietaryRestrictions")}
+              value={formData.dietary_restrictions}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  dietary_restrictions: e.target.value,
+                })
+              }
+              multiline
+              rows={2}
+            />
           </Grid>
         </Grid>
       )}

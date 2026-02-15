@@ -107,10 +107,10 @@ export default function EditableLocation({ contact }: EditableLocationProps) {
       actions={actions}
     >
       {!isEditing ? (
-        <Grid container spacing={3}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
           <InfoItem label={t("clubForm.country")} value={contact.country} />
           {contact.districts.length > 0 && (
-            <Grid size={{ xs: 12 }}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Box>
                 <Typography
                   variant="caption"
@@ -140,9 +140,10 @@ export default function EditableLocation({ contact }: EditableLocationProps) {
           )}
         </Grid>
       ) : (
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12 }}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Autocomplete
+              sx={{ maxWidth: 400, width: "100%" }}
               value={
                 countries.find((c: Country) => c.id === formData.id_country) ||
                 null
@@ -155,7 +156,6 @@ export default function EditableLocation({ contact }: EditableLocationProps) {
               }}
               options={countries}
               getOptionLabel={(option: Country) => option.name}
-              fullWidth
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -166,8 +166,9 @@ export default function EditableLocation({ contact }: EditableLocationProps) {
               )}
             />
           </Grid>
-          <Grid size={{ xs: 12 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Autocomplete
+              sx={{ maxWidth: 400, width: "100%" }}
               multiple
               value={districtsOptions.filter((d: District) =>
                 formData.id_districts.includes(d.id)
@@ -182,7 +183,6 @@ export default function EditableLocation({ contact }: EditableLocationProps) {
               getOptionLabel={(option: District) => option.number.toString()}
               disabled={!formData.id_country || isLoadingDistricts}
               loading={isLoadingDistricts}
-              fullWidth
               renderInput={(params) => (
                 <TextField
                   {...params}

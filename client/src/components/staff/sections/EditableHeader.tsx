@@ -8,7 +8,6 @@ import {
   IconButton,
   TextField,
   Grid,
-  Button,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -171,25 +170,60 @@ export default function EditableHeader({
               flexWrap: "wrap",
             }}
           >
-            <Avatar
-              src={!isLoading ? imageUrl || undefined : undefined}
-              alt={fullName}
-              sx={{
-                width: 100,
-                height: 100,
-                border: "4px solid white",
-                boxShadow: 3,
-              }}
+            <Box
+              component="label"
+              sx={{ cursor: "pointer", position: "relative" }}
             >
-              {formData.first_name[0]}
-              {formData.last_name[0]}
-            </Avatar>
+              <Avatar
+                src={
+                  photo
+                    ? URL.createObjectURL(photo)
+                    : !isLoading
+                      ? imageUrl || undefined
+                      : undefined
+                }
+                alt={fullName}
+                sx={{
+                  width: 100,
+                  height: 100,
+                  border: "4px solid",
+                  borderColor: "primary.main",
+                  boxShadow: 3,
+                  "&:hover": { opacity: 0.7 },
+                  transition: "opacity 0.2s",
+                }}
+              >
+                {formData.first_name[0]}
+                {formData.last_name[0]}
+              </Avatar>
+              <CloudUploadIcon
+                sx={{
+                  position: "absolute",
+                  bottom: 4,
+                  right: 4,
+                  fontSize: 20,
+                  color: "primary.main",
+                  bgcolor: "background.paper",
+                  borderRadius: "50%",
+                  p: 0.25,
+                }}
+              />
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) setPhoto(file);
+                }}
+              />
+            </Box>
             <Box sx={{ flex: 1, minWidth: 300 }}>
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 4 }}>
+              <Grid container rowSpacing={2} columnSpacing={8}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
-                    fullWidth
                     size="small"
+                    sx={{ maxWidth: 400, width: "100%" }}
                     label={t("staffForm.firstName")}
                     value={formData.first_name}
                     disabled={!canEditStaffName}
@@ -198,10 +232,10 @@ export default function EditableHeader({
                     }
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 4 }}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
-                    fullWidth
                     size="small"
+                    sx={{ maxWidth: 400, width: "100%" }}
                     label={t("staffForm.middleName")}
                     value={formData.middle_name}
                     onChange={(e) =>
@@ -209,10 +243,10 @@ export default function EditableHeader({
                     }
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 4 }}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
-                    fullWidth
                     size="small"
+                    sx={{ maxWidth: 400, width: "100%" }}
                     label={t("staffForm.lastName")}
                     value={formData.last_name}
                     disabled={!canEditStaffName}
@@ -220,25 +254,6 @@ export default function EditableHeader({
                       setFormData({ ...formData, last_name: e.target.value })
                     }
                   />
-                </Grid>
-                <Grid size={{ xs: 12 }}>
-                  <Button
-                    variant="outlined"
-                    component="label"
-                    startIcon={<CloudUploadIcon />}
-                    fullWidth
-                  >
-                    {photo ? photo.name : t("common.uploadPhoto")}
-                    <input
-                      type="file"
-                      hidden
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) setPhoto(file);
-                      }}
-                    />
-                  </Button>
                 </Grid>
               </Grid>
             </Box>

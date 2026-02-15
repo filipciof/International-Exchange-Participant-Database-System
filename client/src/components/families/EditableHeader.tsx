@@ -114,8 +114,8 @@ export default function EditableHeader({ family }: EditableHeaderProps) {
               </>
             ) : (
               <TextField
-                fullWidth
                 size="small"
+                sx={{ maxWidth: 400, width: "100%" }}
                 label={t("familyForm.familyName")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}

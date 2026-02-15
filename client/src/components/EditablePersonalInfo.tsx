@@ -90,7 +90,7 @@ export default function EditablePersonalInfo({
       actions={actions}
     >
       {!isEditing ? (
-        <Grid container spacing={3}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
           <InfoItem
             label={t("staffForm.email")}
             value={formData.email}
@@ -99,11 +99,11 @@ export default function EditablePersonalInfo({
           <InfoItem label={t("staffForm.gender")} value={t(`gender.${genderName}`)} />
         </Grid>
       ) : (
-        <Grid container spacing={2}>
+        <Grid container rowSpacing={2} columnSpacing={8}>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("staffForm.email")}
               type="email"
               value={formData.email}
@@ -114,8 +114,8 @@ export default function EditablePersonalInfo({
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               label={t("staffForm.phone")}
               value={formData.phone}
               onChange={(e) =>
@@ -125,8 +125,8 @@ export default function EditablePersonalInfo({
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              fullWidth
               size="small"
+              sx={{ maxWidth: 400, width: "100%" }}
               select
               label={t("staffForm.gender")}
               value={formData.gender}

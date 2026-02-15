@@ -16,7 +16,7 @@ export default function InfoItem({
   const displayValue = value?.toString() || "—";
 
   return (
-    <Grid size={{ xs: 12, sm: fullWidth ? 12 : 6, md: fullWidth ? 12 : 4 }}>
+    <Grid size={{ xs: 12, sm: fullWidth ? 12 : 6 }}>
       <Box>
         <Typography
           variant="caption"

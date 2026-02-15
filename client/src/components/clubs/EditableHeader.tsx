@@ -3,6 +3,7 @@ import {
   Box,
   Card,
   CardContent,
+  Grid,
   Typography,
   IconButton,
   TextField,
@@ -113,21 +114,26 @@ export default function EditableHeader({ club }: EditableHeaderProps) {
                 </Typography>
               </>
             ) : (
-              <Box sx={{ display: "flex", gap: 2 }}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  label={t("clubForm.clubName")}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-                <TextField
-                  size="small"
-                  label={t("clubForm.number")}
-                  value={number}
-                  onChange={(e) => setNumber(e.target.value)}
-                />
-              </Box>
+              <Grid container rowSpacing={2} columnSpacing={8}>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    size="small"
+                    sx={{ maxWidth: 400, width: "100%" }}
+                    label={t("clubForm.clubName")}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    size="small"
+                    sx={{ maxWidth: 400, width: "100%" }}
+                    label={t("clubForm.number")}
+                    value={number}
+                    onChange={(e) => setNumber(e.target.value)}
+                  />
+                </Grid>
+              </Grid>
             )}
           </Box>
         </Box>
