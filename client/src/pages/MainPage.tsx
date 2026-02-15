@@ -29,13 +29,21 @@ export default function MainPage() {
   return (
     <Box>
       <Box>
-        <AppBar position="fixed">
+        <AppBar
+          position="fixed"
+          sx={{
+            backgroundColor: "white",
+            color: "text.primary",
+            boxShadow: "none",
+            borderBottom: "1px solid",
+            borderColor: "divider",
+          }}
+        >
           <Toolbar>
             {canViewSidebar && (
               <IconButton
                 size="large"
                 edge="start"
-                color="inherit"
                 aria-label="menu"
                 sx={{ mr: 2, display: { sm: "block", md: "none" } }}
                 onClick={toggleDrawer(true)}
@@ -44,9 +52,9 @@ export default function MainPage() {
               </IconButton>
             )}
 
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              IEPDS
-            </Typography>
+            <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}>
+              <img src="/logo.png" alt="Rotary Youth Exchange" height={40} />
+            </Box>
 
             <AccountMenu setLoading={setLoading} />
 
