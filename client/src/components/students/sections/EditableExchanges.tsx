@@ -6,7 +6,6 @@ import {
   IconButton,
   Paper,
   Stack,
-  Chip,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -28,7 +27,6 @@ import usePermissions from "../../../hooks/usePermissions";
 
 type EditableExchangesProps = {
   studentId: number;
-  isInbound: boolean;
 };
 
 // Helper function to get current academic year in YYYY/YY format
@@ -51,7 +49,6 @@ const getCurrentAcademicYear = (): string => {
 
 export default function EditableExchanges({
   studentId,
-  isInbound,
 }: EditableExchangesProps) {
   const { t } = useTranslation();
   const { canEditExchanges, canViewClubs, canViewStaff } = usePermissions();
@@ -232,9 +229,9 @@ export default function EditableExchanges({
                   elevation={0}
                   sx={{
                     p: 2.5,
-                    bgcolor: isInbound ? "success.lighter" : "info.lighter",
+                    bgcolor: "grey.50",
                     border: "1px solid",
-                    borderColor: isInbound ? "success.light" : "info.light",
+                    borderColor: "divider",
                     borderRadius: 1,
                   }}
                 >
@@ -249,21 +246,11 @@ export default function EditableExchanges({
                     <Box>
                       <Typography
                         variant="subtitle1"
-                        sx={{ fontWeight: 600, mb: 0.5 }}
+                        sx={{ fontWeight: 600 }}
                       >
                         {t(`exchangeTypes.${exchange.type}`) ||
                           t("studentForm.labels.exchange")}
                       </Typography>
-                      <Chip
-                        label={
-                          isInbound
-                            ? t("students.filter.inbound")
-                            : t("students.filter.outbound")
-                        }
-                        size="small"
-                        color={isInbound ? "success" : "info"}
-                        sx={{ fontWeight: 500 }}
-                      />
                     </Box>
                     <Box sx={{ display: "flex", gap: 1 }}>
                       {exchange.year && (

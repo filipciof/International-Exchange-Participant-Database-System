@@ -8,6 +8,7 @@ import {
   IconButton,
   TextField,
   Grid,
+  Chip,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -172,6 +173,18 @@ export default function EditableHeader({
                   "{student.nick_name}"
                 </Typography>
               )}
+              <Chip
+                label={
+                  student.is_inbound
+                    ? t("students.filter.inbound")
+                    : t("students.filter.outbound")
+                }
+                size="small"
+                sx={{
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  color: "white",
+                }}
+              />
             </Box>
           </Box>
         ) : (
