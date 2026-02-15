@@ -11,6 +11,7 @@ import {
   InputLabel,
   Chip,
   type SelectChangeEvent,
+  Typography,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -161,7 +162,7 @@ export default function EditableUserAccount({
                 color: "text.secondary",
               }}
             >
-              {t("account.noUser")}
+              <Typography>{t("account.noUser")}</Typography>
             </Box>
           )}
         </>
@@ -181,59 +182,62 @@ export default function EditableUserAccount({
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-          <FormControl
-            sx={{ maxWidth: 400, width: "100%" }}
-            size="small"
-            disabled={isLoading || !canAssignGroups}
-          >
-            <InputLabel id="group-select-label">
-              {t("account.groups")}
-            </InputLabel>
-            <Select<string[]>
-              labelId="group-select-label"
-              id="group-select"
-              multiple
-              value={formData.groups}
-              label={t("account.groups")}
-              onChange={(e: SelectChangeEvent<string[]>) =>
-                setFormData({ ...formData, groups: e.target.value as string[] })
-              }
-              renderValue={(selected) => (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                  {selected.map((value) => (
-                    <Chip
-                      key={value}
-                      label={t(`account.${value}`)}
-                      size="small"
-                    />
-                  ))}
+            <FormControl
+              sx={{ maxWidth: 400, width: "100%" }}
+              size="small"
+              disabled={isLoading || !canAssignGroups}
+            >
+              <InputLabel id="group-select-label">
+                {t("account.groups")}
+              </InputLabel>
+              <Select<string[]>
+                labelId="group-select-label"
+                id="group-select"
+                multiple
+                value={formData.groups}
+                label={t("account.groups")}
+                onChange={(e: SelectChangeEvent<string[]>) =>
+                  setFormData({
+                    ...formData,
+                    groups: e.target.value as string[],
+                  })
+                }
+                renderValue={(selected) => (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {selected.map((value) => (
+                      <Chip
+                        key={value}
+                        label={t(`account.${value}`)}
+                        size="small"
+                      />
+                    ))}
+                  </Box>
+                )}
+              >
+                <MenuItem value="admin">{t("account.admin")}</MenuItem>
+                <MenuItem value="correspondent">
+                  {t("account.correspondent")}
+                </MenuItem>
+                <MenuItem value="club_officer">
+                  {t("account.club_officer")}
+                </MenuItem>
+                <MenuItem value="kwm_officer">
+                  {t("account.kwm_officer")}
+                </MenuItem>
+              </Select>
+              {!canAssignGroups && (
+                <Box
+                  sx={{
+                    fontSize: "0.75rem",
+                    color: "text.secondary",
+                    mt: 0.5,
+                    ml: 1.75,
+                  }}
+                >
+                  <Typography>{t("account.onlyAdmin")}</Typography>
                 </Box>
               )}
-            >
-              <MenuItem value="admin">{t("account.admin")}</MenuItem>
-              <MenuItem value="correspondent">
-                {t("account.correspondent")}
-              </MenuItem>
-              <MenuItem value="club_officer">
-                {t("account.club_officer")}
-              </MenuItem>
-              <MenuItem value="kwm_officer">
-                {t("account.kwm_officer")}
-              </MenuItem>
-            </Select>
-            {!canAssignGroups && (
-              <Box
-                sx={{
-                  fontSize: "0.75rem",
-                  color: "text.secondary",
-                  mt: 0.5,
-                  ml: 1.75,
-                }}
-              >
-                {t("account.onlyAdmin")}
-              </Box>
-            )}
-          </FormControl>
+            </FormControl>
           </Grid>
         </Grid>
       )}

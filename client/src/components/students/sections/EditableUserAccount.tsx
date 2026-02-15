@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Grid, IconButton, TextField, Alert } from "@mui/material";
+import { Box, Grid, IconButton, TextField, Alert, Typography } from "@mui/material";
 import {
   Edit as EditIcon,
   Save,
@@ -127,7 +127,7 @@ export default function EditableUserAccount({
                 color: "text.secondary",
               }}
             >
-              {t("account.noUser")}
+              <Typography>{t("account.noUser")}</Typography>
             </Box>
           )}
         </>

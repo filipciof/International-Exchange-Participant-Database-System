@@ -216,7 +216,7 @@ export default function AddEditExchangeDialog({
           />
 
           <Divider sx={{ my: 1 }}>
-            {t("studentForm.labels.sendingClub")}
+            <Typography>{t("studentForm.labels.sendingClub")}</Typography>
           </Divider>
 
           <Autocomplete
@@ -320,7 +320,7 @@ export default function AddEditExchangeDialog({
           />
 
           <Divider sx={{ my: 1 }}>
-            {t("studentForm.labels.receivingClub")}
+            <Typography>{t("studentForm.labels.receivingClub")}</Typography>
           </Divider>
 
           <Autocomplete
@@ -423,7 +423,9 @@ export default function AddEditExchangeDialog({
             )}
           />
 
-          <Divider sx={{ my: 1 }}>{t("navigation.staff")}</Divider>
+          <Divider sx={{ my: 1 }}>
+            <Typography>{t("navigation.staff")}</Typography>
+          </Divider>
 
           <MyAutocomplete
             initialId={formData.id_counsellor}
