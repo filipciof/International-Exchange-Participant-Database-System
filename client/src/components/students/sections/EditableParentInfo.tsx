@@ -153,7 +153,7 @@ export default function EditableParentInfo({
               </Typography>
               <TextField
                 size="small"
-                sx={{ maxWidth: 400, width: "100%" }}
+                sx={{ maxWidth: 400, width: "100%", mb: 2 }}
                 label={t("studentForm.labels.fullName")}
                 value={formData.first_parent_full_name}
                 onChange={(e) =>
@@ -162,7 +162,6 @@ export default function EditableParentInfo({
                     first_parent_full_name: e.target.value,
                   })
                 }
-                sx={{ mb: 2 }}
               />
               <TextField
                 size="small"
@@ -190,7 +189,7 @@ export default function EditableParentInfo({
               </Typography>
               <TextField
                 size="small"
-                sx={{ maxWidth: 400, width: "100%" }}
+                sx={{ maxWidth: 400, width: "100%", mb: 2 }}
                 label={t("studentForm.labels.fullName")}
                 value={formData.second_parent_full_name}
                 onChange={(e) =>
@@ -199,7 +198,6 @@ export default function EditableParentInfo({
                     second_parent_full_name: e.target.value,
                   })
                 }
-                sx={{ mb: 2 }}
               />
               <TextField
                 size="small"
