@@ -106,6 +106,7 @@
     "students": "Students",
     "staff": "Staff",
     "clubs": "Clubs",
+    "districts": "Districts",
     "families": "Families",
     "contacts": "Contacts"
   },
@@ -366,6 +367,15 @@
     "district": "District",
     "city": "City"
   },
+  "districts": {
+    "newDistrict": "New District",
+    "updateDistrict": "Update District",
+    "searchPlaceholder": "Search districts..."
+  },
+  "districtForm": {
+    "number": "District ID",
+    "country": "Country"
+  },
   "families": {
     "newFamily": "New Family",
     "updateFamily": "Update Family",
@@ -444,7 +454,8 @@
     "clubNumberRequired": "Club number is required",
     "familyNameRequired": "Family name is required",
     "groupRequired": "At least one group is required",
-    "documentNameRequired": "Document name is required"
+    "documentNameRequired": "Document name is required",
+    "districtNumberRequired": "District ID is required"
   },
   "contactForm": {
     "firstName": "First Name",

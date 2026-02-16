@@ -1,4 +1,5 @@
 from . import club
+from . import district
 from . import contact
 from . import document
 from . import exchange

@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission
 from main.policies import club as club_policy
+from main.policies import district as district_policy
 from main.policies import document as document_policy
 from main.policies import exchange_family as exchange_family_policy
 from main.policies import exchange as exchange_policy
@@ -32,6 +33,10 @@ class PolicyPermission(BasePermission):
 
 class ClubPermission(PolicyPermission):
     policy = club_policy
+
+
+class DistrictPermission(PolicyPermission):
+    policy = district_policy
 
 
 class DocumentPermission(PolicyPermission):

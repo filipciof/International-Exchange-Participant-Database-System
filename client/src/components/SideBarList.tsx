@@ -11,6 +11,7 @@ import HouseIcon from "@mui/icons-material/House";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PersonIcon from "@mui/icons-material/Person";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
+import PublicIcon from "@mui/icons-material/Public";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import usePermissions from "../hooks/usePermissions";
@@ -40,6 +41,9 @@ export default function SideBarList() {
     }
     if (permissions.canViewClubs) {
       items.push({ text: t("navigation.clubs"), icon: <GroupsIcon />, path: "/clubs" });
+    }
+    if (permissions.canViewDistricts) {
+      items.push({ text: t("navigation.districts"), icon: <PublicIcon />, path: "/districts" });
     }
     if (permissions.canViewFamilies) {
       items.push({ text: t("navigation.families"), icon: <HouseIcon />, path: "/families" });

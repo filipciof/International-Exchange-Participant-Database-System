@@ -16,6 +16,7 @@ from .base import (
 from .policy_permissions import (
     PolicyPermission,
     ClubPermission,
+    DistrictPermission,
     DocumentPermission,
     ExchangeFamilyPermission,
     ExchangePermission,

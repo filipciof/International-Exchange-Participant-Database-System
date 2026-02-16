@@ -1,4 +1,4 @@
-from .club import CountryView, DistrictView, ClubListView, ClubDetailView
+from .club import CountryView, DistrictListView, DistrictDetailView, ClubListView, ClubDetailView
 from .contact import ContactListView, ContactDetailView, ContactPhotoView
 from .document import DocumentListView, DocumentDetailView, DocumentFileView
 from .exchange import (

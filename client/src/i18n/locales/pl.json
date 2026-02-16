@@ -106,6 +106,7 @@
     "students": "Uczestnicy",
     "staff": "Pracownicy",
     "clubs": "Kluby",
+    "districts": "Dystrykty",
     "families": "Rodziny",
     "contacts": "Wizytówki"
   },
@@ -366,6 +367,15 @@
     "district": "Dystrykt",
     "city": "Miasto"
   },
+  "districts": {
+    "newDistrict": "Nowy dystrykt",
+    "updateDistrict": "Zaktualizuj dystrykt",
+    "searchPlaceholder": "Wyszukaj dystrykty..."
+  },
+  "districtForm": {
+    "number": "ID dystryktu",
+    "country": "Kraj"
+  },
   "families": {
     "newFamily": "Nowa rodzina",
     "updateFamily": "Zaktualizuj rodzinę",
@@ -444,7 +454,8 @@
     "clubNumberRequired": "Numer klubu jest wymagany",
     "familyNameRequired": "Nazwisko rodziny jest wymagane",
     "groupRequired": "Wymagana jest co najmniej jedna grupa",
-    "documentNameRequired": "Nazwa dokumentu jest wymagana"
+    "documentNameRequired": "Nazwa dokumentu jest wymagana",
+    "districtNumberRequired": "ID dystryktu jest wymagane"
   },
   "contactForm": {
     "firstName": "Imię",

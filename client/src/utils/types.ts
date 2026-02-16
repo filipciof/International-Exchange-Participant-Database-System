@@ -24,7 +24,15 @@ export type District = {
   id: number;
   id_country: number;
   number: number;
+  country: string;
 };
+
+export const districtSchema = z.object({
+  number: z.string().min(1, i18next.t("schema.districtNumberRequired")),
+  id_country: z.number().nullable().optional(),
+});
+
+export type DistrictFormData = z.infer<typeof districtSchema>;
 
 export const getGenderOptions = () => [
   { value: 0, label: i18next.t("gender.male") },

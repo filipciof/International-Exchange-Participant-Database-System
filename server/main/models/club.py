@@ -21,6 +21,7 @@ class District(models.Model):
     number = models.CharField(
         max_length=4, unique=True, validators=[RegexValidator(regex=r"^\d{4}$")]
     )
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = "district"

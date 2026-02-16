@@ -32,7 +32,9 @@ type Permissions = {
   canToggleIsInbound: boolean;
   defaultIsInbound: boolean;
   canAssignGroups: boolean;
+  canViewDistricts: boolean;
   canCreateHomeCountryClubs: boolean;
+  canCreateHomeCountryDistricts: boolean;
   hasLockedSendingClub: boolean;
   canEditStaffClubInfo: boolean;
   canEditStudentName: boolean;
@@ -48,6 +50,7 @@ function resolvePermissions(group: string): Permissions {
         canViewStudents: true,
         canViewStaff: true,
         canViewClubs: true,
+        canViewDistricts: true,
         canViewFamilies: true,
         canViewContacts: true,
         canEditExchanges: true,
@@ -57,6 +60,7 @@ function resolvePermissions(group: string): Permissions {
         defaultIsInbound: true,
         canAssignGroups: true,
         canCreateHomeCountryClubs: true,
+        canCreateHomeCountryDistricts: true,
         hasLockedSendingClub: false,
         canEditStaffClubInfo: true,
         canEditStudentName: true,
@@ -69,6 +73,7 @@ function resolvePermissions(group: string): Permissions {
         canViewStudents: true,
         canViewStaff: false,
         canViewClubs: true,
+        canViewDistricts: true,
         canViewFamilies: true,
         canViewContacts: true,
         canEditExchanges: true,
@@ -78,6 +83,7 @@ function resolvePermissions(group: string): Permissions {
         defaultIsInbound: true,
         canAssignGroups: false,
         canCreateHomeCountryClubs: false,
+        canCreateHomeCountryDistricts: false,
         hasLockedSendingClub: false,
         canEditStaffClubInfo: false,
         canEditStudentName: true,
@@ -90,6 +96,7 @@ function resolvePermissions(group: string): Permissions {
         canViewStudents: true,
         canViewStaff: false,
         canViewClubs: true,
+        canViewDistricts: true,
         canViewFamilies: true,
         canViewContacts: true,
         canEditExchanges: true,
@@ -99,6 +106,7 @@ function resolvePermissions(group: string): Permissions {
         defaultIsInbound: true,
         canAssignGroups: false,
         canCreateHomeCountryClubs: false,
+        canCreateHomeCountryDistricts: false,
         hasLockedSendingClub: false,
         canEditStaffClubInfo: false,
         canEditStudentName: true,
@@ -111,6 +119,7 @@ function resolvePermissions(group: string): Permissions {
         canViewStudents: true,
         canViewStaff: false,
         canViewClubs: false,
+        canViewDistricts: false,
         canViewFamilies: true,
         canViewContacts: false,
         canEditExchanges: true,
@@ -120,6 +129,7 @@ function resolvePermissions(group: string): Permissions {
         defaultIsInbound: false,
         canAssignGroups: false,
         canCreateHomeCountryClubs: false,
+        canCreateHomeCountryDistricts: false,
         hasLockedSendingClub: true,
         canEditStaffClubInfo: false,
         canEditStudentName: true,
@@ -132,6 +142,7 @@ function resolvePermissions(group: string): Permissions {
         canViewStudents: false,
         canViewStaff: false,
         canViewClubs: false,
+        canViewDistricts: false,
         canViewFamilies: false,
         canViewContacts: false,
         canEditExchanges: false,
@@ -141,6 +152,7 @@ function resolvePermissions(group: string): Permissions {
         defaultIsInbound: false,
         canAssignGroups: false,
         canCreateHomeCountryClubs: false,
+        canCreateHomeCountryDistricts: false,
         hasLockedSendingClub: false,
         canEditStaffClubInfo: false,
         canEditStudentName: false,
@@ -153,6 +165,7 @@ function resolvePermissions(group: string): Permissions {
         canViewStudents: false,
         canViewStaff: false,
         canViewClubs: false,
+        canViewDistricts: false,
         canViewFamilies: false,
         canViewContacts: false,
         canEditExchanges: false,
@@ -162,6 +175,7 @@ function resolvePermissions(group: string): Permissions {
         defaultIsInbound: false,
         canAssignGroups: false,
         canCreateHomeCountryClubs: false,
+        canCreateHomeCountryDistricts: false,
         hasLockedSendingClub: false,
         canEditStaffClubInfo: false,
         canEditStudentName: false,

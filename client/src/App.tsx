@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainPage from "./pages/MainPage";
 import Students from "./pages/Students";
 import Clubs from "./pages/Clubs";
+import Districts from "./pages/Districts";
 import Families from "./pages/Families";
 import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
@@ -67,6 +68,14 @@ function App() {
               element={
                 <ProtectedRoute hasPermission={permissions.canViewClubs}>
                   <Clubs />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="districts"
+              element={
+                <ProtectedRoute hasPermission={permissions.canViewDistricts}>
+                  <Districts />
                 </ProtectedRoute>
               }
             />

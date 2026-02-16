@@ -1,4 +1,5 @@
 from .club import club_queryset_for
+from .district import district_queryset_for
 from .contact import contact_queryset_for
 from .document import document_queryset_for
 from .exchange import exchange_queryset_for
