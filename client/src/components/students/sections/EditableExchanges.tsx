@@ -13,7 +13,7 @@ import {
   Delete as DeleteIcon,
   SwapHoriz as ExchangeIcon,
 } from "@mui/icons-material";
-import type { Exchange, ExchangeFormData } from "../../../utils/types";
+import type { Exchange } from "../../../utils/types";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
 import queryClient from "../../../utils/queryClient";
@@ -60,18 +60,6 @@ export default function EditableExchanges({
     null,
   );
 
-  const [formData, setFormData] = useState<ExchangeFormData>({
-    id_student: studentId,
-    year: "",
-    id_type: null,
-    start_date: "",
-    end_date: "",
-    id_counsellor: null,
-    id_kwm_officer: null,
-    id_sending_club: null,
-    id_receiving_club: null,
-  });
-
   const {
     data: exchanges,
     isLoading,
@@ -86,38 +74,6 @@ export default function EditableExchanges({
     },
   });
 
-  const createMutation = useMutation({
-    mutationFn: async (data: ExchangeFormData) => {
-      const response = await axiosClient.post(`/exchanges/`, data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["exchangesStudent", studentId],
-      });
-      handleCloseDialog();
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: Partial<ExchangeFormData>;
-    }) => {
-      const response = await axiosClient.patch(`/exchanges/${id}/`, data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["exchangesStudent", studentId],
-      });
-      handleCloseDialog();
-    },
-  });
-
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       await axiosClient.delete(`/exchanges/${id}/`);
@@ -129,57 +85,21 @@ export default function EditableExchanges({
     },
   });
 
-  const handleOpenAddDialog = () => {
-    setEditingExchange(null);
-    setFormData({
-      id_student: studentId,
-      year: getCurrentAcademicYear(),
-      id_type: null,
-      start_date: "",
-      end_date: "",
-      id_counsellor: null,
-      id_kwm_officer: null,
-      id_sending_club: null,
-      id_receiving_club: null,
-    });
-    setDialogOpen("add");
-  };
-
-  const handleOpenEditDialog = (exchange: Exchange) => {
-    setEditingExchange(exchange);
-    setFormData({
-      id_student: studentId,
-      year: exchange.year,
-      id_type: exchange.id_type,
-      start_date: exchange.start_date || "",
-      end_date: exchange.end_date || "",
-      id_counsellor: exchange.id_counsellor,
-      id_kwm_officer: exchange.id_kwm_officer,
-      id_sending_club: exchange.id_sending_club,
-      id_receiving_club: exchange.id_receiving_club,
-    });
-    setDialogOpen("update");
-  };
-
   const handleCloseDialog = () => {
-    createMutation.reset();
-    updateMutation.reset();
     deleteMutation.reset();
     setDialogOpen(null);
     setEditingExchange(null);
     setDeletingExchange(null);
   };
 
-  const handleSave = () => {
-    if (editingExchange) {
-      updateMutation.mutate({ id: editingExchange.id, data: formData });
-    } else {
-      createMutation.mutate(formData);
-    }
-  };
-
   const actions = canEditExchanges ? (
-    <IconButton size="small" onClick={handleOpenAddDialog}>
+    <IconButton
+      size="small"
+      onClick={() => {
+        setEditingExchange(null);
+        setDialogOpen("add");
+      }}
+    >
       <AddIcon />
     </IconButton>
   ) : undefined;
@@ -192,14 +112,12 @@ export default function EditableExchanges({
     >
       {isLoading && (
         <Typography variant="body2" color="text.secondary">
-          {/* Loading exchanges... */}
           {t("common.loading")}
         </Typography>
       )}
 
       {error && (
         <Typography variant="body2" color="error.main">
-          {/* Error loading exchanges */}
           {t("common.error", error.message)}
         </Typography>
       )}
@@ -262,7 +180,10 @@ export default function EditableExchanges({
                         <>
                           <IconButton
                             size="small"
-                            onClick={() => handleOpenEditDialog(exchange)}
+                            onClick={() => {
+                              setEditingExchange(exchange);
+                              setDialogOpen("update");
+                            }}
                           >
                             <EditIcon fontSize="small" />
                           </IconButton>
@@ -351,17 +272,14 @@ export default function EditableExchanges({
         </>
       )}
 
-      <AddEditExchangeDialog
-        dialogOpen={dialogOpen === "add" || dialogOpen === "update"}
-        handleCloseDialog={handleCloseDialog}
-        editingExchange={editingExchange}
-        formData={formData}
-        setFormData={setFormData}
-        handleSave={handleSave}
-        isLoading={createMutation.isPending || updateMutation.isPending}
-        isSuccess={createMutation.isSuccess || updateMutation.isSuccess}
-        error={createMutation.error || updateMutation.error}
-      />
+      {(dialogOpen === "add" || dialogOpen === "update") && (
+        <AddEditExchangeDialog
+          handleClose={handleCloseDialog}
+          editingExchange={editingExchange}
+          studentId={studentId}
+          defaultYear={getCurrentAcademicYear()}
+        />
+      )}
 
       <DeleteConfirmationDialog
         open={dialogOpen === "delete"}

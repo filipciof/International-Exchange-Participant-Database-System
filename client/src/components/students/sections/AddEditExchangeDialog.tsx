@@ -1,19 +1,7 @@
-import {
-  Autocomplete,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Stack,
-  TextField,
-  Typography,
-  Divider,
-  CircularProgress,
-} from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
-import { useState, useEffect } from "react";
+import { Stack, Divider, Typography, Dialog, DialogTitle } from "@mui/material";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   Exchange,
   ExchangeFormData,
@@ -23,44 +11,95 @@ import type {
   District,
   Club,
 } from "../../../utils/types";
-import { useQuery } from "@tanstack/react-query";
+import { exchangeSchema } from "../../../utils/types";
 import axiosClient from "../../../utils/axiosClient";
-import { handleValidationErrors } from "../../../utils/handleValidationErrors";
+import queryClient from "../../../utils/queryClient";
+import useCountryDistrictClub from "../../../hooks/useCountryDistrictClub";
 import MyAutocomplete from "../../MyAutocomplete";
+import {
+  ControlledTextField,
+  ControlledAutocomplete,
+  ControlledDatePicker,
+  FormShell,
+} from "../../form";
 import { useTranslation } from "react-i18next";
 
 type AddEditExchangeDialogProps = {
-  dialogOpen: boolean;
-  handleCloseDialog: () => void;
+  handleClose: () => void;
   editingExchange: Exchange | null;
-  formData: ExchangeFormData;
-  setFormData: (formData: ExchangeFormData) => void;
-  handleSave: () => void;
-  isLoading?: boolean;
-  isSuccess?: boolean;
-  error?: any;
+  studentId: number;
+  defaultYear: string;
 };
 
 export default function AddEditExchangeDialog({
-  dialogOpen,
-  handleCloseDialog,
+  handleClose,
   editingExchange,
-  formData,
-  setFormData,
-  handleSave,
-  isLoading = false,
-  isSuccess = false,
-  error = null,
+  studentId,
+  defaultYear,
 }: AddEditExchangeDialogProps) {
   const { t } = useTranslation();
-  const [sendingCountry, setSendingCountry] = useState<number | null>(null);
-  const [sendingDistrict, setSendingDistrict] = useState<number | null>(null);
-  const [receivingCountry, setReceivingCountry] = useState<number | null>(null);
-  const [receivingDistrict, setReceivingDistrict] = useState<number | null>(
-    null,
-  );
 
-  const { data: exchangeTypes } = useQuery({
+  const { control, handleSubmit, reset, watch } =
+    useForm<ExchangeFormData>({
+      resolver: zodResolver(exchangeSchema),
+      defaultValues: editingExchange
+        ? {
+            id_student: studentId,
+            year: editingExchange.year,
+            id_type: editingExchange.id_type,
+            start_date: editingExchange.start_date || "",
+            end_date: editingExchange.end_date || "",
+            id_counsellor: editingExchange.id_counsellor,
+            id_kwm_officer: editingExchange.id_kwm_officer,
+            id_sending_country:
+              editingExchange.sending_club?.id_country ?? null,
+            id_sending_district:
+              editingExchange.sending_club?.id_district ?? null,
+            id_sending_club: editingExchange.id_sending_club,
+            id_receiving_country:
+              editingExchange.receiving_club?.id_country ?? null,
+            id_receiving_district:
+              editingExchange.receiving_club?.id_district ?? null,
+            id_receiving_club: editingExchange.id_receiving_club,
+          }
+        : {
+            id_student: studentId,
+            year: defaultYear,
+            id_type: null,
+            start_date: "",
+            end_date: "",
+            id_counsellor: null,
+            id_kwm_officer: null,
+            id_sending_country: null,
+            id_sending_district: null,
+            id_sending_club: null,
+            id_receiving_country: null,
+            id_receiving_district: null,
+            id_receiving_club: null,
+          },
+    });
+
+  const sendingCountry = watch("id_sending_country");
+  const sendingDistrict = watch("id_sending_district");
+  const receivingCountry = watch("id_receiving_country");
+  const receivingDistrict = watch("id_receiving_district");
+
+  const {
+    countries,
+    districts: sendingDistricts,
+    clubs: sendingClubs,
+    isLoadingDistricts: isLoadingSendingDistricts,
+    isLoadingClubs: isLoadingSendingClubs,
+  } = useCountryDistrictClub(sendingCountry, sendingDistrict);
+
+  const {
+    districts: receivingDistricts,
+    clubs: receivingClubs,
+    isLoadingDistricts: isLoadingReceivingDistricts,
+    isLoadingClubs: isLoadingReceivingClubs,
+  } = useCountryDistrictClub(receivingCountry, receivingDistrict);
+
+  const { data: exchangeTypes = [] } = useQuery({
     queryKey: ["exchangeTypes"],
     queryFn: async () => {
       const response = await axiosClient.get("exchangeTypes/");
@@ -68,430 +107,205 @@ export default function AddEditExchangeDialog({
     },
   });
 
-  const { data: countries = [] } = useQuery({
-    queryKey: ["countries"],
-    queryFn: async () => {
-      const response = await axiosClient.get("/countries/");
+  const createMutation = useMutation({
+    mutationFn: async (data: ExchangeFormData) => {
+      const response = await axiosClient.post(`/exchanges/`, data);
       return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["exchangesStudent", studentId],
+      });
+      onClose();
     },
   });
 
-  const { data: sendingDistricts = [], isLoading: isLoadingSendingDistricts } =
-    useQuery({
-      queryKey: ["districts", sendingCountry],
-      queryFn: async () => {
-        const response = await axiosClient.get(
-          `/districts/?country=${sendingCountry}`,
-        );
-        return response.data;
-      },
-      enabled: sendingCountry !== null && sendingCountry > 0,
-    });
-
-  const {
-    data: receivingDistricts = [],
-    isLoading: isLoadingReceivingDistricts,
-  } = useQuery({
-    queryKey: ["districts", receivingCountry],
-    queryFn: async () => {
-      const response = await axiosClient.get(
-        `/districts/?country=${receivingCountry}`,
+  const updateMutation = useMutation({
+    mutationFn: async (data: ExchangeFormData) => {
+      const response = await axiosClient.patch(
+        `/exchanges/${editingExchange!.id}/`,
+        data,
       );
       return response.data;
     },
-    enabled: receivingCountry !== null && receivingCountry > 0,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["exchangesStudent", studentId],
+      });
+      onClose();
+    },
   });
 
-  const { data: sendingClubs = [], isLoading: isLoadingSendingClubs } =
-    useQuery({
-      queryKey: ["clubs", sendingDistrict],
-      queryFn: async () => {
-        const response = await axiosClient.get(
-          `/clubs/?id_district=${sendingDistrict}`,
-        );
-        return response.data;
-      },
-      enabled: sendingDistrict !== null && sendingDistrict > 0,
-    });
+  const mutation = editingExchange ? updateMutation : createMutation;
 
-  const { data: receivingClubs = [], isLoading: isLoadingReceivingClubs } =
-    useQuery({
-      queryKey: ["clubs", receivingDistrict],
-      queryFn: async () => {
-        const response = await axiosClient.get(
-          `/clubs/?id_district=${receivingDistrict}`,
-        );
-        return response.data;
-      },
-      enabled: receivingDistrict !== null && receivingDistrict > 0,
-    });
+  const onSubmit = ({
+    id_sending_country,
+    id_sending_district,
+    id_receiving_country,
+    id_receiving_district,
+    ...data
+  }: ExchangeFormData) => {
+    mutation.mutate(data);
+  };
 
-  // Set initial country/district when editing
-  useEffect(() => {
-    if (editingExchange) {
-      if (editingExchange.sending_club) {
-        setSendingCountry(editingExchange.sending_club.id_country);
-        setSendingDistrict(editingExchange.sending_club.id_district);
-      }
-      if (editingExchange.receiving_club) {
-        setReceivingCountry(editingExchange.receiving_club.id_country);
-        setReceivingDistrict(editingExchange.receiving_club.id_district);
-      }
-    }
-  }, [editingExchange]);
+  const onClose = () => {
+    reset();
+    createMutation.reset();
+    updateMutation.reset();
+    handleClose();
+  };
 
   return (
-    <Dialog
-      open={dialogOpen}
-      onClose={handleCloseDialog}
-      maxWidth="sm"
-      fullWidth
-    >
+    <Dialog open onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>
         {editingExchange
           ? t("exchanges.editExchange")
           : t("exchanges.addExchange")}
       </DialogTitle>
-      <DialogContent>
-        <Stack spacing={2} sx={{ mt: 1 }}>
-          <Autocomplete
-            options={exchangeTypes || []}
-            getOptionLabel={(option) => option.name}
-            value={
-              exchangeTypes?.find(
-                (type: ExchangeType) => type.id === formData.id_type,
-              ) || null
-            }
-            onChange={(_, newValue) => {
-              setFormData({
-                ...formData,
-                id_type: newValue ? newValue.id : null,
-              });
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t("exchanges.exchangeType")}
-                variant="outlined"
-                fullWidth
-                size="small"
-              />
-            )}
-          />
-          <TextField
-            fullWidth
-            size="small"
-            label={t("exchanges.year")}
-            placeholder="YYYY/YY"
-            value={formData.year || ""}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                year: e.target.value,
-              })
-            }
-            helperText="Format: YYYY/YY (e.g., 2024/25)"
-          />
-          <DatePicker
+      <FormShell
+        variant="dialog"
+        onClose={onClose}
+        onSubmit={handleSubmit(onSubmit)}
+        isLoading={mutation.isPending}
+        isSuccess={mutation.isSuccess}
+        error={mutation.error}
+        submitButtonText={
+          editingExchange ? t("common.update") : t("common.add")
+        }
+      >
+        <ControlledAutocomplete
+          name="id_type"
+          control={control}
+          options={exchangeTypes}
+          getOptionLabel={(o: ExchangeType) => o.name}
+          getOptionValue={(o: ExchangeType) => o.id}
+          label={t("exchanges.exchangeType")}
+        />
+        <ControlledTextField
+          name="year"
+          control={control}
+          label={t("exchanges.year")}
+          placeholder="YYYY/YY"
+          helperText="Format: YYYY/YY (e.g., 2024/25)"
+        />
+        <Stack direction="row" spacing={1}>
+          <ControlledDatePicker
+            name="start_date"
+            control={control}
             label={t("studentForm.labels.startDate")}
-            format="YYYY-MM-DD"
-            value={formData.start_date ? dayjs(formData.start_date) : null}
-            onChange={(date) => {
-              setFormData({
-                ...formData,
-                start_date: date ? date.format("YYYY-MM-DD") : "",
-              });
-            }}
           />
-          <DatePicker
+          <ControlledDatePicker
+            name="end_date"
+            control={control}
             label={t("studentForm.labels.endDate")}
-            format="YYYY-MM-DD"
-            value={formData.end_date ? dayjs(formData.end_date) : null}
-            onChange={(date) => {
-              setFormData({
-                ...formData,
-                end_date: date ? date.format("YYYY-MM-DD") : "",
-              });
-            }}
           />
+        </Stack>
 
-          <Divider sx={{ my: 1 }}>
-            <Typography>{t("studentForm.labels.sendingClub")}</Typography>
-          </Divider>
+        <Divider sx={{ my: 1 }}>
+          <Typography>{t("studentForm.labels.sendingClub")}</Typography>
+        </Divider>
 
-          <Autocomplete
-            value={
-              countries.find((c: Country) => c.id === sendingCountry) || null
-            }
-            onChange={(_event, newValue) => {
-              setSendingCountry(newValue?.id || null);
-              setSendingDistrict(null);
-              setFormData({ ...formData, id_sending_club: null });
-            }}
-            options={countries}
-            getOptionLabel={(option) => option.name}
-            fullWidth
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t("studentForm.labels.sendingCountry")}
-                placeholder={t("common.selectCountry")}
-                size="small"
-              />
-            )}
-          />
-
-          <Autocomplete
-            value={
-              sendingDistricts.find(
-                (d: District) => d.id === sendingDistrict,
-              ) || null
-            }
-            onChange={(_event, newValue) => {
-              setSendingDistrict(newValue?.id || null);
-              setFormData({ ...formData, id_sending_club: null });
-            }}
+        <ControlledAutocomplete
+          name="id_sending_country"
+          control={control}
+          options={countries}
+          getOptionLabel={(c: Country) => c.name}
+          getOptionValue={(c: Country) => c.id}
+          label={t("studentForm.labels.sendingCountry")}
+        />
+        <Stack direction="row" spacing={1}>
+          <ControlledAutocomplete
+            name="id_sending_district"
+            control={control}
             options={sendingDistricts}
-            getOptionLabel={(option) => option.number.toString()}
+            getOptionLabel={(d: District) => d.number.toString()}
+            getOptionValue={(d: District) => d.id}
+            label={t("studentForm.labels.sendingDistrict")}
             disabled={!sendingCountry || isLoadingSendingDistricts}
             loading={isLoadingSendingDistricts}
-            fullWidth
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t("studentForm.labels.sendingDistrict")}
-                placeholder={t("common.selectDistrict")}
-                slotProps={{
-                  input: {
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {isLoadingSendingDistricts ? (
-                          <CircularProgress color="inherit" size={20} />
-                        ) : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
-                  },
-                }}
-                size="small"
-              />
-            )}
           />
-
-          <Autocomplete
-            value={
-              sendingClubs.find(
-                (c: Club) => c.id === formData.id_sending_club,
-              ) || null
-            }
-            onChange={(_event, newValue) => {
-              setFormData({
-                ...formData,
-                id_sending_club: newValue?.id || null,
-              });
-            }}
+          <ControlledAutocomplete
+            name="id_sending_club"
+            control={control}
             options={sendingClubs}
-            getOptionLabel={(option) => option.name}
+            getOptionLabel={(c: Club) => c.name}
+            getOptionValue={(c: Club) => c.id}
+            label={t("studentForm.labels.sendingClub")}
             disabled={!sendingDistrict || isLoadingSendingClubs}
             loading={isLoadingSendingClubs}
-            fullWidth
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t("studentForm.labels.sendingClub")}
-                placeholder={t("common.selectClub")}
-                slotProps={{
-                  input: {
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {isLoadingSendingClubs ? (
-                          <CircularProgress color="inherit" size={20} />
-                        ) : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
-                  },
-                }}
-                size="small"
-              />
-            )}
           />
+        </Stack>
 
-          <Divider sx={{ my: 1 }}>
-            <Typography>{t("studentForm.labels.receivingClub")}</Typography>
-          </Divider>
+        <Divider sx={{ my: 1 }}>
+          <Typography>{t("studentForm.labels.receivingClub")}</Typography>
+        </Divider>
 
-          <Autocomplete
-            value={
-              countries.find((c: Country) => c.id === receivingCountry) || null
-            }
-            onChange={(_event, newValue) => {
-              setReceivingCountry(newValue?.id || null);
-              setReceivingDistrict(null);
-              setFormData({ ...formData, id_receiving_club: null });
-            }}
-            options={countries}
-            getOptionLabel={(option) => option.name}
-            fullWidth
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t("studentForm.labels.receivingCountry")}
-                placeholder={t("common.selectCountry")}
-                size="small"
-              />
-            )}
-          />
-
-          <Autocomplete
-            value={
-              receivingDistricts.find(
-                (d: District) => d.id === receivingDistrict,
-              ) || null
-            }
-            onChange={(_event, newValue) => {
-              setReceivingDistrict(newValue?.id || null);
-              setFormData({ ...formData, id_receiving_club: null });
-            }}
+        <ControlledAutocomplete
+          name="id_receiving_country"
+          control={control}
+          options={countries}
+          getOptionLabel={(c: Country) => c.name}
+          getOptionValue={(c: Country) => c.id}
+          label={t("studentForm.labels.receivingCountry")}
+        />
+        <Stack direction="row" spacing={1}>
+          <ControlledAutocomplete
+            name="id_receiving_district"
+            control={control}
             options={receivingDistricts}
-            getOptionLabel={(option) => option.number.toString()}
+            getOptionLabel={(d: District) => d.number.toString()}
+            getOptionValue={(d: District) => d.id}
+            label={t("studentForm.labels.receivingDistrict")}
             disabled={!receivingCountry || isLoadingReceivingDistricts}
             loading={isLoadingReceivingDistricts}
-            fullWidth
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t("studentForm.labels.receivingDistrict")}
-                placeholder={t("common.selectDistrict")}
-                slotProps={{
-                  input: {
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {isLoadingReceivingDistricts ? (
-                          <CircularProgress color="inherit" size={20} />
-                        ) : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
-                  },
-                }}
-                size="small"
-              />
-            )}
           />
-
-          <Autocomplete
-            value={
-              receivingClubs.find(
-                (c: Club) => c.id === formData.id_receiving_club,
-              ) || null
-            }
-            onChange={(_event, newValue) => {
-              setFormData({
-                ...formData,
-                id_receiving_club: newValue?.id || null,
-              });
-            }}
+          <ControlledAutocomplete
+            name="id_receiving_club"
+            control={control}
             options={receivingClubs}
-            getOptionLabel={(option) => option.name}
+            getOptionLabel={(c: Club) => c.name}
+            getOptionValue={(c: Club) => c.id}
+            label={t("studentForm.labels.receivingClub")}
             disabled={!receivingDistrict || isLoadingReceivingClubs}
             loading={isLoadingReceivingClubs}
-            fullWidth
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t("studentForm.labels.receivingClub")}
-                placeholder={t("common.selectClub")}
-                slotProps={{
-                  input: {
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {isLoadingReceivingClubs ? (
-                          <CircularProgress color="inherit" size={20} />
-                        ) : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    ),
-                  },
-                }}
-                size="small"
-              />
-            )}
-          />
-
-          <Divider sx={{ my: 1 }}>
-            <Typography>{t("navigation.staff")}</Typography>
-          </Divider>
-
-          <MyAutocomplete
-            initialId={formData.id_counsellor}
-            handleChange={(staff: Staff) => {
-              setFormData({ ...formData, id_counsellor: staff.id });
-            }}
-            label={t("studentForm.labels.counsellor")}
-            endpoint="staff"
-            getOptionLabel={(item: Staff) =>
-              `${item.first_name} ${item.last_name}`
-            }
-          />
-
-          <MyAutocomplete
-            initialId={formData.id_kwm_officer}
-            handleChange={(staff: Staff) => {
-              setFormData({ ...formData, id_kwm_officer: staff.id });
-            }}
-            label={t("studentForm.labels.kwmOfficer")}
-            endpoint="staff"
-            getOptionLabel={(item: Staff) =>
-              `${item.first_name} ${item.last_name}`
-            }
           />
         </Stack>
-      </DialogContent>
-      <DialogActions>
-        <Stack spacing={2} sx={{ p: 2, width: "100%" }}>
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button onClick={handleCloseDialog} disabled={isLoading}>
-              {t("common.cancel")}
-            </Button>
-            <Button
-              onClick={handleSave}
-              variant="contained"
-              disabled={isLoading || isSuccess}
-            >
-              {isLoading
-                ? editingExchange
-                  ? t("common.updating")
-                  : t("common.adding")
-                : editingExchange
-                  ? t("common.update")
-                  : t("common.add")}
-            </Button>
-          </Stack>
-          {error && (
-            <Stack spacing={1}>
-              {handleValidationErrors(error.response?.data).map(
-                (message: string, index: number) => (
-                  <Typography key={index} sx={{ color: "error.main" }}>
-                    {message}
-                  </Typography>
-                ),
-              )}
-            </Stack>
+
+        <Divider sx={{ my: 1 }}>
+          <Typography>{t("navigation.staff")}</Typography>
+        </Divider>
+
+        <Controller
+          name="id_counsellor"
+          control={control}
+          render={({ field }) => (
+            <MyAutocomplete
+              initialId={field.value}
+              handleChange={(staff: Staff) => field.onChange(staff.id)}
+              label={t("studentForm.labels.counsellor")}
+              endpoint="staff"
+              getOptionLabel={(item: Staff) =>
+                `${item.first_name} ${item.last_name}`
+              }
+            />
           )}
-          {isSuccess && (
-            <Typography sx={{ color: "success.main" }}>
-              {editingExchange
-                ? t("exchanges.updateSuccess")
-                : t("exchanges.addSuccess")}
-            </Typography>
+        />
+        <Controller
+          name="id_kwm_officer"
+          control={control}
+          render={({ field }) => (
+            <MyAutocomplete
+              initialId={field.value}
+              handleChange={(staff: Staff) => field.onChange(staff.id)}
+              label={t("studentForm.labels.kwmOfficer")}
+              endpoint="staff"
+              getOptionLabel={(item: Staff) =>
+                `${item.first_name} ${item.last_name}`
+              }
+            />
           )}
-        </Stack>
-      </DialogActions>
+        />
+      </FormShell>
     </Dialog>
   );
 }

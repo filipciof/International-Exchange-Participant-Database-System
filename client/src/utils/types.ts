@@ -240,17 +240,23 @@ export type Exchange = {
   year: string;
 };
 
-export type ExchangeFormData = {
-  id_student: number;
-  year: string;
-  id_type: number | null;
-  start_date: string;
-  end_date: string;
-  id_counsellor: number | null;
-  id_kwm_officer: number | null;
-  id_sending_club: number | null;
-  id_receiving_club: number | null;
-};
+export const exchangeSchema = z.object({
+  id_student: z.number(),
+  year: z.string(),
+  id_type: z.number().nullable().optional(),
+  start_date: z.string().optional(),
+  end_date: z.string().optional(),
+  id_counsellor: z.number().nullable().optional(),
+  id_kwm_officer: z.number().nullable().optional(),
+  id_sending_country: z.number().nullable().optional(),
+  id_sending_district: z.number().nullable().optional(),
+  id_sending_club: z.number().nullable().optional(),
+  id_receiving_country: z.number().nullable().optional(),
+  id_receiving_district: z.number().nullable().optional(),
+  id_receiving_club: z.number().nullable().optional(),
+});
+
+export type ExchangeFormData = z.infer<typeof exchangeSchema>;
 
 export type ExchangeType = {
   id: number;
