@@ -16,6 +16,7 @@ class Migration(migrations.Migration):
             name="number",
             field=models.CharField(
                 default=0,
+                max_length=10,
                 unique=True,
                 validators=[django.core.validators.RegexValidator(regex="^\\d+$")],
             ),
