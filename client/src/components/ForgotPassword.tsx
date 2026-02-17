@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -20,6 +21,7 @@ export default function ForgotPassword({
 }: ForgotPasswordProps) {
   const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleDialogClose = () => {
     handleClose();
@@ -29,7 +31,7 @@ export default function ForgotPassword({
     <Dialog
       open={open}
       onClose={handleDialogClose}
-      onTransitionExited={() => setSubmitted(false)}
+      onTransitionExited={() => { setSubmitted(false); setLoading(false); }}
       slotProps={{
         paper: {
           sx: { backgroundImage: "none" },
@@ -58,6 +60,7 @@ export default function ForgotPassword({
             const data = new FormData(event.currentTarget);
             const email = data.get("email");
             if (!email) return;
+            setLoading(true);
             await axiosClient.post("/auth/password-reset/", { email });
             setSubmitted(true);
           }}
@@ -82,8 +85,8 @@ export default function ForgotPassword({
           </DialogContent>
           <DialogActions sx={{ pb: 3, px: 3, justifyContent: "flex-end" }}>
             <Button onClick={handleDialogClose}>{t("common.cancel")}</Button>
-            <Button variant="contained" type="submit">
-              {t("forgotPassword.continue")}
+            <Button variant="contained" type="submit" disabled={loading}>
+              {loading ? <CircularProgress size={24} /> : t("forgotPassword.continue")}
             </Button>
           </DialogActions>
         </form>
