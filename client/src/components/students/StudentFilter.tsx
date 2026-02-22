@@ -14,15 +14,12 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useState } from "react";
 import SearchInput from "../SearchInput";
-import type {
-  Country,
-  PaginationModel,
-  SearchableField,
-} from "../../utils/types";
+import type { Country, SearchableField } from "../../utils/types";
 import { getGenderOptions, ShirtSize } from "../../utils/types";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
+import useCountryDistrictClub from "../../hooks/useCountryDistrictClub";
 
 // Generate year options (from 2010 to current year + 2)
 const currentYear = new Date().getFullYear();
@@ -55,93 +52,61 @@ const getSearchableFields = (t: (key: string) => string): SearchableField[] => [
   { value: "notes", label: t("students.searchFields.notes") },
 ];
 
-// Consider filtering by height as well.
-type StudentFilterProps = {
-  searchInput: string;
-  setSearchInput: (newSearchInput: string) => void;
+export type StudentFilters = {
+  search: string;
   searchFields: string[];
-  setSearchFields: (fields: string[]) => void;
-  paginationModel: PaginationModel;
-  setPaginationModel: (model: PaginationModel) => void;
-  selectedGenders: number[];
-  setSelectedGenders: (genders: number[]) => void;
-  selectedCountryOfBirth: Country | null;
-  setSelectedCountryOfBirth: (country: Country | null) => void;
-  selectedCountryOfDeparture: Country | null;
-  setSelectedCountryOfDeparture: (country: Country | null) => void;
-  selectedCountryOfPassport: Country | null;
-  setSelectedCountryOfPassport: (country: Country | null) => void;
-  selectedShirtSizes: string[];
-  setSelectedShirtSizes: (sizes: string[]) => void;
-  selectedStartYear: number | null;
-  setSelectedStartYear: (year: number | null) => void;
-  isInbound: boolean | null;
-  setIsInbound: (isInbound: boolean | null) => void;
+  countryOfBirthId: number | null;
+  countryOfDepartureId: number | null;
+  countryOfPassportId: number | null;
+  shirtSizes: string[];
+  genders: number[];
+  startYear: number | null;
+  isInbound: string;
   dateOfBirthBefore: string;
-  setDateOfBirthBefore: (date: string) => void;
   dateOfBirthAfter: string;
-  setDateOfBirthAfter: (date: string) => void;
   passportExpirationDateBefore: string;
-  setPassportExpirationDateBefore: (date: string) => void;
   passportExpirationDateAfter: string;
-  setPassportExpirationDateAfter: (date: string) => void;
-  countries: Country[];
+};
+
+type StudentFilterProps = {
+  filters: StudentFilters;
+  onFilterChange: (update: Partial<StudentFilters>) => void;
 };
 
 export default function StudentFilter({
-  searchInput,
-  setSearchInput,
-  searchFields,
-  setSearchFields,
-  paginationModel,
-  setPaginationModel,
-  selectedGenders,
-  setSelectedGenders,
-  selectedCountryOfBirth,
-  setSelectedCountryOfBirth,
-  selectedCountryOfDeparture,
-  setSelectedCountryOfDeparture,
-  selectedCountryOfPassport,
-  setSelectedCountryOfPassport,
-  selectedShirtSizes,
-  setSelectedShirtSizes,
-  selectedStartYear,
-  setSelectedStartYear,
-  isInbound,
-  setIsInbound,
-  dateOfBirthBefore,
-  setDateOfBirthBefore,
-  dateOfBirthAfter,
-  setDateOfBirthAfter,
-  passportExpirationDateBefore,
-  setPassportExpirationDateBefore,
-  passportExpirationDateAfter,
-  setPassportExpirationDateAfter,
-  countries,
+  filters,
+  onFilterChange,
 }: StudentFilterProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const SEARCHABLE_FIELDS = getSearchableFields(t);
+  const { countries } = useCountryDistrictClub();
+
+  const isInbound =
+    filters.isInbound === "both" ? null : filters.isInbound === "true";
+
+  const selectedCountryOfBirth =
+    countries.find((c: Country) => c.id === filters.countryOfBirthId) ?? null;
+  const selectedCountryOfDeparture =
+    countries.find((c: Country) => c.id === filters.countryOfDepartureId) ?? null;
+  const selectedCountryOfPassport =
+    countries.find((c: Country) => c.id === filters.countryOfPassportId) ?? null;
 
   return (
     <>
       <SearchInput
-        value={searchInput}
-        onChange={(newSearchInput) => {
-          setPaginationModel({ ...paginationModel, page: 1 });
-          setSearchInput(newSearchInput);
-        }}
+        value={filters.search}
+        onChange={(search) => onFilterChange({ search })}
         placeholder={t("students.searchPlaceholder")}
       />
       <Box sx={{ my: 2 }}>
         <Autocomplete
           multiple
           value={SEARCHABLE_FIELDS.filter((field) =>
-            searchFields.includes(field.value),
+            filters.searchFields.includes(field.value),
           )}
           onChange={(_event, newValue) => {
-            setPaginationModel({ ...paginationModel, page: 1 });
-            setSearchFields(newValue.map((field) => field.value));
+            onFilterChange({ searchFields: newValue.map((field) => field.value) });
           }}
           options={SEARCHABLE_FIELDS}
           getOptionLabel={(option) => option.label}
@@ -204,10 +169,9 @@ export default function StudentFilter({
                 {t("students.filter.gender")}
               </Typography>
               <ToggleButtonGroup
-                value={selectedGenders.map((g) => g.toString())}
+                value={filters.genders.map((g) => g.toString())}
                 onChange={(_event, newValues) => {
-                  setPaginationModel({ ...paginationModel, page: 1 });
-                  setSelectedGenders(newValues.map((v: string) => parseInt(v)));
+                  onFilterChange({ genders: newValues.map((v: string) => parseInt(v)) });
                 }}
                 aria-label="gender filter"
                 sx={{
@@ -253,10 +217,9 @@ export default function StudentFilter({
                 {t("students.filter.shirtSize")}
               </Typography>
               <ToggleButtonGroup
-                value={selectedShirtSizes}
+                value={filters.shirtSizes}
                 onChange={(_event, newSizes) => {
-                  setPaginationModel({ ...paginationModel, page: 1 });
-                  setSelectedShirtSizes(newSizes);
+                  onFilterChange({ shirtSizes: newSizes });
                 }}
                 aria-label="shirt size filters"
                 sx={{
@@ -307,11 +270,15 @@ export default function StudentFilter({
                 }
                 exclusive
                 onChange={(_event, newValue) => {
-                  setPaginationModel({ ...paginationModel, page: 1 });
                   if (newValue === null) return;
-                  setIsInbound(
-                    newValue === "both" ? null : newValue === "inbound",
-                  );
+                  onFilterChange({
+                    isInbound:
+                      newValue === "both"
+                        ? "both"
+                        : newValue === "inbound"
+                          ? "true"
+                          : "false",
+                  });
                 }}
                 aria-label="exchange type filter"
                 sx={{
@@ -358,11 +325,10 @@ export default function StudentFilter({
               </Typography>
               <TextField
                 select
-                value={selectedStartYear ?? ""}
+                value={filters.startYear ?? ""}
                 onChange={(event) => {
-                  setPaginationModel({ ...paginationModel, page: 1 });
                   const value = event.target.value;
-                  setSelectedStartYear(value === "" ? null : Number(value));
+                  onFilterChange({ startYear: value === "" ? null : Number(value) });
                 }}
                 size="small"
                 sx={{ minWidth: 150 }}
@@ -393,11 +359,10 @@ export default function StudentFilter({
               <Autocomplete
                 value={selectedCountryOfBirth}
                 onChange={(_event, newValue) => {
-                  setPaginationModel({ ...paginationModel, page: 1 });
-                  setSelectedCountryOfBirth(newValue);
+                  onFilterChange({ countryOfBirthId: newValue?.id ?? null });
                 }}
                 options={countries}
-                getOptionLabel={(option) => option.name}
+                getOptionLabel={(option: Country) => option.name}
                 sx={{ minWidth: 200, flex: 1 }}
                 renderInput={(params) => (
                   <TextField
@@ -426,11 +391,10 @@ export default function StudentFilter({
               <Autocomplete
                 value={selectedCountryOfDeparture}
                 onChange={(_event, newValue) => {
-                  setPaginationModel({ ...paginationModel, page: 1 });
-                  setSelectedCountryOfDeparture(newValue);
+                  onFilterChange({ countryOfDepartureId: newValue?.id ?? null });
                 }}
                 options={countries}
-                getOptionLabel={(option) => option.name}
+                getOptionLabel={(option: Country) => option.name}
                 sx={{ minWidth: 200, flex: 1 }}
                 renderInput={(params) => (
                   <TextField
@@ -459,11 +423,10 @@ export default function StudentFilter({
               <Autocomplete
                 value={selectedCountryOfPassport}
                 onChange={(_event, newValue) => {
-                  setPaginationModel({ ...paginationModel, page: 1 });
-                  setSelectedCountryOfPassport(newValue);
+                  onFilterChange({ countryOfPassportId: newValue?.id ?? null });
                 }}
                 options={countries}
-                getOptionLabel={(option) => option.name}
+                getOptionLabel={(option: Country) => option.name}
                 sx={{ minWidth: 200, flex: 1 }}
                 renderInput={(params) => (
                   <TextField
@@ -505,12 +468,11 @@ export default function StudentFilter({
                   <DatePicker
                     label={t("common.after")}
                     format="YYYY-MM-DD"
-                    value={dateOfBirthAfter ? dayjs(dateOfBirthAfter) : null}
+                    value={filters.dateOfBirthAfter ? dayjs(filters.dateOfBirthAfter) : null}
                     onChange={(newValue) => {
-                      setPaginationModel({ ...paginationModel, page: 1 });
-                      setDateOfBirthAfter(
-                        newValue ? newValue.format("YYYY-MM-DD") : "",
-                      );
+                      onFilterChange({
+                        dateOfBirthAfter: newValue ? newValue.format("YYYY-MM-DD") : "",
+                      });
                     }}
                     slotProps={{
                       textField: {
@@ -522,12 +484,11 @@ export default function StudentFilter({
                   <DatePicker
                     label={t("common.before")}
                     format="YYYY-MM-DD"
-                    value={dateOfBirthBefore ? dayjs(dateOfBirthBefore) : null}
+                    value={filters.dateOfBirthBefore ? dayjs(filters.dateOfBirthBefore) : null}
                     onChange={(newValue) => {
-                      setPaginationModel({ ...paginationModel, page: 1 });
-                      setDateOfBirthBefore(
-                        newValue ? newValue.format("YYYY-MM-DD") : "",
-                      );
+                      onFilterChange({
+                        dateOfBirthBefore: newValue ? newValue.format("YYYY-MM-DD") : "",
+                      });
                     }}
                     slotProps={{
                       textField: {
@@ -562,15 +523,14 @@ export default function StudentFilter({
                     label={t("common.after")}
                     format="YYYY-MM-DD"
                     value={
-                      passportExpirationDateAfter
-                        ? dayjs(passportExpirationDateAfter)
+                      filters.passportExpirationDateAfter
+                        ? dayjs(filters.passportExpirationDateAfter)
                         : null
                     }
                     onChange={(newValue) => {
-                      setPaginationModel({ ...paginationModel, page: 1 });
-                      setPassportExpirationDateAfter(
-                        newValue ? newValue.format("YYYY-MM-DD") : "",
-                      );
+                      onFilterChange({
+                        passportExpirationDateAfter: newValue ? newValue.format("YYYY-MM-DD") : "",
+                      });
                     }}
                     slotProps={{
                       textField: {
@@ -583,15 +543,14 @@ export default function StudentFilter({
                     label={t("common.before")}
                     format="YYYY-MM-DD"
                     value={
-                      passportExpirationDateBefore
-                        ? dayjs(passportExpirationDateBefore)
+                      filters.passportExpirationDateBefore
+                        ? dayjs(filters.passportExpirationDateBefore)
                         : null
                     }
                     onChange={(newValue) => {
-                      setPaginationModel({ ...paginationModel, page: 1 });
-                      setPassportExpirationDateBefore(
-                        newValue ? newValue.format("YYYY-MM-DD") : "",
-                      );
+                      onFilterChange({
+                        passportExpirationDateBefore: newValue ? newValue.format("YYYY-MM-DD") : "",
+                      });
                     }}
                     slotProps={{
                       textField: {

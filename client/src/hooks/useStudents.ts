@@ -1,63 +1,27 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import queryClient from "../utils/queryClient";
-import type { Country, StudentFormData, PaginationModel } from "../utils/types";
+import type { StudentFormData, PaginationModel } from "../utils/types";
+import type { StudentFilters } from "../components/students/StudentFilter";
 
 interface UseStudentsParams {
   paginationModel: PaginationModel;
-  selectedCountryOfDepartureId: number | null;
-  selectedCountryOfBirthId: number | null;
-  selectedCountryOfPassportId: number | null;
-  selectedGenders: number[];
-  selectedShirtSizes: string[];
-  selectedStartYear: number | null;
-  isInbound: boolean | null;
-  searchFields: string[];
-  searchInput: string;
-  dateOfBirthBefore: string;
-  dateOfBirthAfter: string;
-  passportExpirationDateBefore: string;
-  passportExpirationDateAfter: string;
+  filters: StudentFilters;
 }
 
 export function useStudents({
   paginationModel,
-  selectedCountryOfDepartureId,
-  selectedCountryOfBirthId,
-  selectedCountryOfPassportId,
-  selectedGenders,
-  selectedShirtSizes,
-  selectedStartYear,
-  isInbound,
-  searchFields,
-  searchInput,
-  dateOfBirthBefore,
-  dateOfBirthAfter,
-  passportExpirationDateBefore,
-  passportExpirationDateAfter,
+  filters,
 }: UseStudentsParams) {
+  const isInbound =
+    filters.isInbound === "both" ? null : filters.isInbound === "true";
+
   const {
     data: students,
     isLoading,
     error,
   } = useQuery({
-    queryKey: [
-      "students",
-      paginationModel,
-      selectedCountryOfDepartureId,
-      selectedCountryOfBirthId,
-      selectedCountryOfPassportId,
-      selectedGenders,
-      selectedShirtSizes,
-      selectedStartYear,
-      isInbound,
-      searchFields,
-      searchInput,
-      dateOfBirthBefore,
-      dateOfBirthAfter,
-      passportExpirationDateBefore,
-      passportExpirationDateAfter,
-    ],
+    queryKey: ["students", paginationModel, filters],
     queryFn: async () => {
       const params = getStudentParams();
       const response = await axiosClient.get(`/students/?${params.toString()}`);
@@ -97,42 +61,42 @@ export function useStudents({
       page_size: paginationModel.pageSize.toString(),
     });
 
-    if (searchInput) {
-      params.append("search", searchInput);
+    if (filters.search) {
+      params.append("search", filters.search);
     }
 
-    searchFields.forEach((searchField) => {
+    filters.searchFields.forEach((searchField) => {
       params.append("search_field", searchField);
     });
 
-    selectedGenders.forEach((gender) => {
+    filters.genders.forEach((gender) => {
       params.append("gender", gender.toString());
     });
 
-    selectedShirtSizes.forEach((shirtSize) => {
+    filters.shirtSizes.forEach((shirtSize) => {
       params.append("shirt_size", shirtSize);
     });
 
-    if (selectedCountryOfBirthId) {
-      params.append("country_of_birth", selectedCountryOfBirthId.toString());
+    if (filters.countryOfBirthId) {
+      params.append("country_of_birth", filters.countryOfBirthId.toString());
     }
 
-    if (selectedCountryOfDepartureId) {
+    if (filters.countryOfDepartureId) {
       params.append(
         "country_of_departure",
-        selectedCountryOfDepartureId.toString(),
+        filters.countryOfDepartureId.toString(),
       );
     }
 
-    if (selectedCountryOfPassportId) {
+    if (filters.countryOfPassportId) {
       params.append(
         "country_of_passport",
-        selectedCountryOfPassportId.toString(),
+        filters.countryOfPassportId.toString(),
       );
     }
 
-    if (selectedStartYear) {
-      params.append("start_year", selectedStartYear.toString());
+    if (filters.startYear) {
+      params.append("start_year", filters.startYear.toString());
     }
 
     if (isInbound === true) {
@@ -141,39 +105,30 @@ export function useStudents({
       params.append("is_inbound", "false");
     }
 
-    if (dateOfBirthBefore) {
-      params.append("date_of_birth_before", dateOfBirthBefore);
+    if (filters.dateOfBirthBefore) {
+      params.append("date_of_birth_before", filters.dateOfBirthBefore);
     }
 
-    if (dateOfBirthAfter) {
-      params.append("date_of_birth_after", dateOfBirthAfter);
+    if (filters.dateOfBirthAfter) {
+      params.append("date_of_birth_after", filters.dateOfBirthAfter);
     }
 
-    if (passportExpirationDateBefore) {
+    if (filters.passportExpirationDateBefore) {
       params.append(
         "passport_expiration_date_before",
-        passportExpirationDateBefore,
+        filters.passportExpirationDateBefore,
       );
     }
 
-    if (passportExpirationDateAfter) {
+    if (filters.passportExpirationDateAfter) {
       params.append(
         "passport_expiration_date_after",
-        passportExpirationDateAfter,
+        filters.passportExpirationDateAfter,
       );
     }
 
     return params;
   };
-
-  const { data: countries = [] } = useQuery<Country[]>({
-    queryKey: ["countries"],
-    queryFn: async () => {
-      const response = await axiosClient.get("/countries/");
-      return response.data;
-    },
-    staleTime: Infinity,
-  });
 
   const addStudentMutation = useMutation({
     mutationFn: async (newStudent: StudentFormData) => {
@@ -215,7 +170,6 @@ export function useStudents({
 
   return {
     students,
-    countries,
     isLoading,
     error,
     addStudentMutation,

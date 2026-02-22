@@ -11,8 +11,9 @@ import DownloadIcon from "@mui/icons-material/Download";
 import { useStudents } from "../hooks/useStudents";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 import StudentFilter from "../components/students/StudentFilter";
-import { useQueryState } from "nuqs";
 import {
+  useQueryState,
+  useQueryStates,
   parseAsStringLiteral,
   parseAsInteger,
   parseAsString,
@@ -46,57 +47,22 @@ export default function Students() {
     setPageSize(model.pageSize);
   };
 
-  // Search
-  const [searchInput, setSearchInput] = useQueryState(
-    "search",
-    parseAsString.withDefault(""),
-  );
-  const [searchFields, setSearchFields] = useQueryState(
-    "searchFields",
-    parseAsArrayOf(parseAsString).withDefault([]),
-  );
-
   // Filters
-  const [selectedCountryOfDepartureId, setSelectedCountryOfDepartureId] =
-    useQueryState("countryOfDeparture", parseAsInteger);
-  const [selectedCountryOfBirthId, setSelectedCountryOfBirthId] = useQueryState(
-    "countryOfBirth",
-    parseAsInteger,
-  );
-  const [selectedCountryOfPassportId, setSelectedCountryOfPassportId] =
-    useQueryState("countryOfPassport", parseAsInteger);
-  const [selectedShirtSizes, setSelectedShirtSizes] = useQueryState(
-    "shirtSizes",
-    parseAsArrayOf(parseAsString).withDefault([]),
-  );
-  const [selectedGenders, setSelectedGenders] = useQueryState(
-    "genders",
-    parseAsArrayOf(parseAsInteger).withDefault([]),
-  );
-  const [selectedStartYear, setSelectedStartYear] = useQueryState(
-    "startYear",
-    parseAsInteger,
-  );
-  const [isInboundParam, setIsInboundParam] = useQueryState(
-    "isInbound",
-    parseAsStringLiteral(["true", "false", "both"]).withDefault("true"),
-  );
-  const isInbound =
-    isInboundParam === "both" ? null : isInboundParam === "true";
-
-  // Date filters
-  const [dateOfBirthBefore, setDateOfBirthBefore] = useQueryState(
-    "dateOfBirthBefore",
-    parseAsString.withDefault(""),
-  );
-  const [dateOfBirthAfter, setDateOfBirthAfter] = useQueryState(
-    "dateOfBirthAfter",
-    parseAsString.withDefault(""),
-  );
-  const [passportExpirationDateBefore, setPassportExpirationDateBefore] =
-    useQueryState("passportExpBefore", parseAsString.withDefault(""));
-  const [passportExpirationDateAfter, setPassportExpirationDateAfter] =
-    useQueryState("passportExpAfter", parseAsString.withDefault(""));
+  const [filters, setFilters] = useQueryStates({
+    search: parseAsString.withDefault(""),
+    searchFields: parseAsArrayOf(parseAsString).withDefault([]),
+    countryOfBirthId: parseAsInteger,
+    countryOfDepartureId: parseAsInteger,
+    countryOfPassportId: parseAsInteger,
+    shirtSizes: parseAsArrayOf(parseAsString).withDefault([]),
+    genders: parseAsArrayOf(parseAsInteger).withDefault([]),
+    startYear: parseAsInteger,
+    isInbound: parseAsStringLiteral(["true", "false", "both"]).withDefault("true"),
+    dateOfBirthBefore: parseAsString.withDefault(""),
+    dateOfBirthAfter: parseAsString.withDefault(""),
+    passportExpirationDateBefore: parseAsString.withDefault(""),
+    passportExpirationDateAfter: parseAsString.withDefault(""),
+  });
 
   const scrollPositionRef = useRef<number>(0);
 
@@ -112,28 +78,12 @@ export default function Students() {
 
   const {
     students,
-    countries,
     isLoading,
     error,
     updateStudentMutation,
     deleteStudentMutation,
     exportStudentsMutation,
-  } = useStudents({
-    paginationModel,
-    selectedCountryOfDepartureId,
-    selectedCountryOfBirthId,
-    selectedCountryOfPassportId,
-    selectedGenders,
-    selectedShirtSizes,
-    selectedStartYear,
-    isInbound,
-    searchFields,
-    searchInput,
-    dateOfBirthBefore,
-    dateOfBirthAfter,
-    passportExpirationDateBefore,
-    passportExpirationDateAfter,
-  });
+  } = useStudents({ paginationModel, filters });
 
   const handleViewChange = (newView: ViewType) => {
     if (currentView === "list") {
@@ -241,49 +191,11 @@ export default function Students() {
       )}
 
       <StudentFilter
-        searchInput={searchInput}
-        setSearchInput={setSearchInput}
-        searchFields={searchFields}
-        setSearchFields={setSearchFields}
-        paginationModel={paginationModel}
-        setPaginationModel={setPaginationModel}
-        selectedCountryOfDeparture={
-          countries.find((c) => c.id === selectedCountryOfDepartureId) || null
-        }
-        setSelectedCountryOfDeparture={(country) =>
-          setSelectedCountryOfDepartureId(country?.id || null)
-        }
-        selectedCountryOfBirth={
-          countries.find((c) => c.id === selectedCountryOfBirthId) || null
-        }
-        setSelectedCountryOfBirth={(country) =>
-          setSelectedCountryOfBirthId(country?.id || null)
-        }
-        selectedCountryOfPassport={
-          countries.find((c) => c.id === selectedCountryOfPassportId) || null
-        }
-        setSelectedCountryOfPassport={(country) =>
-          setSelectedCountryOfPassportId(country?.id || null)
-        }
-        selectedShirtSizes={selectedShirtSizes}
-        setSelectedShirtSizes={setSelectedShirtSizes}
-        selectedGenders={selectedGenders}
-        setSelectedGenders={setSelectedGenders}
-        selectedStartYear={selectedStartYear}
-        setSelectedStartYear={setSelectedStartYear}
-        isInbound={isInbound}
-        setIsInbound={(value) =>
-          setIsInboundParam(value === null ? "both" : value ? "true" : "false")
-        }
-        dateOfBirthBefore={dateOfBirthBefore}
-        setDateOfBirthBefore={setDateOfBirthBefore}
-        dateOfBirthAfter={dateOfBirthAfter}
-        setDateOfBirthAfter={setDateOfBirthAfter}
-        passportExpirationDateBefore={passportExpirationDateBefore}
-        setPassportExpirationDateBefore={setPassportExpirationDateBefore}
-        passportExpirationDateAfter={passportExpirationDateAfter}
-        setPassportExpirationDateAfter={setPassportExpirationDateAfter}
-        countries={countries}
+        filters={filters}
+        onFilterChange={(update) => {
+          setFilters(update);
+          setPage(1);
+        }}
       />
 
       <MyPagination
