@@ -2,27 +2,32 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import queryClient from "../utils/queryClient";
 import type { PaginationModel, DistrictFormData } from "../utils/types";
+import type { DistrictFilters } from "../components/districts/DistrictFilter";
 
 interface UseDistrictsParams {
   paginationModel: PaginationModel;
-  searchInput: string;
+  filters: DistrictFilters;
 }
 
-export function useDistricts({ paginationModel, searchInput }: UseDistrictsParams) {
+export function useDistricts({ paginationModel, filters }: UseDistrictsParams) {
   const {
     data: districts,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["districts", paginationModel, searchInput],
+    queryKey: ["districts", paginationModel, filters],
     queryFn: async () => {
       const params = new URLSearchParams({
         page: paginationModel.page.toString(),
         page_size: paginationModel.pageSize.toString(),
       });
 
-      if (searchInput) {
-        params.append("search", searchInput);
+      if (filters.search) {
+        params.append("search", filters.search);
+      }
+
+      if (filters.countryId) {
+        params.append("id_country", filters.countryId.toString());
       }
 
       const response = await axiosClient.get(`/districts/?${params.toString()}`);
