@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Grid, Typography, IconButton, TextField } from "@mui/material";
+import { Box, Grid, Typography, IconButton, TextField, CircularProgress } from "@mui/material";
 import {
   Edit as EditIcon,
   Save,
@@ -73,7 +73,7 @@ export default function EditableParentInfo({
         disabled={updateMutation.isPending}
         color="primary"
       >
-        <Save />
+        {updateMutation.isPending ? <CircularProgress size={20} /> : <Save />}
       </IconButton>
       <IconButton
         size="small"

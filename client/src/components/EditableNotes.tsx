@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Box, Typography, IconButton, TextField, Paper } from "@mui/material";
+import {
+  Box,
+  Typography,
+  IconButton,
+  TextField,
+  Paper,
+  CircularProgress,
+} from "@mui/material";
 import {
   Edit as EditIcon,
   Save,
@@ -63,7 +70,7 @@ export default function EditableNotes({
         disabled={updateMutation.isPending}
         color="primary"
       >
-        <Save />
+        {updateMutation.isPending ? <CircularProgress size={20} /> : <Save />}
       </IconButton>
       <IconButton
         size="small"

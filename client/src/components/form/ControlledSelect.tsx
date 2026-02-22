@@ -30,6 +30,7 @@ export default function ControlledSelect<T extends FieldValues>({
       render={({ field, fieldState: { error } }) => (
         <TextField
           {...field}
+          value={field.value ?? ""}
           select
           error={!!error}
           helperText={error?.message}

@@ -88,7 +88,7 @@ export default function EditableLocation({ contact }: EditableLocationProps) {
         disabled={updateMutation.isPending}
         color="primary"
       >
-        <Save />
+        {updateMutation.isPending ? <CircularProgress size={20} /> : <Save />}
       </IconButton>
       <IconButton
         size="small"

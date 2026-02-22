@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Grid, IconButton, TextField, MenuItem } from "@mui/material";
+import { Box, Grid, IconButton, TextField, MenuItem, CircularProgress } from "@mui/material";
 import { Edit as EditIcon, Save, Close, Language } from "@mui/icons-material";
 import type { Student } from "../../../utils/types";
 import { getLanguageProficiencyOptions } from "../../../utils/types";
@@ -73,7 +73,7 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
         disabled={updateMutation.isPending}
         color="primary"
       >
-        <Save />
+        {updateMutation.isPending ? <CircularProgress size={20} /> : <Save />}
       </IconButton>
       <IconButton
         size="small"

@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -8,13 +7,12 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Edit as EditIcon, Save, Close, LocationOn } from "@mui/icons-material";
-import type { Club, Country, District } from "../../utils/types";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import axiosClient from "../../utils/axiosClient";
-import queryClient from "../../utils/queryClient";
+import type { Club } from "../../utils/types";
+import useCountryDistrictClub from "../../hooks/useCountryDistrictClub";
 import Section from "../Section";
 import InfoItem from "../InfoItem";
 import { useTranslation } from "react-i18next";
+import { useEditableSection } from "../../hooks/useEditableSection";
 
 type EditableLocationProps = {
   club: Club;
@@ -22,65 +20,29 @@ type EditableLocationProps = {
 
 export default function EditableLocation({ club }: EditableLocationProps) {
   const { t } = useTranslation();
-  const [isEditing, setIsEditing] = useState(false);
-  const [country, setCountry] = useState<number | null>(null);
-
-  const [formData, setFormData] = useState({
-    id_district: club.id_district,
-    city: club.city || "",
-  });
-
-  const { data: countries = [] } = useQuery<Country[]>({
-    queryKey: ["countries"],
-    queryFn: async () => {
-      const response = await axiosClient.get("/countries/");
-      return response.data;
-    },
-    staleTime: Infinity,
-  });
-
-  const { data: districts = [], isLoading: isLoadingDistricts } = useQuery<
-    District[]
-  >({
-    queryKey: ["districts", country],
-    queryFn: async () => {
-      const response = await axiosClient.get(`/districts/?country=${country}`);
-      return response.data;
-    },
-    enabled: country !== null && country > 0,
-  });
-
-  useEffect(() => {
-    if (isEditing) {
-      setCountry(club.id_country);
-    }
-  }, [isEditing, club]);
-
-  const updateMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      const response = await axiosClient.patch(`/clubs/${club.id}/`, data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clubs"] });
-      setIsEditing(false);
-    },
-  });
-
-  const handleSave = () => {
-    updateMutation.mutate(formData);
-  };
-
-  const handleCancel = () => {
-    setFormData({
+  const {
+    isEditing,
+    setIsEditing,
+    formData,
+    setFormData,
+    isPending,
+    handleSave,
+    handleCancel,
+  } = useEditableSection({
+    endpoint: `/clubs/${club.id}/`,
+    queryKey: ["clubs", club.id],
+    initialData: {
       id_district: club.id_district,
       city: club.city || "",
-    });
-    setCountry(null);
-    setIsEditing(false);
-  };
+      country: club.id_country as number | null,
+    },
+  });
 
-  const selectedCountry = countries.find((c) => c.id === country) || null;
+  const { countries, districts, isLoadingDistricts } =
+    useCountryDistrictClub(formData.country);
+
+  const selectedCountry =
+    countries.find((c) => c.id === formData.country) || null;
   const selectedDistrict =
     districts.find((d) => d.id === formData.id_district) || null;
 
@@ -93,15 +55,15 @@ export default function EditableLocation({ club }: EditableLocationProps) {
       <IconButton
         size="small"
         onClick={handleSave}
-        disabled={updateMutation.isPending}
+        disabled={isPending}
         color="primary"
       >
-        <Save />
+        {isPending ? <CircularProgress size={20} /> : <Save />}
       </IconButton>
       <IconButton
         size="small"
         onClick={handleCancel}
-        disabled={updateMutation.isPending}
+        disabled={isPending}
       >
         <Close />
       </IconButton>
@@ -128,8 +90,11 @@ export default function EditableLocation({ club }: EditableLocationProps) {
               sx={{ maxWidth: 400, width: "100%" }}
               value={selectedCountry}
               onChange={(_event, newValue) => {
-                setCountry(newValue?.id || null);
-                setFormData({ ...formData, id_district: 0 });
+                setFormData({
+                  ...formData,
+                  country: newValue?.id || null,
+                  id_district: 0,
+                });
               }}
               options={countries}
               getOptionLabel={(option) => option.name}
@@ -151,7 +116,7 @@ export default function EditableLocation({ club }: EditableLocationProps) {
               }}
               options={districts}
               getOptionLabel={(option) => option.number.toString()}
-              disabled={!country || isLoadingDistricts}
+              disabled={!formData.country || isLoadingDistricts}
               loading={isLoadingDistricts}
               renderInput={(params) => (
                 <TextField

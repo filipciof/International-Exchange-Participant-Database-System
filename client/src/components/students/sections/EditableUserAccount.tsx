@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Grid, IconButton, TextField, Alert, Typography } from "@mui/material";
+import { Box, Grid, IconButton, TextField, Alert, Typography, CircularProgress } from "@mui/material";
 import {
   Edit as EditIcon,
   Save,
@@ -78,7 +78,7 @@ export default function EditableUserAccount({
         disabled={isLoading || !email}
         color="primary"
       >
-        <Save />
+        {isLoading ? <CircularProgress size={20} /> : <Save />}
       </IconButton>
       <IconButton size="small" onClick={handleCancel} disabled={isLoading}>
         <Close />

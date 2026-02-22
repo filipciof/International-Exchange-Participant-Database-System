@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Grid, IconButton, TextField } from "@mui/material";
+import { Box, Grid, IconButton, TextField, CircularProgress } from "@mui/material";
 import {
   Edit as EditIcon,
   Save,
@@ -69,7 +69,7 @@ export default function EditableInsurance({ student }: EditableInsuranceProps) {
         disabled={updateMutation.isPending}
         color="primary"
       >
-        <Save />
+        {updateMutation.isPending ? <CircularProgress size={20} /> : <Save />}
       </IconButton>
       <IconButton
         size="small"

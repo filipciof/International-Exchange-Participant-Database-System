@@ -12,6 +12,7 @@ import {
   Chip,
   type SelectChangeEvent,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -106,7 +107,7 @@ export default function EditableUserAccount({
         disabled={isLoading}
         color="primary"
       >
-        <Save />
+        {isLoading ? <CircularProgress size={20} /> : <Save />}
       </IconButton>
       <IconButton size="small" onClick={handleCancel} disabled={isLoading}>
         <Close />

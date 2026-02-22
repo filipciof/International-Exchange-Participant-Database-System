@@ -60,13 +60,30 @@ export default function FormShell({
           <Button variant="outlined" onClick={onClose} size="large">
             {t("common.cancel")}
           </Button>
-          {isLoading ? (
-            <CircularProgress sx={{ color: "secondary.main" }} />
-          ) : (
-            <Button variant="contained" type="submit" size="large">
+          <Button
+            variant="contained"
+            type="submit"
+            size="large"
+            sx={{
+              position: "relative",
+              ...(isLoading && { pointerEvents: "none" }),
+            }}
+          >
+            <Box
+              component="span"
+              sx={{ visibility: isLoading ? "hidden" : "visible" }}
+            >
               {submitButtonText || t("common.submit")}
-            </Button>
-          )}
+            </Box>
+            {isLoading && (
+              <CircularProgress
+                size={26}
+                thickness={5}
+                color="inherit"
+                sx={{ position: "absolute" }}
+              />
+            )}
+          </Button>
         </Stack>
         {error && !isLoading && (
           <Stack spacing={1}>
