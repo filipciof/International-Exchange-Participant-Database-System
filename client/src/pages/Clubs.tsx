@@ -35,6 +35,7 @@ export default function Clubs() {
   const [filters, setFilters] = useQueryStates({
     search: parseAsString.withDefault(""),
     countryId: parseAsInteger,
+    districtId: parseAsInteger,
   });
   const [currentView, setCurrentView] = useQueryState(
     "view",

@@ -31,6 +31,10 @@ export function useClubs({ paginationModel, filters }: UseClubsParams) {
         params.append("id_country", filters.countryId.toString());
       }
 
+      if (filters.districtId) {
+        params.append("id_district", filters.districtId.toString());
+      }
+
       const response = await axiosClient.get(`/clubs/?${params.toString()}`);
       return response.data;
     },

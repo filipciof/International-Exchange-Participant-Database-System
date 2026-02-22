@@ -58,7 +58,13 @@ TODO:
 - Move mutations from pages to forms.
 - Don't show form fields until the object is fetched.
 <!-- - Pass active role in the custom HTTP header. -->
-- 
+- Database clearing script.
+- The form template/creation functionality.
+- Remove extra email in Staff.
+- Write tests.
+- Perform tests on the frontend. (Come up with imaginary exchange scenario).
+- Exporting dialog.
+- Indication what the user's role is.
 ---
 
 - Don't use MyAutocomplete, instead restrict the option set instead.
