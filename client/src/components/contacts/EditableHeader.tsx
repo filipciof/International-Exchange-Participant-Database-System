@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Box,
   Card,
@@ -12,6 +11,7 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  CircularProgress,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -20,10 +20,8 @@ import {
   CloudUpload as CloudUploadIcon,
 } from "@mui/icons-material";
 import type { Contact } from "../../utils/types";
-import { useMutation } from "@tanstack/react-query";
-import axiosClient from "../../utils/axiosClient";
-import queryClient from "../../utils/queryClient";
 import { useTranslation } from "react-i18next";
+import { useEditableSection } from "../../hooks/useEditableSection";
 
 type EditableHeaderProps = {
   contact: Contact;
@@ -37,62 +35,29 @@ export default function EditableHeader({
   isLoading,
 }: EditableHeaderProps) {
   const { t } = useTranslation();
-  const [isEditing, setIsEditing] = useState(false);
-  const [photo, setPhoto] = useState<File | null>(null);
-
-  const [formData, setFormData] = useState({
-    first_name: contact.first_name || "",
-    middle_name: contact.middle_name || "",
-    last_name: contact.last_name || "",
-    is_longterm: contact.is_longterm,
-    is_family_to_family: contact.is_family_to_family,
-    is_camp: contact.is_camp,
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async (data: typeof formData & { photo?: File | null }) => {
-      const formDataToSend = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (key === "photo" && value instanceof File) {
-          formDataToSend.append(key, value);
-        } else if (key !== "photo" && value !== null && value !== undefined) {
-          formDataToSend.append(key, String(value));
-        }
-      });
-      const response = await axiosClient.patch(
-        `/contacts/${contact.id}/`,
-        formDataToSend,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contacts"] });
-      setIsEditing(false);
-      setPhoto(null);
-    },
-  });
-
-  const handleSave = () => {
-    updateMutation.mutate({ ...formData, photo });
-  };
-
-  const handleCancel = () => {
-    setFormData({
+  const {
+    isEditing,
+    setIsEditing,
+    formData,
+    setFormData,
+    photo,
+    setPhoto,
+    isPending,
+    handleSave,
+    handleCancel,
+  } = useEditableSection({
+    endpoint: `/contacts/${contact.id}/`,
+    queryKey: ["contacts", contact.id],
+    photoQueryKey: ["contactPhoto", contact.id],
+    initialData: {
       first_name: contact.first_name || "",
       middle_name: contact.middle_name || "",
       last_name: contact.last_name || "",
       is_longterm: contact.is_longterm,
       is_family_to_family: contact.is_family_to_family,
       is_camp: contact.is_camp,
-    });
-    setPhoto(null);
-    setIsEditing(false);
-  };
+    },
+  });
 
   const fullName = [
     formData.first_name,
@@ -126,14 +91,14 @@ export default function EditableHeader({
               <IconButton
                 size="small"
                 onClick={handleSave}
-                disabled={updateMutation.isPending}
+                disabled={isPending}
               >
-                <Save />
+                {isPending ? <CircularProgress size={20} /> : <Save />}
               </IconButton>
               <IconButton
                 size="small"
                 onClick={handleCancel}
-                disabled={updateMutation.isPending}
+                disabled={isPending}
               >
                 <Close />
               </IconButton>

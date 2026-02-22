@@ -57,6 +57,7 @@ TODO:
 - Set a timeout for operation successful message to disappear.
 - Test filling in forms differently.
 - Group filters in objects.
+- Move mutations from pages to forms.
 ---
 
 - Don't use MyAutocomplete, instead restrict the option set instead.

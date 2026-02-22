@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Box,
   Card,
@@ -8,6 +7,7 @@ import {
   IconButton,
   TextField,
   Grid,
+  CircularProgress,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -16,11 +16,9 @@ import {
   CloudUpload as CloudUploadIcon,
 } from "@mui/icons-material";
 import type { Staff } from "../../../utils/types";
-import { useMutation } from "@tanstack/react-query";
-import axiosClient from "../../../utils/axiosClient";
-import queryClient from "../../../utils/queryClient";
 import { useTranslation } from "react-i18next";
 import usePermissions from "../../../hooks/usePermissions";
+import { useEditableSection } from "../../../hooks/useEditableSection";
 
 type EditableHeaderProps = {
   staff: Staff;
@@ -35,53 +33,26 @@ export default function EditableHeader({
 }: EditableHeaderProps) {
   const { t } = useTranslation();
   const { canEditStaffName } = usePermissions();
-  const [isEditing, setIsEditing] = useState(false);
-  const [photo, setPhoto] = useState<File | null>(null);
-
-  const [formData, setFormData] = useState({
-    first_name: staff.first_name || "",
-    middle_name: staff.middle_name || "",
-    last_name: staff.last_name || "",
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async (data: typeof formData & { photo?: File | null }) => {
-      const formDataToSend = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (key === "photo" && value instanceof File) {
-          formDataToSend.append(key, value);
-        } else if (key !== "photo" && value !== null && value !== undefined) {
-          formDataToSend.append(key, String(value));
-        }
-      });
-      const url = `/staff/${staff.id}/`;
-      const response = await axiosClient.patch(url, formDataToSend, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["staff"] });
-      setIsEditing(false);
-      setPhoto(null);
-    },
-  });
-
-  const handleSave = () => {
-    updateMutation.mutate({ ...formData, photo });
-  };
-
-  const handleCancel = () => {
-    setFormData({
+  const {
+    isEditing,
+    setIsEditing,
+    formData,
+    setFormData,
+    photo,
+    setPhoto,
+    isPending,
+    handleSave,
+    handleCancel,
+  } = useEditableSection({
+    endpoint: `/staff/${staff.id}/`,
+    queryKey: ["staff", staff.id],
+    photoQueryKey: ["staffPhoto", staff.id],
+    initialData: {
       first_name: staff.first_name || "",
       middle_name: staff.middle_name || "",
       last_name: staff.last_name || "",
-    });
-    setPhoto(null);
-    setIsEditing(false);
-  };
+    },
+  });
 
   const fullName = [
     formData.first_name,
@@ -115,14 +86,14 @@ export default function EditableHeader({
               <IconButton
                 size="small"
                 onClick={handleSave}
-                disabled={updateMutation.isPending}
+                disabled={isPending}
               >
-                <Save />
+                {isPending ? <CircularProgress size={20} /> : <Save />}
               </IconButton>
               <IconButton
                 size="small"
                 onClick={handleCancel}
-                disabled={updateMutation.isPending}
+                disabled={isPending}
               >
                 <Close />
               </IconButton>

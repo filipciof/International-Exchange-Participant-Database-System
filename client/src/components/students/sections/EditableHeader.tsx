@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Box,
   Card,
@@ -9,6 +8,7 @@ import {
   TextField,
   Grid,
   Chip,
+  CircularProgress,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -17,11 +17,9 @@ import {
   CloudUpload as CloudUploadIcon,
 } from "@mui/icons-material";
 import type { Student } from "../../../utils/types";
-import { useMutation } from "@tanstack/react-query";
-import axiosClient from "../../../utils/axiosClient";
-import queryClient from "../../../utils/queryClient";
 import { useTranslation } from "react-i18next";
 import usePermissions from "../../../hooks/usePermissions";
+import { useEditableSection } from "../../../hooks/useEditableSection";
 
 type EditableHeaderProps = {
   student: Student;
@@ -36,58 +34,27 @@ export default function EditableHeader({
 }: EditableHeaderProps) {
   const { t } = useTranslation();
   const { canEditStudentName } = usePermissions();
-  const [isEditing, setIsEditing] = useState(false);
-  const [photo, setPhoto] = useState<File | null>(null);
-
-  const [formData, setFormData] = useState({
-    first_name: student.first_name || "",
-    middle_name: student.middle_name || "",
-    last_name: student.last_name || "",
-    nick_name: student.nick_name || "",
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async (data: typeof formData & { photo?: File | null }) => {
-      const formDataToSend = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (key === "photo" && value instanceof File) {
-          formDataToSend.append(key, value);
-        } else if (key !== "photo" && value !== null && value !== undefined) {
-          formDataToSend.append(key, String(value));
-        }
-      });
-      const response = await axiosClient.patch(
-        `/students/${student.id}/`,
-        formDataToSend,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["students"] });
-      setIsEditing(false);
-      setPhoto(null);
-    },
-  });
-
-  const handleSave = () => {
-    updateMutation.mutate({ ...formData, photo });
-  };
-
-  const handleCancel = () => {
-    setFormData({
+  const {
+    isEditing,
+    setIsEditing,
+    formData,
+    setFormData,
+    photo,
+    setPhoto,
+    isPending,
+    handleSave,
+    handleCancel,
+  } = useEditableSection({
+    endpoint: `/students/${student.id}/`,
+    queryKey: ["students", student.id],
+    photoQueryKey: ["studentPhoto", student.id],
+    initialData: {
       first_name: student.first_name || "",
       middle_name: student.middle_name || "",
       last_name: student.last_name || "",
       nick_name: student.nick_name || "",
-    });
-    setPhoto(null);
-    setIsEditing(false);
-  };
+    },
+  });
 
   const fullName = [
     formData.first_name,
@@ -121,14 +88,14 @@ export default function EditableHeader({
               <IconButton
                 size="small"
                 onClick={handleSave}
-                disabled={updateMutation.isPending}
+                disabled={isPending}
               >
-                <Save />
+                {isPending ? <CircularProgress size={20} /> : <Save />}
               </IconButton>
               <IconButton
                 size="small"
                 onClick={handleCancel}
-                disabled={updateMutation.isPending}
+                disabled={isPending}
               >
                 <Close />
               </IconButton>
@@ -161,14 +128,23 @@ export default function EditableHeader({
             <Box sx={{ flex: 1, minWidth: 200 }}>
               <Typography
                 variant="h4"
-                sx={{ color: isEditing ? "text.primary" : "white", fontWeight: 700, mb: 1 }}
+                sx={{
+                  color: isEditing ? "text.primary" : "white",
+                  fontWeight: 700,
+                  mb: 1,
+                }}
               >
                 {fullName}
               </Typography>
               {student.nick_name && (
                 <Typography
                   variant="h6"
-                  sx={{ color: isEditing ? "text.secondary" : "rgba(255,255,255,0.9)", mb: 1 }}
+                  sx={{
+                    color: isEditing
+                      ? "text.secondary"
+                      : "rgba(255,255,255,0.9)",
+                    mb: 1,
+                  }}
                 >
                   "{student.nick_name}"
                 </Typography>

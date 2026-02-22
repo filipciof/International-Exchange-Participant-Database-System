@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Box,
   Card,
@@ -6,17 +5,12 @@ import {
   Typography,
   IconButton,
   TextField,
+  CircularProgress,
 } from "@mui/material";
-import {
-  Edit as EditIcon,
-  Save,
-  Close,
-} from "@mui/icons-material";
+import { Edit as EditIcon, Save, Close } from "@mui/icons-material";
 import type { Family } from "../../utils/types";
-import { useMutation } from "@tanstack/react-query";
-import axiosClient from "../../utils/axiosClient";
-import queryClient from "../../utils/queryClient";
 import { useTranslation } from "react-i18next";
+import { useEditableSection } from "../../hooks/useEditableSection";
 
 type EditableHeaderProps = {
   family: Family;
@@ -24,28 +18,21 @@ type EditableHeaderProps = {
 
 export default function EditableHeader({ family }: EditableHeaderProps) {
   const { t } = useTranslation();
-  const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(family.name || "");
-
-  const updateMutation = useMutation({
-    mutationFn: async (data: { name: string }) => {
-      const response = await axiosClient.patch(`/families/${family.id}/`, data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["families"] });
-      setIsEditing(false);
+  const {
+    isEditing,
+    setIsEditing,
+    formData,
+    setFormData,
+    isPending,
+    handleSave,
+    handleCancel,
+  } = useEditableSection({
+    endpoint: `/families/${family.id}/`,
+    queryKey: ["families", family.id],
+    initialData: {
+      name: family.name || "",
     },
   });
-
-  const handleSave = () => {
-    updateMutation.mutate({ name });
-  };
-
-  const handleCancel = () => {
-    setName(family.name || "");
-    setIsEditing(false);
-  };
 
   return (
     <Card
@@ -71,14 +58,14 @@ export default function EditableHeader({ family }: EditableHeaderProps) {
               <IconButton
                 size="small"
                 onClick={handleSave}
-                disabled={updateMutation.isPending}
+                disabled={isPending}
               >
-                <Save />
+                {isPending ? <CircularProgress size={20} /> : <Save />}
               </IconButton>
               <IconButton
                 size="small"
                 onClick={handleCancel}
-                disabled={updateMutation.isPending}
+                disabled={isPending}
               >
                 <Close />
               </IconButton>
@@ -101,7 +88,7 @@ export default function EditableHeader({ family }: EditableHeaderProps) {
                   variant="h4"
                   sx={{ color: "white", fontWeight: 700, mb: 1 }}
                 >
-                  {name}
+                  {formData.name}
                 </Typography>
                 {family.club && (
                   <Typography
@@ -117,8 +104,8 @@ export default function EditableHeader({ family }: EditableHeaderProps) {
                 size="small"
                 sx={{ maxWidth: 400, width: "100%" }}
                 label={t("familyForm.familyName")}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={formData.name}
+                onChange={(e) => setFormData({ name: e.target.value })}
               />
             )}
           </Box>

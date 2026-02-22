@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Box,
   Card,
@@ -7,6 +6,7 @@ import {
   Typography,
   IconButton,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -14,9 +14,7 @@ import {
   Close,
 } from "@mui/icons-material";
 import type { Club } from "../../utils/types";
-import { useMutation } from "@tanstack/react-query";
-import axiosClient from "../../utils/axiosClient";
-import queryClient from "../../utils/queryClient";
+import { useEditableSection } from "../../hooks/useEditableSection";
 import { useTranslation } from "react-i18next";
 
 type EditableHeaderProps = {
@@ -25,30 +23,22 @@ type EditableHeaderProps = {
 
 export default function EditableHeader({ club }: EditableHeaderProps) {
   const { t } = useTranslation();
-  const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(club.name || "");
-  const [number, setNumber] = useState(club.number || "");
-
-  const updateMutation = useMutation({
-    mutationFn: async (data: { name: string; number: string }) => {
-      const response = await axiosClient.patch(`/clubs/${club.id}/`, data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clubs"] });
-      setIsEditing(false);
+  const {
+    isEditing,
+    setIsEditing,
+    formData,
+    setFormData,
+    isPending,
+    handleSave,
+    handleCancel,
+  } = useEditableSection({
+    endpoint: `/clubs/${club.id}/`,
+    queryKey: ["clubs", club.id],
+    initialData: {
+      name: club.name || "",
+      number: club.number || "",
     },
   });
-
-  const handleSave = () => {
-    updateMutation.mutate({ name, number });
-  };
-
-  const handleCancel = () => {
-    setName(club.name || "");
-    setNumber(club.number || "");
-    setIsEditing(false);
-  };
 
   return (
     <Card
@@ -74,14 +64,14 @@ export default function EditableHeader({ club }: EditableHeaderProps) {
               <IconButton
                 size="small"
                 onClick={handleSave}
-                disabled={updateMutation.isPending}
+                disabled={isPending}
               >
-                <Save />
+                {isPending ? <CircularProgress size={20} /> : <Save />}
               </IconButton>
               <IconButton
                 size="small"
                 onClick={handleCancel}
-                disabled={updateMutation.isPending}
+                disabled={isPending}
               >
                 <Close />
               </IconButton>
@@ -104,7 +94,7 @@ export default function EditableHeader({ club }: EditableHeaderProps) {
                   variant="h4"
                   sx={{ color: "white", fontWeight: 700, mb: 1 }}
                 >
-                  {name}
+                  {formData.name}
                 </Typography>
                 <Typography
                   variant="h6"
@@ -120,8 +110,11 @@ export default function EditableHeader({ club }: EditableHeaderProps) {
                     size="small"
                     sx={{ maxWidth: 400, width: "100%" }}
                     label={t("clubForm.clubName")}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={formData.name}
+                    disabled={isPending}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>
@@ -129,8 +122,11 @@ export default function EditableHeader({ club }: EditableHeaderProps) {
                     size="small"
                     sx={{ maxWidth: 400, width: "100%" }}
                     label={t("clubForm.number")}
-                    value={number}
-                    onChange={(e) => setNumber(e.target.value)}
+                    value={formData.number}
+                    disabled={isPending}
+                    onChange={(e) =>
+                      setFormData({ ...formData, number: e.target.value })
+                    }
                   />
                 </Grid>
               </Grid>
