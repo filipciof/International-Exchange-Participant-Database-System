@@ -18,7 +18,7 @@ import {
   Download as DownloadIcon,
   Edit as EditIcon,
 } from "@mui/icons-material";
-import type { Document, DocumentFormInputs } from "../utils/types";
+import type { Document } from "../utils/types";
 import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import Section from "./Section";
@@ -50,18 +50,15 @@ export default function EditableDocuments({
     null
   );
 
-  const { createMutation, updateMutation, deleteMutation } =
-    useDocumentMutations({
-      ownerType,
-      ownerId,
-    });
+  const { deleteMutation } = useDocumentMutations({
+    ownerType,
+    ownerId,
+  });
 
   const handleCloseDialog = () => {
     setDialogOpen(null);
     setEditingDocument(null);
     setDeletingDocument(null);
-    createMutation.reset();
-    updateMutation.reset();
     deleteMutation.reset();
   };
 
@@ -79,16 +76,6 @@ export default function EditableDocuments({
     },
   });
 
-  const handleOpenAddDialog = () => {
-    setEditingDocument(null);
-    setDialogOpen("add");
-  };
-
-  const handleOpenEditDialog = (document: Document) => {
-    setEditingDocument(document);
-    setDialogOpen("edit");
-  };
-
   const handleDownload = async (document: Document) => {
     const response = await axiosClient.get(`/documents/${document.id}/file/`, {
       responseType: "blob",
@@ -101,19 +88,14 @@ export default function EditableDocuments({
     URL.revokeObjectURL(url);
   };
 
-  const handleSubmit = (data: DocumentFormInputs, file: File | null) => {
-    if (editingDocument) {
-      updateMutation.mutate(
-        { id: editingDocument.id, data, file },
-        { onSuccess: handleCloseDialog }
-      );
-    } else {
-      createMutation.mutate({ data, file }, { onSuccess: handleCloseDialog });
-    }
-  };
-
   const actions = canAddDocuments && (
-    <IconButton size="small" onClick={handleOpenAddDialog}>
+    <IconButton
+      size="small"
+      onClick={() => {
+        setEditingDocument(null);
+        setDialogOpen("add");
+      }}
+    >
       <AddIcon />
     </IconButton>
   );
@@ -193,7 +175,10 @@ export default function EditableDocuments({
                             <>
                               <IconButton
                                 size="small"
-                                onClick={() => handleOpenEditDialog(document)}
+                                onClick={() => {
+                                  setEditingDocument(document);
+                                  setDialogOpen("edit");
+                                }}
                               >
                                 <EditIcon fontSize="small" />
                               </IconButton>
@@ -220,14 +205,14 @@ export default function EditableDocuments({
         </>
       )}
 
-      <AddEditDocumentDialog
-        open={dialogOpen === "add" || dialogOpen === "edit"}
-        onClose={handleCloseDialog}
-        editingDocument={editingDocument}
-        onSubmit={handleSubmit}
-        isPending={createMutation.isPending || updateMutation.isPending}
-        error={createMutation.error || updateMutation.error}
-      />
+      {(dialogOpen === "add" || dialogOpen === "edit") && (
+        <AddEditDocumentDialog
+          handleClose={handleCloseDialog}
+          editingDocument={editingDocument}
+          ownerType={ownerType}
+          ownerId={ownerId}
+        />
+      )}
 
       <DeleteConfirmationDialog
         open={dialogOpen === "delete"}
