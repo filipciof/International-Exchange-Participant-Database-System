@@ -13,8 +13,7 @@ import { Box, Button, Typography } from "@mui/material";
 import MyPagination from "../components/MyPagination";
 import Loading from "../components/Loading";
 import DistrictFilter from "../components/districts/DistrictFilter";
-import DistrictAdd from "../components/districts/DistrictAdd";
-import DistrictUpdate from "../components/districts/DistrictUpdate";
+import DistrictForm from "../components/districts/DistrictForm";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 import { useTranslation } from "react-i18next";
 
@@ -64,28 +63,6 @@ export default function Districts() {
     setCurrentView(newView);
   };
 
-  const handleClose = () => {
-    setSelectedId(null);
-    addDistrictMutation.reset();
-    updateDistrictMutation.reset();
-    deleteDistrictMutation.reset();
-    handleViewChange("list");
-  };
-
-  const handleAddOpen = () => {
-    handleViewChange("add");
-  };
-
-  const handleUpdateOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("update");
-  };
-
-  const handleDeleteOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("delete");
-  };
-
   const {
     districts,
     isLoading,
@@ -94,6 +71,25 @@ export default function Districts() {
     updateDistrictMutation,
     deleteDistrictMutation,
   } = useDistricts({ paginationModel, searchInput });
+
+  const handleClose = () => {
+    setSelectedId(null);
+    addDistrictMutation.reset();
+    updateDistrictMutation.reset();
+    deleteDistrictMutation.reset();
+    handleViewChange("list");
+  };
+
+  const handleSubmit = (data: DistrictFormData) => {
+    if (currentView === "update" && selectedId) {
+      updateDistrictMutation.mutate({ id: selectedId, data });
+    } else {
+      addDistrictMutation.mutate(data);
+    }
+  };
+
+  const isEditing = currentView === "update";
+  const mutation = isEditing ? updateDistrictMutation : addDistrictMutation;
 
   if (isLoading && currentView === "list") {
     return <Loading />;
@@ -107,58 +103,31 @@ export default function Districts() {
     );
   }
 
-  const handleAddDistrict = (district: DistrictFormData) => {
-    addDistrictMutation.mutate(district);
-  };
-
-  if (currentView === "add") {
-    return (
-      <DistrictAdd
-        handleClose={handleClose}
-        handleAddDistrict={handleAddDistrict}
-        isLoading={addDistrictMutation.isPending}
-        isSuccess={addDistrictMutation.isSuccess}
-        error={addDistrictMutation.error}
-      />
-    );
-  }
-
-  const handleUpdateDistrict = (data: DistrictFormData) => {
-    if (selectedId) {
-      updateDistrictMutation.mutate({ id: selectedId, data });
-    }
-  };
-
-  if (currentView === "update" && selectedId) {
-    return (
-      <DistrictUpdate
-        handleClose={handleClose}
-        handleUpdateDistrict={handleUpdateDistrict}
-        isLoading={updateDistrictMutation.isPending}
-        isSuccess={updateDistrictMutation.isSuccess}
-        error={updateDistrictMutation.error}
-        id={selectedId}
-      />
-    );
-  }
-
-  const handleDeleteDistrict = () => {
-    if (selectedId) {
-      deleteDistrictMutation.mutate(selectedId);
-    }
-  };
-
   return (
     <Box>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <Button
           variant="outlined"
           startIcon={<AddIcon />}
-          onClick={handleAddOpen}
+          onClick={() => handleViewChange("add")}
         >
           {t("districts.newDistrict")}
         </Button>
       </Box>
+
+      {(currentView === "add" || (currentView === "update" && selectedId)) && (
+        <DistrictForm
+          handleClose={handleClose}
+          handleSubmit={handleSubmit}
+          isLoading={mutation.isPending}
+          isSuccess={mutation.isSuccess}
+          error={mutation.error}
+          editingId={isEditing ? selectedId : undefined}
+          submitButtonText={
+            isEditing ? t("common.update") : t("common.add")
+          }
+        />
+      )}
 
       {selectedId && (
         <DeleteConfirmationDialog
@@ -167,7 +136,9 @@ export default function Districts() {
           isLoading={deleteDistrictMutation.isPending}
           isSuccess={deleteDistrictMutation.isSuccess}
           error={deleteDistrictMutation.error}
-          onConfirm={() => handleDeleteDistrict()}
+          onConfirm={() =>
+            selectedId && deleteDistrictMutation.mutate(selectedId)
+          }
         />
       )}
 
@@ -190,8 +161,14 @@ export default function Districts() {
         paginationModel={paginationModel}
         setPaginationModel={setPaginationModel}
         isLoading={isLoading}
-        onEdit={handleUpdateOpen}
-        onDelete={handleDeleteOpen}
+        onEdit={(id: number) => {
+          setSelectedId(id);
+          handleViewChange("update");
+        }}
+        onDelete={(id: number) => {
+          setSelectedId(id);
+          handleViewChange("delete");
+        }}
       />
 
       <MyPagination

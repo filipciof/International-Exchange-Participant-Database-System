@@ -13,8 +13,7 @@ import { Box, Button, Typography } from "@mui/material";
 import MyPagination from "../components/MyPagination";
 import Loading from "../components/Loading";
 import ClubFilter from "../components/clubs/ClubFilter";
-import ClubAdd from "../components/clubs/ClubAdd";
-import ClubUpdate from "../components/clubs/ClubUpdate";
+import ClubForm from "../components/clubs/ClubForm";
 import ClubDetail from "../components/clubs/ClubDetail";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 import { useTranslation } from "react-i18next";
@@ -65,33 +64,6 @@ export default function Clubs() {
     setCurrentView(newView);
   };
 
-  const handleClose = () => {
-    setSelectedId(null);
-    addClubMutation.reset();
-    updateClubMutation.reset();
-    deleteClubMutation.reset();
-    handleViewChange("list");
-  };
-
-  const handleAddOpen = () => {
-    handleViewChange("add");
-  };
-
-  const handleUpdateOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("update");
-  };
-
-  const handleDeleteOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("delete");
-  };
-
-  const handleDetailOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("detail");
-  };
-
   const {
     clubs,
     isLoading,
@@ -100,6 +72,25 @@ export default function Clubs() {
     updateClubMutation,
     deleteClubMutation,
   } = useClubs({ paginationModel, searchInput });
+
+  const handleClose = () => {
+    setSelectedId(null);
+    addClubMutation.reset();
+    updateClubMutation.reset();
+    deleteClubMutation.reset();
+    handleViewChange("list");
+  };
+
+  const handleSubmit = (data: ClubFormData) => {
+    if (currentView === "update" && selectedId) {
+      updateClubMutation.mutate({ id: selectedId, data });
+    } else {
+      addClubMutation.mutate(data);
+    }
+  };
+
+  const isEditing = currentView === "update";
+  const mutation = isEditing ? updateClubMutation : addClubMutation;
 
   if (isLoading && currentView === "list") {
     return <Loading />;
@@ -113,47 +104,6 @@ export default function Clubs() {
     );
   }
 
-  const handleAddClub = (club: ClubFormData) => {
-    addClubMutation.mutate(club);
-  };
-
-  if (currentView === "add") {
-    return (
-      <ClubAdd
-        handleClose={handleClose}
-        handleAddClub={handleAddClub}
-        isLoading={addClubMutation.isPending}
-        isSuccess={addClubMutation.isSuccess}
-        error={addClubMutation.error}
-      />
-    );
-  }
-
-  const handleUpdateClub = (data: ClubFormData) => {
-    if (selectedId) {
-      updateClubMutation.mutate({ id: selectedId, data });
-    }
-  };
-
-  if (currentView === "update" && selectedId) {
-    return (
-      <ClubUpdate
-        handleClose={handleClose}
-        handleUpdateClub={handleUpdateClub}
-        isLoading={updateClubMutation.isPending}
-        isSuccess={updateClubMutation.isSuccess}
-        error={updateClubMutation.error}
-        id={selectedId}
-      />
-    );
-  }
-
-  const handleDeleteClub = () => {
-    if (selectedId) {
-      deleteClubMutation.mutate(selectedId);
-    }
-  };
-
   if (currentView === "detail" && selectedId) {
     return <ClubDetail handleClose={handleClose} id={selectedId} />;
   }
@@ -164,11 +114,25 @@ export default function Clubs() {
         <Button
           variant="outlined"
           startIcon={<AddIcon />}
-          onClick={handleAddOpen}
+          onClick={() => handleViewChange("add")}
         >
           {t("clubs.newClub")}
         </Button>
       </Box>
+
+      {(currentView === "add" || (currentView === "update" && selectedId)) && (
+        <ClubForm
+          handleClose={handleClose}
+          handleSubmit={handleSubmit}
+          isLoading={mutation.isPending}
+          isSuccess={mutation.isSuccess}
+          error={mutation.error}
+          editingId={isEditing ? selectedId : undefined}
+          submitButtonText={
+            isEditing ? t("common.update") : t("common.add")
+          }
+        />
+      )}
 
       {selectedId && (
         <DeleteConfirmationDialog
@@ -177,7 +141,7 @@ export default function Clubs() {
           isLoading={deleteClubMutation.isPending}
           isSuccess={deleteClubMutation.isSuccess}
           error={deleteClubMutation.error}
-          onConfirm={() => handleDeleteClub()}
+          onConfirm={() => selectedId && deleteClubMutation.mutate(selectedId)}
         />
       )}
 
@@ -200,9 +164,18 @@ export default function Clubs() {
         paginationModel={paginationModel}
         setPaginationModel={setPaginationModel}
         isLoading={isLoading}
-        onEdit={handleUpdateOpen}
-        onDelete={handleDeleteOpen}
-        onRowClick={handleDetailOpen}
+        onEdit={(id: number) => {
+          setSelectedId(id);
+          handleViewChange("update");
+        }}
+        onDelete={(id: number) => {
+          setSelectedId(id);
+          handleViewChange("delete");
+        }}
+        onRowClick={(id: number) => {
+          setSelectedId(id);
+          handleViewChange("detail");
+        }}
       />
 
       <MyPagination

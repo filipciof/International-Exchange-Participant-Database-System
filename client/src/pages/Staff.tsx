@@ -13,8 +13,8 @@ import { Box, Button, Typography } from "@mui/material";
 import MyPagination from "../components/MyPagination";
 import Loading from "../components/Loading";
 import StaffFilter from "../components/staff/StaffFilter";
-import StaffAdd from "../components/staff/StaffAdd";
-import StaffUpdate from "../components/staff/StaffUpdate";
+import CreateStaffForm from "../components/staff/CreateStaffForm";
+import StaffForm from "../components/staff/StaffForm";
 import StaffDetail from "../components/staff/StaffDetail";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 import { useTranslation } from "react-i18next";
@@ -65,6 +65,14 @@ export default function Staff() {
     setCurrentView(newView);
   };
 
+  const {
+    staff,
+    isLoading,
+    error,
+    updateStaffMutation,
+    deleteStaffMutation,
+  } = useStaff({ paginationModel, searchInput });
+
   const handleClose = () => {
     setSelectedId(null);
     updateStaffMutation.reset();
@@ -72,33 +80,11 @@ export default function Staff() {
     handleViewChange("list");
   };
 
-  const handleAddOpen = () => {
-    handleViewChange("add");
+  const handleUpdateSubmit = (data: StaffFormData) => {
+    if (selectedId) {
+      updateStaffMutation.mutate({ id: selectedId, data });
+    }
   };
-
-  const handleUpdateOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("update");
-  };
-
-  const handleDeleteOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("delete");
-  };
-
-  const handleDetailOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("detail");
-  };
-
-  const {
-    staff,
-    // countries,
-    isLoading,
-    error,
-    updateStaffMutation,
-    deleteStaffMutation,
-  } = useStaff({ paginationModel, searchInput });
 
   if (isLoading && currentView === "list") {
     return <Loading />;
@@ -112,31 +98,6 @@ export default function Staff() {
     );
   }
 
-  const handleUpdateStaff = (data: StaffFormData) => {
-    if (selectedId) {
-      updateStaffMutation.mutate({ id: selectedId, data });
-    }
-  };
-
-  if (currentView === "update" && selectedId) {
-    return (
-      <StaffUpdate
-        handleClose={handleClose}
-        handleUpdateStaff={handleUpdateStaff}
-        isLoading={updateStaffMutation.isPending}
-        isSuccess={updateStaffMutation.isSuccess}
-        error={updateStaffMutation.error}
-        id={selectedId}
-      />
-    );
-  }
-
-  const handleDeleteStaff = () => {
-    if (selectedId) {
-      deleteStaffMutation.mutate(selectedId);
-    }
-  };
-
   if (currentView === "detail" && selectedId) {
     return <StaffDetail handleClose={handleClose} id={selectedId} />;
   }
@@ -147,16 +108,30 @@ export default function Staff() {
         <Button
           variant="outlined"
           startIcon={<AddIcon />}
-          onClick={handleAddOpen}
+          onClick={() => handleViewChange("add")}
         >
           {t("staff.newStaff")}
         </Button>
       </Box>
 
       {currentView === "add" && (
-        <StaffAdd
+        <CreateStaffForm
           open
+          title={t("staff.newStaff")}
           handleClose={handleClose}
+          submitButtonText={t("common.add")}
+        />
+      )}
+
+      {currentView === "update" && selectedId && (
+        <StaffForm
+          handleClose={handleClose}
+          handleSubmit={handleUpdateSubmit}
+          isLoading={updateStaffMutation.isPending}
+          isSuccess={updateStaffMutation.isSuccess}
+          error={updateStaffMutation.error}
+          editingId={selectedId}
+          submitButtonText={t("common.update")}
         />
       )}
 
@@ -167,7 +142,9 @@ export default function Staff() {
           isLoading={deleteStaffMutation.isPending}
           isSuccess={deleteStaffMutation.isSuccess}
           error={deleteStaffMutation.error}
-          onConfirm={() => handleDeleteStaff()}
+          onConfirm={() =>
+            selectedId && deleteStaffMutation.mutate(selectedId)
+          }
         />
       )}
 
@@ -190,9 +167,18 @@ export default function Staff() {
         paginationModel={paginationModel}
         setPaginationModel={setPaginationModel}
         isLoading={isLoading}
-        onEdit={handleUpdateOpen}
-        onDelete={handleDeleteOpen}
-        onRowClick={handleDetailOpen}
+        onEdit={(id: number) => {
+          setSelectedId(id);
+          handleViewChange("update");
+        }}
+        onDelete={(id: number) => {
+          setSelectedId(id);
+          handleViewChange("delete");
+        }}
+        onRowClick={(id: number) => {
+          setSelectedId(id);
+          handleViewChange("detail");
+        }}
       />
 
       <MyPagination

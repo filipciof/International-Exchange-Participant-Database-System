@@ -1,10 +1,11 @@
-import { Stack, useMediaQuery } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { Stack, Dialog, DialogTitle } from "@mui/material";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import type { ClubFormData, Country, District } from "../../utils/types";
 import { clubSchema } from "../../utils/types";
+import axiosClient from "../../utils/axiosClient";
 import { useTranslation } from "react-i18next";
 import usePermissions from "../../hooks/usePermissions";
 import useCountryDistrictClub from "../../hooks/useCountryDistrictClub";
@@ -15,35 +16,39 @@ import {
 } from "../form";
 
 type ClubFormProps = {
-  title: string;
   handleClose: () => void;
   handleSubmit: (club: ClubFormData) => void;
   isLoading: boolean;
   isSuccess: boolean;
   error: any | null;
-  initialData?: ClubFormData;
+  editingId?: number | null;
   submitButtonText?: string;
 };
 
 export default function ClubForm({
-  title,
   handleClose,
   handleSubmit: onFormSubmit,
   isLoading,
   isSuccess,
   error,
-  initialData,
+  editingId,
   submitButtonText,
 }: ClubFormProps) {
   const { t } = useTranslation();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
   const { canCreateHomeCountryClubs } = usePermissions();
+
+  const { data: existingClub } = useQuery({
+    queryKey: ["clubs", editingId],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/clubs/${editingId}/`);
+      return response.data;
+    },
+    enabled: !!editingId,
+  });
 
   const { control, handleSubmit, reset, watch } = useForm<ClubFormData>({
     resolver: zodResolver(clubSchema),
-    defaultValues: initialData || {
+    defaultValues: {
       name: "",
       number: "",
       id_country: undefined,
@@ -51,6 +56,12 @@ export default function ClubForm({
       city: "",
     },
   });
+
+  useEffect(() => {
+    if (existingClub) {
+      reset(existingClub);
+    }
+  }, [existingClub, reset]);
 
   const selectedCountry = watch("id_country");
 
@@ -61,12 +72,6 @@ export default function ClubForm({
     ? countries
     : countries.filter((c) => !c.is_home_country);
 
-  useEffect(() => {
-    if (initialData) {
-      reset(initialData);
-    }
-  }, [initialData, reset]);
-
   const onSubmit = ({ id_country, ...data }: ClubFormData) => {
     onFormSubmit(data);
   };
@@ -76,53 +81,58 @@ export default function ClubForm({
     handleClose();
   };
 
+  const title = editingId ? t("clubs.updateClub") : t("clubs.newClub");
+
   return (
-    <FormShell
-      title={title}
-      onClose={onClose}
-      onSubmit={handleSubmit(onSubmit)}
-      isLoading={isLoading}
-      isSuccess={isSuccess}
-      error={error}
-      submitButtonText={submitButtonText}
-    >
-      <Stack direction={isMobile ? "column" : "row"} spacing={1}>
+    <Dialog open onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>{title}</DialogTitle>
+      <FormShell
+        variant="dialog"
+        onClose={onClose}
+        onSubmit={handleSubmit(onSubmit)}
+        isLoading={isLoading}
+        isSuccess={isSuccess}
+        error={error}
+        submitButtonText={submitButtonText}
+      >
+        <Stack direction="row" spacing={1}>
+          <ControlledTextField
+            name="name"
+            control={control}
+            label={t("clubForm.clubName")}
+          />
+          <ControlledTextField
+            name="number"
+            control={control}
+            label={t("clubForm.number")}
+          />
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          <ControlledAutocomplete
+            name="id_country"
+            control={control}
+            options={availableCountries}
+            getOptionLabel={(c: Country) => c.name}
+            getOptionValue={(c: Country) => c.id}
+            label={t("clubForm.country")}
+          />
+          <ControlledAutocomplete
+            name="id_district"
+            control={control}
+            options={districts}
+            getOptionLabel={(d: District) => d.number.toString()}
+            getOptionValue={(d: District) => d.id}
+            label={t("clubForm.district")}
+            disabled={!selectedCountry || isLoadingDistricts}
+            loading={isLoadingDistricts}
+          />
+        </Stack>
         <ControlledTextField
-          name="name"
-          control={control}
-          label={t("clubForm.clubName")}
-        />
-        <ControlledTextField
-          name="number"
-          control={control}
-          label={t("clubForm.number")}
-        />
-      </Stack>
-      <Stack direction={isMobile ? "column" : "row"} spacing={1}>
-        <ControlledAutocomplete
-          name="id_country"
-          control={control}
-          options={availableCountries}
-          getOptionLabel={(c: Country) => c.name}
-          getOptionValue={(c: Country) => c.id}
-          label={t("clubForm.country")}
-        />
-        <ControlledAutocomplete
-          name="id_district"
-          control={control}
-          options={districts}
-          getOptionLabel={(d: District) => d.number.toString()}
-          getOptionValue={(d: District) => d.id}
-          label={t("clubForm.district")}
-          disabled={!selectedCountry || isLoadingDistricts}
-          loading={isLoadingDistricts}
-        />
-      </Stack>
-      <ControlledTextField
           name="city"
           control={control}
           label={t("clubForm.city")}
         />
-    </FormShell>
+      </FormShell>
+    </Dialog>
   );
 }

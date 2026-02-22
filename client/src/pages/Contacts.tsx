@@ -10,8 +10,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import ViewListIcon from "@mui/icons-material/ViewList";
-import AddContact from "../components/contacts/ContactAdd";
-import UpdateContact from "../components/contacts/ContactUpdate";
+import ContactForm from "../components/contacts/ContactForm";
 import ContactDetail from "../components/contacts/ContactDetail";
 import ContactCard from "../components/contacts/ContactCard";
 import ContactList from "../components/contacts/ContactList";
@@ -51,7 +50,6 @@ export default function Contacts() {
   );
   const [selectedId, setSelectedId] = useQueryState("id", parseAsInteger);
 
-  // Pagination
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [pageSize, setPageSize] = useQueryState(
     "pageSize",
@@ -63,7 +61,6 @@ export default function Contacts() {
     setPageSize(model.pageSize);
   };
 
-  // Filters
   const [selectedGroups, setSelectedGroups] = useQueryState(
     "groups",
     parseAsArrayOf(parseAsString).withDefault([]),
@@ -111,22 +108,6 @@ export default function Contacts() {
     searchInput,
   });
 
-  const handleAddContact = (contact: ContactFormData) => {
-    addContactMutation.mutate(contact);
-  };
-
-  const handleUpdateContact = (data: ContactFormData) => {
-    if (selectedId) {
-      updateContactMutation.mutate({ id: selectedId, data });
-    }
-  };
-
-  const handleDeleteContact = () => {
-    if (selectedId) {
-      deleteContactMutation.mutate(selectedId);
-    }
-  };
-
   const handleClose = () => {
     setSelectedId(null);
     addContactMutation.reset();
@@ -135,28 +116,20 @@ export default function Contacts() {
     handleViewChange("list");
   };
 
-  const handleAddOpen = () => {
-    handleViewChange("add");
+  const handleSubmit = (data: ContactFormData) => {
+    if (currentView === "update" && selectedId) {
+      updateContactMutation.mutate({ id: selectedId, data });
+    } else {
+      addContactMutation.mutate(data);
+    }
   };
 
-  const handleUpdateOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("update");
-  };
-
-  const handleDeleteOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("delete");
-  };
-
-  const handleDetailOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("detail");
-  };
+  const isEditing = currentView === "update";
+  const mutation = isEditing ? updateContactMutation : addContactMutation;
 
   const handleViewModeChange = (
     _event: React.MouseEvent<HTMLElement>,
-    newView: "card" | "list" | null
+    newView: "card" | "list" | null,
   ) => {
     if (newView !== null) {
       setViewMode(newView);
@@ -172,34 +145,7 @@ export default function Contacts() {
     );
 
   if (currentView === "detail" && selectedId) {
-    return (
-      <ContactDetail id={selectedId} handleClose={handleClose} />
-    );
-  }
-
-  if (currentView === "add") {
-    return (
-      <AddContact
-        handleClose={handleClose}
-        handleAddContact={handleAddContact}
-        isLoading={addContactMutation.isPending}
-        isSuccess={addContactMutation.isSuccess}
-        error={addContactMutation.error}
-      />
-    );
-  }
-
-  if (currentView === "update" && selectedId) {
-    return (
-      <UpdateContact
-        handleClose={handleClose}
-        handleUpdateContact={handleUpdateContact}
-        isLoading={updateContactMutation.isPending}
-        isSuccess={updateContactMutation.isSuccess}
-        error={updateContactMutation.error}
-        id={selectedId}
-      />
-    );
+    return <ContactDetail id={selectedId} handleClose={handleClose} />;
   }
 
   return (
@@ -208,7 +154,7 @@ export default function Contacts() {
         <Button
           variant="outlined"
           startIcon={<AddIcon />}
-          onClick={handleAddOpen}
+          onClick={() => handleViewChange("add")}
         >
           {t("contacts.newContact")}
         </Button>
@@ -229,6 +175,21 @@ export default function Contacts() {
         </ToggleButtonGroup>
       </Box>
 
+      {(currentView === "add" ||
+        (currentView === "update" && selectedId)) && (
+        <ContactForm
+          handleClose={handleClose}
+          handleSubmit={handleSubmit}
+          isLoading={mutation.isPending}
+          isSuccess={mutation.isSuccess}
+          error={mutation.error}
+          editingId={isEditing ? selectedId : undefined}
+          submitButtonText={
+            isEditing ? t("common.update") : t("common.add")
+          }
+        />
+      )}
+
       {selectedId && (
         <DeleteConfirmationDialog
           open={currentView === "delete"}
@@ -236,7 +197,9 @@ export default function Contacts() {
           isLoading={deleteContactMutation.isPending}
           isSuccess={deleteContactMutation.isSuccess}
           error={deleteContactMutation.error}
-          onConfirm={() => handleDeleteContact()}
+          onConfirm={() =>
+            selectedId && deleteContactMutation.mutate(selectedId)
+          }
         />
       )}
 
@@ -274,9 +237,18 @@ export default function Contacts() {
             <ContactCard
               key={contact.id}
               contact={contact}
-              onCardClick={handleDetailOpen}
-              onEdit={handleUpdateOpen}
-              onDelete={handleDeleteOpen}
+              onCardClick={(id: number) => {
+                setSelectedId(id);
+                handleViewChange("detail");
+              }}
+              onEdit={(id: number) => {
+                setSelectedId(id);
+                handleViewChange("update");
+              }}
+              onDelete={(id: number) => {
+                setSelectedId(id);
+                handleViewChange("delete");
+              }}
             />
           ))}
         </Box>
@@ -289,9 +261,18 @@ export default function Contacts() {
             paginationModel={paginationModel}
             setPaginationModel={setPaginationModel}
             isLoading={isLoading}
-            onEdit={handleUpdateOpen}
-            onDelete={handleDeleteOpen}
-            onRowClick={handleDetailOpen}
+            onEdit={(id: number) => {
+              setSelectedId(id);
+              handleViewChange("update");
+            }}
+            onDelete={(id: number) => {
+              setSelectedId(id);
+              handleViewChange("delete");
+            }}
+            onRowClick={(id: number) => {
+              setSelectedId(id);
+              handleViewChange("detail");
+            }}
           />
         </Box>
       )}

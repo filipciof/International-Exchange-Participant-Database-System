@@ -13,8 +13,7 @@ import { Box, Button, Typography } from "@mui/material";
 import MyPagination from "../components/MyPagination";
 import Loading from "../components/Loading";
 import FamilyFilter from "../components/families/FamilyFilter";
-import FamilyAdd from "../components/families/FamilyAdd";
-import FamilyUpdate from "../components/families/FamilyUpdate";
+import FamilyForm from "../components/families/FamilyForm";
 import FamilyDetail from "../components/families/FamilyDetail";
 import DeleteConfirmationDialog from "../components/DeleteConfirmationDialog";
 import { useTranslation } from "react-i18next";
@@ -65,33 +64,6 @@ export default function Families() {
     setCurrentView(newView);
   };
 
-  const handleClose = () => {
-    setSelectedId(null);
-    addFamilyMutation.reset();
-    updateFamilyMutation.reset();
-    deleteFamilyMutation.reset();
-    handleViewChange("list");
-  };
-
-  const handleAddOpen = () => {
-    handleViewChange("add");
-  };
-
-  const handleUpdateOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("update");
-  };
-
-  const handleDeleteOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("delete");
-  };
-
-  const handleDetailOpen = (id: number) => {
-    setSelectedId(id);
-    handleViewChange("detail");
-  };
-
   const {
     families,
     isLoading,
@@ -100,6 +72,25 @@ export default function Families() {
     updateFamilyMutation,
     deleteFamilyMutation,
   } = useFamilies({ paginationModel, searchInput });
+
+  const handleClose = () => {
+    setSelectedId(null);
+    addFamilyMutation.reset();
+    updateFamilyMutation.reset();
+    deleteFamilyMutation.reset();
+    handleViewChange("list");
+  };
+
+  const handleSubmit = (data: FamilyFormData) => {
+    if (currentView === "update" && selectedId) {
+      updateFamilyMutation.mutate({ id: selectedId, data });
+    } else {
+      addFamilyMutation.mutate(data);
+    }
+  };
+
+  const isEditing = currentView === "update";
+  const mutation = isEditing ? updateFamilyMutation : addFamilyMutation;
 
   if (isLoading && currentView === "list") {
     return <Loading />;
@@ -113,47 +104,6 @@ export default function Families() {
     );
   }
 
-  const handleAddFamily = (family: FamilyFormData) => {
-    addFamilyMutation.mutate(family);
-  };
-
-  if (currentView === "add") {
-    return (
-      <FamilyAdd
-        handleClose={handleClose}
-        handleAddFamily={handleAddFamily}
-        isLoading={addFamilyMutation.isPending}
-        isSuccess={addFamilyMutation.isSuccess}
-        error={addFamilyMutation.error}
-      />
-    );
-  }
-
-  const handleUpdateFamily = (data: FamilyFormData) => {
-    if (selectedId) {
-      updateFamilyMutation.mutate({ id: selectedId, data });
-    }
-  };
-
-  if (currentView === "update" && selectedId) {
-    return (
-      <FamilyUpdate
-        handleClose={handleClose}
-        handleUpdateFamily={handleUpdateFamily}
-        isLoading={updateFamilyMutation.isPending}
-        isSuccess={updateFamilyMutation.isSuccess}
-        error={updateFamilyMutation.error}
-        id={selectedId}
-      />
-    );
-  }
-
-  const handleDeleteFamily = () => {
-    if (selectedId) {
-      deleteFamilyMutation.mutate(selectedId);
-    }
-  };
-
   if (currentView === "detail" && selectedId) {
     return <FamilyDetail handleClose={handleClose} id={selectedId} />;
   }
@@ -164,11 +114,25 @@ export default function Families() {
         <Button
           variant="outlined"
           startIcon={<AddIcon />}
-          onClick={handleAddOpen}
+          onClick={() => handleViewChange("add")}
         >
           {t("families.newFamily")}
         </Button>
       </Box>
+
+      {(currentView === "add" || (currentView === "update" && selectedId)) && (
+        <FamilyForm
+          handleClose={handleClose}
+          handleSubmit={handleSubmit}
+          isLoading={mutation.isPending}
+          isSuccess={mutation.isSuccess}
+          error={mutation.error}
+          editingId={isEditing ? selectedId : undefined}
+          submitButtonText={
+            isEditing ? t("common.update") : t("common.add")
+          }
+        />
+      )}
 
       {selectedId && (
         <DeleteConfirmationDialog
@@ -177,7 +141,9 @@ export default function Families() {
           isLoading={deleteFamilyMutation.isPending}
           isSuccess={deleteFamilyMutation.isSuccess}
           error={deleteFamilyMutation.error}
-          onConfirm={() => handleDeleteFamily()}
+          onConfirm={() =>
+            selectedId && deleteFamilyMutation.mutate(selectedId)
+          }
         />
       )}
 
@@ -200,9 +166,18 @@ export default function Families() {
         paginationModel={paginationModel}
         setPaginationModel={setPaginationModel}
         isLoading={isLoading}
-        onEdit={handleUpdateOpen}
-        onDelete={handleDeleteOpen}
-        onRowClick={handleDetailOpen}
+        onEdit={(id: number) => {
+          setSelectedId(id);
+          handleViewChange("update");
+        }}
+        onDelete={(id: number) => {
+          setSelectedId(id);
+          handleViewChange("delete");
+        }}
+        onRowClick={(id: number) => {
+          setSelectedId(id);
+          handleViewChange("detail");
+        }}
       />
 
       <MyPagination

@@ -52,10 +52,6 @@ Club officers have no need to view or modify any clubs.
 When admins create staff members provide pretty much the same information: name, surname, group(role), district and club (since staff can only be from the home country). This should be the default not a rule because admins should be able to bypass any rule. Then admins provide an email and an account is created in much the same way like students.
 
 TODO:
-- Refactor form dialogs and change the form pages into dialogs too.
-  - AddEditExchangeDialog.
-  - AddEditExchangeFamilyDialog.
-  - AddEditFamilyMemberDialog.
 - Editable hook.
 - Show loading state in Editable sections.
 - Set a timeout for operation successful message to disappear.
