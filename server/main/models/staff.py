@@ -26,7 +26,6 @@ class Staff(models.Model):
     last_name = models.CharField(max_length=50)
 
     gender = models.IntegerField(choices=Gender, null=True)
-    email = models.EmailField(blank=True, default="")
     phone = PhoneNumberField(blank=True, default="")
 
     photo = models.ImageField(upload_to="staff_photos/", blank=True, default="")

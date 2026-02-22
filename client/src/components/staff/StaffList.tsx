@@ -70,7 +70,7 @@ export default function StaffList({
       valueGetter: (_, row) => t(`gender.${row.gender_name}`),
     },
     {
-      field: "email",
+      field: "user_email",
       headerName: t("staffForm.email"),
       width: 150,
     },

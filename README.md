@@ -52,19 +52,28 @@ Club officers have no need to view or modify any clubs.
 When admins create staff members provide pretty much the same information: name, surname, group(role), district and club (since staff can only be from the home country). This should be the default not a rule because admins should be able to bypass any rule. Then admins provide an email and an account is created in much the same way like students.
 
 TODO:
-- Editable (EditableHeaders and clubs/EditableLocation use it for now).
+
 <!-- - Test filling in forms differently. -->
-- Group filters in objects.
-- Move mutations from pages to forms.
 - Don't show form fields until the object is fetched.
-<!-- - Pass active role in the custom HTTP header. -->
 - Database clearing script.
-- The form template/creation functionality.
-- Remove extra email in Staff.
-- Write tests.
-- Perform tests on the frontend. (Come up with imaginary exchange scenario).
-- Exporting dialog.
-- Indication what the user's role is.
+- Can't remove club completely (cause it's required/ FamilyDetail).
+- AddEditDocument flashes when closing on edit back to add.
+- Pass active role (not necessarily for scoping but just in general).
+- Filter students by sending and receiving club (exchange information).
+
+Less important refactors:
+- Editable (EditableHeaders and clubs/EditableLocation use it for now).
+- Move mutations from pages to forms.
+
+Tests:
+- Unit tests on the backend.
+- Manual testing on the frontend.
+
+Major features:
+- Exporting dialog/logic.
+- Custom form creation.
+
+- Istnieje już club o tej wartości pola number.
 ---
 
 - Don't use MyAutocomplete, instead restrict the option set instead.

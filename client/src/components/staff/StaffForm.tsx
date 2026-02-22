@@ -64,7 +64,6 @@ export default function StaffForm({
         id_district: undefined,
         id_club: undefined,
         gender: undefined,
-        email: "",
         phone: "",
         notes: "",
       },
@@ -83,13 +82,8 @@ export default function StaffForm({
   const selectedCountry = watch("id_country");
   const selectedDistrict = watch("id_district");
 
-  const {
-    countries,
-    districts,
-    clubs,
-    isLoadingDistricts,
-    isLoadingClubs,
-  } = useCountryDistrictClub(selectedCountry, selectedDistrict);
+  const { countries, districts, clubs, isLoadingDistricts, isLoadingClubs } =
+    useCountryDistrictClub(selectedCountry, selectedDistrict);
 
   const homeCountry = countries.filter((c: Country) => c.is_home_country);
 
@@ -161,24 +155,18 @@ export default function StaffForm({
             disabled={!selectedCountry || isLoadingDistricts}
             loading={isLoadingDistricts}
           />
-          <ControlledAutocomplete
-            name="id_club"
-            control={control}
-            options={clubs}
-            getOptionLabel={(c: Club) => c.name}
-            getOptionValue={(c: Club) => c.id}
-            label={t("staffForm.club")}
-            disabled={!selectedDistrict || isLoadingClubs}
-            loading={isLoadingClubs}
-          />
         </Stack>
+        <ControlledAutocomplete
+          name="id_club"
+          control={control}
+          options={clubs}
+          getOptionLabel={(c: Club) => c.name}
+          getOptionValue={(c: Club) => c.id}
+          label={t("staffForm.club")}
+          disabled={!selectedDistrict || isLoadingClubs}
+          loading={isLoadingClubs}
+        />
         <Stack direction="row" spacing={1}>
-          <ControlledTextField
-            name="email"
-            control={control}
-            label={t("staffForm.email")}
-            type="email"
-          />
           <ControlledTextField
             name="phone"
             control={control}

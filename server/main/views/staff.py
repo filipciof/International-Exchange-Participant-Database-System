@@ -41,7 +41,7 @@ class StaffFilter(filters.FilterSet):
             | Q(middle_name__icontains=value)
             | Q(last_name__icontains=value)
             | Q(phone__icontains=value)
-            | Q(email__icontains=value)
+            | Q(id_user__email__icontains=value)
         )
 
 

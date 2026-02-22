@@ -12,7 +12,6 @@ import { getGenderOptions } from "../utils/types";
 type EditablePersonalInfoProps = {
   gender: number;
   genderName: string;
-  email: string | null;
   phone: string | null;
   endpoint: string;
   queryKey: string;
@@ -21,7 +20,6 @@ type EditablePersonalInfoProps = {
 export default function EditablePersonalInfo({
   gender: initialGender,
   genderName,
-  email: initialEmail,
   phone: initialPhone,
   endpoint,
   queryKey,
@@ -31,7 +29,6 @@ export default function EditablePersonalInfo({
 
   const [formData, setFormData] = useState({
     gender: initialGender,
-    email: initialEmail || "",
     phone: initialPhone || "",
   });
 
@@ -53,7 +50,6 @@ export default function EditablePersonalInfo({
   const handleCancel = () => {
     setFormData({
       gender: initialGender,
-      email: initialEmail || "",
       phone: initialPhone || "",
     });
     setIsEditing(false);
@@ -91,27 +87,11 @@ export default function EditablePersonalInfo({
     >
       {!isEditing ? (
         <Grid container rowSpacing={2} columnSpacing={8}>
-          <InfoItem
-            label={t("staffForm.email")}
-            value={formData.email}
-          />
           <InfoItem label={t("staffForm.phone")} value={formData.phone} />
           <InfoItem label={t("staffForm.gender")} value={t(`gender.${genderName}`)} />
         </Grid>
       ) : (
         <Grid container rowSpacing={2} columnSpacing={8}>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              size="small"
-              sx={{ maxWidth: 400, width: "100%" }}
-              label={t("staffForm.email")}
-              type="email"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-            />
-          </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
               size="small"

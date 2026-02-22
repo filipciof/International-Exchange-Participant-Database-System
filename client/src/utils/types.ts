@@ -281,7 +281,6 @@ export type Staff = {
   last_name: string;
   gender: number;
   gender_name: string;
-  email: string;
   phone: string;
   has_photo: boolean;
   notes: string;
@@ -298,7 +297,6 @@ export const staffSchema = z.object({
   middle_name: z.string().optional(),
   last_name: z.string().min(1, i18next.t("schema.lastNameRequired")),
   gender: z.number().nullable().optional(),
-  email: z.email().or(z.literal("")),
   phone: z.string().optional(),
   notes: z.string().optional(),
 });
