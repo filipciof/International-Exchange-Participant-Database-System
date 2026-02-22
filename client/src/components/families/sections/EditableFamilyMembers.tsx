@@ -14,10 +14,10 @@ import {
   Delete as DeleteIcon,
   People as PeopleIcon,
 } from "@mui/icons-material";
-import type { FamilyMember, FamilyMemberFormData } from "../../../utils/types";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import type { FamilyMember } from "../../../utils/types";
+import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
-import queryClient from "../../../utils/queryClient";
+import { useFamilyMemberMutations } from "../../../hooks/useFamilyMemberMutations";
 import Section from "../../Section";
 import DeleteConfirmationDialog from "../../DeleteConfirmationDialog";
 import AddEditFamilyMemberDialog from "./AddEditFamilyMemberDialog";
@@ -38,20 +38,7 @@ export default function EditableFamilyMembers({
   const [deletingMember, setDeletingMember] = useState<FamilyMember | null>(
     null,
   );
-
   const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
-  const [formData, setFormData] = useState<FamilyMemberFormData>({
-    id_family: familyId,
-    first_name: "",
-    middle_name: "",
-    last_name: "",
-    gender: undefined,
-    date_of_birth: "",
-    email: "",
-    phone: "",
-    is_head_of_family: false,
-    occupation: "",
-  });
 
   const {
     data: familyMembers,
@@ -67,110 +54,23 @@ export default function EditableFamilyMembers({
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await axiosClient.delete(`/family-members/${id}/`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["familyMembers", familyId],
-      });
-    },
-  });
-
-  const addMutation = useMutation({
-    mutationFn: async (data: FamilyMemberFormData) => {
-      await axiosClient.post("/family-members/", data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["familyMembers", familyId],
-      });
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: FamilyMemberFormData;
-    }) => {
-      await axiosClient.put(`/family-members/${id}/`, data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["familyMembers", familyId],
-      });
-    },
-  });
+  const { deleteMutation } = useFamilyMemberMutations(familyId);
 
   const handleCloseDialog = () => {
     deleteMutation.reset();
-    addMutation.reset();
-    updateMutation.reset();
     setDialogOpen(null);
     setDeletingMember(null);
     setEditingMember(null);
-    setFormData({
-      id_family: familyId,
-      first_name: "",
-      middle_name: "",
-      last_name: "",
-      gender: undefined,
-      date_of_birth: "",
-      email: "",
-      phone: "",
-      is_head_of_family: false,
-      occupation: "",
-    });
-  };
-
-  const handleAddOpen = () => {
-    setEditingMember(null);
-    setFormData({
-      id_family: familyId,
-      first_name: "",
-      middle_name: "",
-      last_name: "",
-      gender: undefined,
-      date_of_birth: "",
-      email: "",
-      phone: "",
-      is_head_of_family: false,
-      occupation: "",
-    });
-    setDialogOpen("addEdit");
-  };
-
-  const handleEditOpen = (member: FamilyMember) => {
-    setEditingMember(member);
-    setFormData({
-      id_family: familyId,
-      first_name: member.first_name,
-      middle_name: member.middle_name,
-      last_name: member.last_name,
-      gender: member.gender,
-      date_of_birth: member.date_of_birth,
-      email: member.email,
-      phone: member.phone,
-      is_head_of_family: member.is_head_of_family,
-      occupation: member.occupation,
-    });
-    setDialogOpen("addEdit");
-  };
-
-  const handleSave = () => {
-    if (editingMember) {
-      updateMutation.mutate({ id: editingMember.id, data: formData });
-    } else {
-      addMutation.mutate(formData);
-    }
   };
 
   const actions = (
-    <IconButton size="small" onClick={handleAddOpen}>
+    <IconButton
+      size="small"
+      onClick={() => {
+        setEditingMember(null);
+        setDialogOpen("addEdit");
+      }}
+    >
       <AddIcon />
     </IconButton>
   );
@@ -183,14 +83,12 @@ export default function EditableFamilyMembers({
     >
       {isLoading && (
         <Typography variant="body2" color="text.secondary">
-          {/* Loading family members... */}
           {t("common.loading")}
         </Typography>
       )}
 
       {error && (
         <Typography variant="body2" color="error.main">
-          {/* Error loading family members */}
           {t("common.error", error.message)}
         </Typography>
       )}
@@ -266,7 +164,10 @@ export default function EditableFamilyMembers({
                       <Box sx={{ display: "flex", gap: 1 }}>
                         <IconButton
                           size="small"
-                          onClick={() => handleEditOpen(member)}
+                          onClick={() => {
+                            setEditingMember(member);
+                            setDialogOpen("addEdit");
+                          }}
                           color="primary"
                         >
                           <EditIcon fontSize="small" />
@@ -298,10 +199,16 @@ export default function EditableFamilyMembers({
                         />
                       )}
                       {member.email && (
-                        <InfoItem label={t("families.email")} value={member.email} />
+                        <InfoItem
+                          label={t("families.email")}
+                          value={member.email}
+                        />
                       )}
                       {member.phone && (
-                        <InfoItem label={t("families.phone")} value={member.phone} />
+                        <InfoItem
+                          label={t("families.phone")}
+                          value={member.phone}
+                        />
                       )}
                       {member.occupation && (
                         <InfoItem
@@ -328,21 +235,13 @@ export default function EditableFamilyMembers({
         }
       />
 
-      <AddEditFamilyMemberDialog
-        dialogOpen={dialogOpen === "addEdit"}
-        handleCloseDialog={handleCloseDialog}
-        editingMember={editingMember}
-        formData={formData}
-        setFormData={setFormData}
-        handleSave={handleSave}
-        isLoading={
-          editingMember ? updateMutation.isPending : addMutation.isPending
-        }
-        isSuccess={
-          editingMember ? updateMutation.isSuccess : addMutation.isSuccess
-        }
-        error={editingMember ? updateMutation.error : addMutation.error}
-      />
+      {dialogOpen === "addEdit" && (
+        <AddEditFamilyMemberDialog
+          handleClose={handleCloseDialog}
+          editingMember={editingMember}
+          familyId={familyId}
+        />
+      )}
     </Section>
   );
 }

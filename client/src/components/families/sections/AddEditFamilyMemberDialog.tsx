@@ -1,223 +1,152 @@
-import {
-  Button,
-  Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControlLabel,
-  MenuItem,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
+import { Dialog, DialogTitle, Stack } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { FamilyMember, FamilyMemberFormData } from "../../../utils/types";
-import { getGenderOptions } from "../../../utils/types";
-import { handleValidationErrors } from "../../../utils/handleValidationErrors";
+import { familyMemberSchema, getGenderOptions } from "../../../utils/types";
+import { useFamilyMemberMutations } from "../../../hooks/useFamilyMemberMutations";
+import {
+  ControlledTextField,
+  ControlledSelect,
+  ControlledCheckbox,
+  ControlledDatePicker,
+  FormShell,
+} from "../../form";
 import { useTranslation } from "react-i18next";
 
 type AddEditFamilyMemberDialogProps = {
-  dialogOpen: boolean;
-  handleCloseDialog: () => void;
+  handleClose: () => void;
   editingMember: FamilyMember | null;
-  formData: FamilyMemberFormData;
-  setFormData: (formData: FamilyMemberFormData) => void;
-  handleSave: () => void;
-  isLoading?: boolean;
-  isSuccess?: boolean;
-  error?: any;
+  familyId: number;
 };
 
 export default function AddEditFamilyMemberDialog({
-  dialogOpen,
-  handleCloseDialog,
+  handleClose,
   editingMember,
-  formData,
-  setFormData,
-  handleSave,
-  isLoading = false,
-  isSuccess = false,
-  error = null,
+  familyId,
 }: AddEditFamilyMemberDialogProps) {
   const { t } = useTranslation();
 
+  const { control, handleSubmit, reset } = useForm<FamilyMemberFormData>({
+    resolver: zodResolver(familyMemberSchema),
+    defaultValues: editingMember
+      ? {
+          id_family: familyId,
+          first_name: editingMember.first_name,
+          middle_name: editingMember.middle_name,
+          last_name: editingMember.last_name,
+          gender: editingMember.gender,
+          date_of_birth: editingMember.date_of_birth || "",
+          email: editingMember.email || "",
+          phone: editingMember.phone || "",
+          is_head_of_family: editingMember.is_head_of_family,
+          occupation: editingMember.occupation || "",
+        }
+      : {
+          id_family: familyId,
+          first_name: "",
+          middle_name: "",
+          last_name: "",
+          gender: undefined,
+          date_of_birth: "",
+          email: "",
+          phone: "",
+          is_head_of_family: false,
+          occupation: "",
+        },
+  });
+
+  const onClose = () => {
+    reset();
+    createMutation.reset();
+    updateMutation.reset();
+    handleClose();
+  };
+
+  const { createMutation, updateMutation } = useFamilyMemberMutations(
+    familyId,
+    onClose,
+  );
+
+  const mutation = editingMember ? updateMutation : createMutation;
+
+  const onSubmit = (data: FamilyMemberFormData) => {
+    if (editingMember) {
+      updateMutation.mutate({ id: editingMember.id, data });
+    } else {
+      createMutation.mutate(data);
+    }
+  };
+
   return (
-    <Dialog
-      open={dialogOpen}
-      onClose={handleCloseDialog}
-      maxWidth="sm"
-      fullWidth
-    >
+    <Dialog open onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
         {editingMember
           ? t("families.editFamilyMember")
           : t("families.addFamilyMember")}
       </DialogTitle>
-      <DialogContent>
-        <Stack spacing={2} sx={{ mt: 1 }}>
-          <TextField
-            fullWidth
+      <FormShell
+        variant="dialog"
+        onClose={onClose}
+        onSubmit={handleSubmit(onSubmit)}
+        isLoading={mutation.isPending}
+        isSuccess={mutation.isSuccess}
+        error={mutation.error}
+        submitButtonText={editingMember ? t("common.update") : t("common.add")}
+      >
+        <Stack direction="row" spacing={1}>
+          <ControlledTextField
+            name="first_name"
+            control={control}
             label={t("contactForm.firstName")}
-            value={formData.first_name || ""}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                first_name: e.target.value,
-              })
-            }
-            size="small"
           />
-          <TextField
-            fullWidth
+          <ControlledTextField
+            name="middle_name"
+            control={control}
             label={t("contactForm.middleName")}
-            value={formData.middle_name || ""}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                middle_name: e.target.value,
-              })
-            }
-            size="small"
           />
-          <TextField
-            fullWidth
+        </Stack>
+        <Stack direction="row" spacing={1}>
+          <ControlledTextField
+            name="last_name"
+            control={control}
             label={t("contactForm.lastName")}
-            value={formData.last_name || ""}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                last_name: e.target.value,
-              })
-            }
-            size="small"
           />
-          <TextField
-            select
-            fullWidth
+          <ControlledSelect
+            name="gender"
+            control={control}
+            options={getGenderOptions()}
             label={t("gender.gender")}
-            value={formData.gender}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                gender: Number(e.target.value),
-              })
-            }
-            size="small"
-          >
-            {getGenderOptions().map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
-          <DatePicker
-            label={t("families.dateOfBirth")}
-            format="YYYY-MM-DD"
-            value={
-              formData.date_of_birth ? dayjs(formData.date_of_birth) : null
-            }
-            onChange={(date) => {
-              setFormData({
-                ...formData,
-                date_of_birth: date ? date.format("YYYY-MM-DD") : "",
-              });
-            }}
           />
-          <TextField
-            fullWidth
+        </Stack>
+        <ControlledDatePicker
+          name="date_of_birth"
+          control={control}
+          label={t("families.dateOfBirth")}
+        />
+        <Stack direction="row" spacing={1}>
+          <ControlledTextField
+            name="email"
+            control={control}
             label={t("families.email")}
             type="email"
-            value={formData.email || ""}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                email: e.target.value,
-              })
-            }
-            size="small"
           />
-          <TextField
-            fullWidth
+          <ControlledTextField
+            name="phone"
+            control={control}
             label={t("families.phone")}
-            value={formData.phone || ""}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                phone: e.target.value,
-              })
-            }
-            size="small"
-          />
-          <TextField
-            fullWidth
-            label={t("families.occupation")}
-            value={formData.occupation || ""}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                occupation: e.target.value,
-              })
-            }
-            size="small"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={formData.is_head_of_family}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    is_head_of_family: e.target.checked,
-                  })
-                }
-              />
-            }
-            label={t("families.head")}
           />
         </Stack>
-      </DialogContent>
-      <DialogActions>
-        <Stack spacing={2} sx={{ p: 2, width: "100%" }}>
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button onClick={handleCloseDialog} disabled={isLoading}>
-              {t("common.cancel")}
-            </Button>
-            <Button
-              onClick={handleSave}
-              variant="contained"
-              disabled={isLoading || isSuccess}
-            >
-              {isLoading
-                ? editingMember
-                  ? t("common.updating")
-                  : t("common.adding")
-                : editingMember
-                  ? t("common.update")
-                  : t("common.add")}
-            </Button>
-          </Stack>
-          {error && (
-            <Stack spacing={1}>
-              {handleValidationErrors(error.response?.data).map(
-                (message: string, index: number) => (
-                  <Typography key={index} sx={{ color: "error.main" }}>
-                    {t("common.error", message)}
-                  </Typography>
-                ),
-              )}
-            </Stack>
-          )}
-          {isSuccess && (
-            <Typography sx={{ color: "success.main" }}>
-              {editingMember
-                ? t("families.familyMemberUpdateSuccess")
-                : t("families.familyMemberAddSuccess")}
-            </Typography>
-          )}
-        </Stack>
-      </DialogActions>
+        <ControlledTextField
+          name="occupation"
+          control={control}
+          label={t("families.occupation")}
+        />
+        <ControlledCheckbox
+          name="is_head_of_family"
+          control={control}
+          label={t("families.head")}
+        />
+      </FormShell>
     </Dialog>
   );
 }
