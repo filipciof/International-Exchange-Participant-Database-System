@@ -54,7 +54,6 @@ When admins create staff members provide pretty much the same information: name,
 TODO:
 - Editable hook.
 - Show loading state in Editable sections.
-- Set a timeout for operation successful message to disappear.
 - Test filling in forms differently.
 - Group filters in objects.
 - Move mutations from pages to forms.

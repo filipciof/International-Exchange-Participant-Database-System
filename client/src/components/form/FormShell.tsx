@@ -10,7 +10,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { handleValidationErrors } from "../../utils/handleValidationErrors";
 import { useTranslation } from "react-i18next";
-import type { ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 
 type FormShellProps = {
   title?: string;
@@ -37,6 +37,15 @@ export default function FormShell({
 }: FormShellProps) {
   const { t } = useTranslation();
   const isDialog = variant === "dialog";
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    if (isSuccess) {
+      setShowSuccess(true);
+      const timer = setTimeout(() => setShowSuccess(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSuccess]);
 
   const form = (
     <form noValidate onSubmit={onSubmit}>
@@ -59,7 +68,7 @@ export default function FormShell({
             </Button>
           )}
         </Stack>
-        {error && (
+        {error && !isLoading && (
           <Stack spacing={1}>
             {handleValidationErrors(error.response?.data).map(
               (errorMessage: string, index: number) => (
@@ -70,7 +79,7 @@ export default function FormShell({
             )}
           </Stack>
         )}
-        {isSuccess && (
+        {showSuccess && (
           <Typography sx={{ color: "success.main" }}>
             {t("common.success")}
           </Typography>
