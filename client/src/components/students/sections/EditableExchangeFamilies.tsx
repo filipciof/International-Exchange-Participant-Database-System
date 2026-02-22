@@ -6,13 +6,10 @@ import {
   Delete as DeleteIcon,
   Home as HomeIcon,
 } from "@mui/icons-material";
-import type {
-  ExchangeFamily,
-  ExchangeFamilyFormData,
-} from "../../../utils/types";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import type { ExchangeFamily } from "../../../utils/types";
+import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
-import queryClient from "../../../utils/queryClient";
+import { useExchangeFamilyMutations } from "../../../hooks/useExchangeFamilyMutations";
 import AddEditExchangeFamilyDialog from "./AddEditExchangeFamilyDialog";
 import DeleteConfirmationDialog from "../../DeleteConfirmationDialog";
 import InfoItem from "../../InfoItem";
@@ -38,13 +35,6 @@ export default function EditableExchangeFamilies({
   const [deletingExchangeFamily, setDeletingExchangeFamily] =
     useState<ExchangeFamily | null>(null);
 
-  const [formData, setFormData] = useState<ExchangeFamilyFormData>({
-    id_exchange: exchangeId,
-    id_family: null,
-    start_date: "",
-    end_date: "",
-  });
-
   const {
     data: exchangeFamilies,
     isLoading,
@@ -59,89 +49,13 @@ export default function EditableExchangeFamilies({
     },
   });
 
-  const createMutation = useMutation({
-    mutationFn: async (data: ExchangeFamilyFormData) => {
-      const response = await axiosClient.post(`/exchange-families/`, data);
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["exchangeFamilies", exchangeId],
-      });
-      handleCloseDialog();
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: {
-      id: number;
-      data: Partial<ExchangeFamilyFormData>;
-    }) => {
-      const response = await axiosClient.patch(
-        `/exchange-families/${id}/`,
-        data,
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["exchangeFamilies", exchangeId],
-      });
-      handleCloseDialog();
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await axiosClient.delete(`/exchange-families/${id}/`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["exchangeFamilies", exchangeId],
-      });
-    },
-  });
-
-  const handleOpenAddDialog = () => {
-    setEditingExchangeFamily(null);
-    setFormData({
-      id_exchange: exchangeId,
-      id_family: null,
-      start_date: "",
-      end_date: "",
-    });
-    setDialogOpen("add");
-  };
-
-  const handleOpenEditDialog = (exchangeFamily: ExchangeFamily) => {
-    setEditingExchangeFamily(exchangeFamily);
-    setFormData({
-      id_exchange: exchangeId,
-      id_family: exchangeFamily.id_family,
-      start_date: exchangeFamily.start_date || "",
-      end_date: exchangeFamily.end_date || "",
-    });
-    setDialogOpen("update");
-  };
+  const { deleteMutation } = useExchangeFamilyMutations(exchangeId);
 
   const handleCloseDialog = () => {
-    createMutation.reset();
-    updateMutation.reset();
     deleteMutation.reset();
     setDialogOpen(null);
     setEditingExchangeFamily(null);
     setDeletingExchangeFamily(null);
-  };
-
-  const handleSave = () => {
-    if (editingExchangeFamily) {
-      updateMutation.mutate({ id: editingExchangeFamily.id, data: formData });
-    } else {
-      createMutation.mutate(formData);
-    }
   };
 
   return (
@@ -161,7 +75,13 @@ export default function EditableExchangeFamilies({
           </Typography>
         </Box>
         {canEditExchanges && (
-          <IconButton size="small" onClick={handleOpenAddDialog}>
+          <IconButton
+            size="small"
+            onClick={() => {
+              setEditingExchangeFamily(null);
+              setDialogOpen("add");
+            }}
+          >
             <AddIcon fontSize="small" />
           </IconButton>
         )}
@@ -173,7 +93,6 @@ export default function EditableExchangeFamilies({
           color="text.secondary"
           sx={{ fontSize: "0.875rem" }}
         >
-          {/* Loading host families... */}
           {t("common.loading")}
         </Typography>
       )}
@@ -184,7 +103,6 @@ export default function EditableExchangeFamilies({
           color="error.main"
           sx={{ fontSize: "0.875rem" }}
         >
-          {/* Error loading host families */}
           {t("common.error", error.message)}
         </Typography>
       )}
@@ -265,7 +183,10 @@ export default function EditableExchangeFamilies({
                         <Box sx={{ display: "flex", gap: 0.5 }}>
                           <IconButton
                             size="small"
-                            onClick={() => handleOpenEditDialog(exchangeFamily)}
+                            onClick={() => {
+                              setEditingExchangeFamily(exchangeFamily);
+                              setDialogOpen("update");
+                            }}
                           >
                             <EditIcon fontSize="small" />
                           </IconButton>
@@ -289,18 +210,14 @@ export default function EditableExchangeFamilies({
           </>
         )}
 
-      <AddEditExchangeFamilyDialog
-        dialogOpen={dialogOpen === "add" || dialogOpen === "update"}
-        handleCloseDialog={handleCloseDialog}
-        editingExchangeFamily={editingExchangeFamily}
-        formData={formData}
-        setFormData={setFormData}
-        handleSave={handleSave}
-        isLoading={createMutation.isPending || updateMutation.isPending}
-        isSuccess={createMutation.isSuccess || updateMutation.isSuccess}
-        error={createMutation.error || updateMutation.error}
-        id_receiving_club={id_receiving_club}
-      />
+      {(dialogOpen === "add" || dialogOpen === "update") && (
+        <AddEditExchangeFamilyDialog
+          handleClose={handleCloseDialog}
+          editingExchangeFamily={editingExchangeFamily}
+          exchangeId={exchangeId}
+          id_receiving_club={id_receiving_club}
+        />
+      )}
 
       <DeleteConfirmationDialog
         open={dialogOpen === "delete"}
