@@ -4,6 +4,7 @@ import {
   Toolbar,
   IconButton,
   Drawer,
+  Typography,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
@@ -13,6 +14,7 @@ import { appBarHeight, drawerWidth } from "../utils/constants";
 import Loading from "../components/Loading";
 import AccountMenu from "../components/AccountMenu";
 import usePermissions from "../hooks/usePermissions";
+import { useTranslation } from "react-i18next";
 
 export default function MainPage() {
   const [open, setOpen] = useState(false);
@@ -23,7 +25,8 @@ export default function MainPage() {
     setOpen(newOpen);
   };
 
-  const { canViewSidebar } = usePermissions();
+  const { t } = useTranslation();
+  const { canViewSidebar, group } = usePermissions();
 
   return (
     <Box>
@@ -55,6 +58,14 @@ export default function MainPage() {
               <img src="/logo.png" alt="Rotary Youth Exchange" height={48} />
             </Box>
 
+            {group && (
+              <Typography
+                variant="body2"
+                sx={{ mr: 2, color: "primary.main", fontWeight: "bold" }}
+              >
+                {t(`account.${group}`)}
+              </Typography>
+            )}
             <AccountMenu setLoading={setLoading} />
 
           </Toolbar>
