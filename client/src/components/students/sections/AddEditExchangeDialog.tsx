@@ -1,21 +1,22 @@
+import { useMemo } from "react";
 import { Stack, Divider, Typography, Dialog, DialogTitle } from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import type {
   Exchange,
   ExchangeFormData,
   ExchangeType,
   Staff,
+  Student,
   Country,
   District,
   Club,
 } from "../../../utils/types";
 import { exchangeSchema } from "../../../utils/types";
 import axiosClient from "../../../utils/axiosClient";
-import queryClient from "../../../utils/queryClient";
+import { useExchangeMutations } from "../../../hooks/useExchangeMutations";
 import useCountryDistrictClub from "../../../hooks/useCountryDistrictClub";
-import MyAutocomplete from "../../MyAutocomplete";
 import {
   ControlledTextField,
   ControlledAutocomplete,
@@ -39,50 +40,60 @@ export default function AddEditExchangeDialog({
 }: AddEditExchangeDialogProps) {
   const { t } = useTranslation();
 
-  const { control, handleSubmit, reset, watch } =
-    useForm<ExchangeFormData>({
-      resolver: zodResolver(exchangeSchema),
-      defaultValues: editingExchange
-        ? {
-            id_student: studentId,
-            year: editingExchange.year,
-            id_type: editingExchange.id_type,
-            start_date: editingExchange.start_date || "",
-            end_date: editingExchange.end_date || "",
-            id_counsellor: editingExchange.id_counsellor,
-            id_kwm_officer: editingExchange.id_kwm_officer,
-            id_sending_country:
-              editingExchange.sending_club?.id_country ?? null,
-            id_sending_district:
-              editingExchange.sending_club?.id_district ?? null,
-            id_sending_club: editingExchange.id_sending_club,
-            id_receiving_country:
-              editingExchange.receiving_club?.id_country ?? null,
-            id_receiving_district:
-              editingExchange.receiving_club?.id_district ?? null,
-            id_receiving_club: editingExchange.id_receiving_club,
-          }
-        : {
-            id_student: studentId,
-            year: defaultYear,
-            id_type: null,
-            start_date: "",
-            end_date: "",
-            id_counsellor: null,
-            id_kwm_officer: null,
-            id_sending_country: null,
-            id_sending_district: null,
-            id_sending_club: null,
-            id_receiving_country: null,
-            id_receiving_district: null,
-            id_receiving_club: null,
-          },
-    });
+  const { data: student } = useQuery({
+    queryKey: ["student", studentId],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/students/${studentId}/`);
+      return response.data as Student;
+    },
+  });
+
+  const isInbound = student?.is_inbound ?? true;
+
+  const { control, handleSubmit, reset, watch } = useForm<ExchangeFormData>({
+    resolver: zodResolver(exchangeSchema),
+    defaultValues: editingExchange
+      ? {
+          id_student: studentId,
+          year: editingExchange.year,
+          id_type: editingExchange.id_type,
+          start_date: editingExchange.start_date || "",
+          end_date: editingExchange.end_date || "",
+          id_counsellor: editingExchange.id_counsellor,
+          id_kwm_officer: editingExchange.id_kwm_officer,
+          id_sending_country: editingExchange.sending_club?.id_country ?? null,
+          id_sending_district:
+            editingExchange.sending_club?.id_district ?? null,
+          id_sending_club: editingExchange.id_sending_club,
+          id_receiving_country:
+            editingExchange.receiving_club?.id_country ?? null,
+          id_receiving_district:
+            editingExchange.receiving_club?.id_district ?? null,
+          id_receiving_club: editingExchange.id_receiving_club,
+        }
+      : {
+          id_student: studentId,
+          year: defaultYear,
+          id_type: null,
+          start_date: "",
+          end_date: "",
+          id_counsellor: null,
+          id_kwm_officer: null,
+          id_sending_country: null,
+          id_sending_district: null,
+          id_sending_club: null,
+          id_receiving_country: null,
+          id_receiving_district: null,
+          id_receiving_club: null,
+        },
+  });
 
   const sendingCountry = watch("id_sending_country");
   const sendingDistrict = watch("id_sending_district");
   const receivingCountry = watch("id_receiving_country");
   const receivingDistrict = watch("id_receiving_district");
+  const sendingClubId = watch("id_sending_club");
+  const receivingClubId = watch("id_receiving_club");
 
   const {
     countries,
@@ -99,6 +110,36 @@ export default function AddEditExchangeDialog({
     isLoadingClubs: isLoadingReceivingClubs,
   } = useCountryDistrictClub(receivingCountry, receivingDistrict);
 
+  // Inbound: sending = foreign, receiving = home country
+  // Outbound: sending = home country, receiving = foreign
+  const sendingCountries = useMemo(
+    () =>
+      countries.filter((c: Country) =>
+        isInbound ? !c.is_home_country : c.is_home_country,
+      ),
+    [countries, isInbound],
+  );
+
+  const receivingCountries = useMemo(
+    () =>
+      countries.filter((c: Country) =>
+        isInbound ? c.is_home_country : !c.is_home_country,
+      ),
+    [countries, isInbound],
+  );
+
+  // Staff club: inbound → receiving club, outbound → sending club
+  const staffClubId = isInbound ? receivingClubId : sendingClubId;
+
+  const { data: staffMembers = [], isLoading: isLoadingStaff } = useQuery({
+    queryKey: ["staff", "club", staffClubId],
+    queryFn: async () => {
+      const response = await axiosClient.get(`/staff/?id_club=${staffClubId}`);
+      return response.data as Staff[];
+    },
+    enabled: !!staffClubId,
+  });
+
   const { data: exchangeTypes = [] } = useQuery({
     queryKey: ["exchangeTypes"],
     queryFn: async () => {
@@ -107,36 +148,22 @@ export default function AddEditExchangeDialog({
     },
   });
 
-  const createMutation = useMutation({
-    mutationFn: async (data: ExchangeFormData) => {
-      const response = await axiosClient.post(`/exchanges/`, data);
-      return response.data;
+  const { createMutation, updateMutation } = useExchangeMutations(
+    studentId,
+    () => {
+      reset();
+      handleClose();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["exchangesStudent", studentId],
-      });
-      onClose();
-    },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: async (data: ExchangeFormData) => {
-      const response = await axiosClient.patch(
-        `/exchanges/${editingExchange!.id}/`,
-        data,
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["exchangesStudent", studentId],
-      });
-      onClose();
-    },
-  });
+  );
 
   const mutation = editingExchange ? updateMutation : createMutation;
+
+  const onClose = () => {
+    reset();
+    createMutation.reset();
+    updateMutation.reset();
+    handleClose();
+  };
 
   const onSubmit = ({
     id_sending_country,
@@ -145,14 +172,11 @@ export default function AddEditExchangeDialog({
     id_receiving_district,
     ...data
   }: ExchangeFormData) => {
-    mutation.mutate(data);
-  };
-
-  const onClose = () => {
-    reset();
-    createMutation.reset();
-    updateMutation.reset();
-    handleClose();
+    if (editingExchange) {
+      updateMutation.mutate({ id: editingExchange.id, data });
+    } else {
+      createMutation.mutate(data);
+    }
   };
 
   return (
@@ -177,7 +201,7 @@ export default function AddEditExchangeDialog({
           name="id_type"
           control={control}
           options={exchangeTypes}
-          getOptionLabel={(o: ExchangeType) => o.name}
+          getOptionLabel={(o: ExchangeType) => t(`exchangeTypes.${o.name}`)}
           getOptionValue={(o: ExchangeType) => o.id}
           label={t("exchanges.exchangeType")}
         />
@@ -208,7 +232,7 @@ export default function AddEditExchangeDialog({
         <ControlledAutocomplete
           name="id_sending_country"
           control={control}
-          options={countries}
+          options={sendingCountries}
           getOptionLabel={(c: Country) => c.name}
           getOptionValue={(c: Country) => c.id}
           label={t("studentForm.labels.sendingCountry")}
@@ -243,7 +267,7 @@ export default function AddEditExchangeDialog({
         <ControlledAutocomplete
           name="id_receiving_country"
           control={control}
-          options={countries}
+          options={receivingCountries}
           getOptionLabel={(c: Country) => c.name}
           getOptionValue={(c: Country) => c.id}
           label={t("studentForm.labels.receivingCountry")}
@@ -275,35 +299,25 @@ export default function AddEditExchangeDialog({
           <Typography>{t("navigation.staff")}</Typography>
         </Divider>
 
-        <Controller
+        <ControlledAutocomplete
           name="id_counsellor"
           control={control}
-          render={({ field }) => (
-            <MyAutocomplete
-              initialId={field.value}
-              handleChange={(staff: Staff) => field.onChange(staff.id)}
-              label={t("studentForm.labels.counsellor")}
-              endpoint="staff"
-              getOptionLabel={(item: Staff) =>
-                `${item.first_name} ${item.last_name}`
-              }
-            />
-          )}
+          options={staffMembers}
+          getOptionLabel={(s: Staff) => `${s.first_name} ${s.last_name}`}
+          getOptionValue={(s: Staff) => s.id}
+          label={t("studentForm.labels.counsellor")}
+          disabled={!staffClubId}
+          loading={isLoadingStaff}
         />
-        <Controller
+        <ControlledAutocomplete
           name="id_kwm_officer"
           control={control}
-          render={({ field }) => (
-            <MyAutocomplete
-              initialId={field.value}
-              handleChange={(staff: Staff) => field.onChange(staff.id)}
-              label={t("studentForm.labels.kwmOfficer")}
-              endpoint="staff"
-              getOptionLabel={(item: Staff) =>
-                `${item.first_name} ${item.last_name}`
-              }
-            />
-          )}
+          options={staffMembers}
+          getOptionLabel={(s: Staff) => `${s.first_name} ${s.last_name}`}
+          getOptionValue={(s: Staff) => s.id}
+          label={t("studentForm.labels.kwmOfficer")}
+          disabled={!staffClubId}
+          loading={isLoadingStaff}
         />
       </FormShell>
     </Dialog>

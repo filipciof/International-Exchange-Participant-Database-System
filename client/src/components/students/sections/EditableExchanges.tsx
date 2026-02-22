@@ -14,9 +14,9 @@ import {
   SwapHoriz as ExchangeIcon,
 } from "@mui/icons-material";
 import type { Exchange } from "../../../utils/types";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import axiosClient from "../../../utils/axiosClient";
-import queryClient from "../../../utils/queryClient";
+import { useExchangeMutations } from "../../../hooks/useExchangeMutations";
 import Section from "../../Section";
 import AddEditExchangeDialog from "./AddEditExchangeDialog";
 import DeleteConfirmationDialog from "../../DeleteConfirmationDialog";
@@ -74,16 +74,7 @@ export default function EditableExchanges({
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await axiosClient.delete(`/exchanges/${id}/`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["exchangesStudent", studentId],
-      });
-    },
-  });
+  const { deleteMutation } = useExchangeMutations(studentId);
 
   const handleCloseDialog = () => {
     deleteMutation.reset();

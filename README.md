@@ -36,19 +36,6 @@ pg_dump -U admin -h localhost -d iepds > ~/repos/IEPDS/server/pg_iepds.sql
 Loading the dump (drop all schema before doing this):
 psql -U admin -h localhost -d iepds < ~/repos/IEPDS/server/pg_iepds.sql
 
-country: 249
-district: 600
-contact: 1000
-contactDistrict: 1537
-club: 4000
-family: 40 000
-familyMember: 160 315
-student: 50 009
-staff: 12 000
-exchangeType: 3
-exchange: 99 987
-exchangeFamily: 299 751
-
 High level description of the system.
 
 The system is designed for managing international student exchanges for a country level branch of an international organization. The country of this branch of the organization is further referred to as the "home" country. The organization works in different countries. Each country can be further split into districts. Within those districts there are clubs. At the beginning of the lifecycle of the system there will be the home country, its districts and clubs. Only admins should be able to add or modify those. For now, let's assume that there will be a fixed set of foreign countries and districts. Foreign clubs might need to be added as the system grows.
@@ -65,21 +52,22 @@ Club officers have no need to view or modify any clubs.
 When admins create staff members provide pretty much the same information: name, surname, group(role), district and club (since staff can only be from the home country). This should be the default not a rule because admins should be able to bypass any rule. Then admins provide an email and an account is created in much the same way like students.
 
 TODO:
-
-- Fix the role mess.
-  - Load the data from the message (home clubs).
-  - Change the forms and filters to match new requirements.
-- Translation.
-- Email Confirmation.
-
+- Refactor form dialogs and change the form pages into dialogs too.
+  - AddEditExchangeDialog.
+  - AddEditExchangeFamilyDialog.
+  - AddEditFamilyMemberDialog.
+- Editable hook.
+- Show loading state in Editable sections.
+- Set a timeout for operation successful message to disappear.
+- Test filling in forms differently.
+- Group filters in objects.
 ---
 
-- How to add a unique indentifier for these lists in React?
-  - This is important both in terms of the error that happens in the console and the UX.
-- Regenerate the database with the academic year set for exchanges.
-- Using zod and react hook form for editable elements in the StudentDetail.
-- Filtering students by height.
-- Removing the errors from console by catching them and doing nothing.
+- Don't use MyAutocomplete, instead restrict the option set instead.
+<!-- - Regenerate the database with the academic year set for exchanges. -->
+<!-- - Using zod and react hook form for editable elements in the StudentDetail. -->
+<!-- - Filtering students by height. -->
+<!-- - Removing the errors from console by catching them and doing nothing. -->
 
 python manage.py makemessages -l pl
 python manage.py compilemessages

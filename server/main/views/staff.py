@@ -29,6 +29,7 @@ User = get_user_model()
 
 class StaffFilter(filters.FilterSet):
     search = filters.CharFilter(method="filter_search")
+    id_club = filters.NumberFilter(field_name="id_club")
 
     class Meta:
         model = Staff
