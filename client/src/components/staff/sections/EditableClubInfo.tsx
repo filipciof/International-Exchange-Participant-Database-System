@@ -49,7 +49,7 @@ export default function EditableClubInfo({
   >({
     queryKey: ["districts", country],
     queryFn: async () => {
-      const response = await axiosClient.get(`/districts/?country=${country}`);
+      const response = await axiosClient.get(`/districts/?id_country=${country}`);
       return response.data;
     },
     enabled: country !== null && country > 0,

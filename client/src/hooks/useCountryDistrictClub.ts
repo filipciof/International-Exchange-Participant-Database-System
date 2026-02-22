@@ -18,7 +18,7 @@ export default function useCountryDistrictClub(
     queryKey: ["districts", countryId],
     queryFn: async () => {
       const response = await axiosClient.get(
-        `/districts/?country=${countryId}`,
+        `/districts/?id_country=${countryId}`,
       );
       return response.data as District[];
     },

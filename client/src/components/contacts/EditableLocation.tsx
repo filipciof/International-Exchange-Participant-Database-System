@@ -46,7 +46,7 @@ export default function EditableLocation({ contact }: EditableLocationProps) {
       queryKey: ["districts", formData.id_country],
       queryFn: async () => {
         const response = await axiosClient.get(
-          `/districts/?country=${formData.id_country}`
+          `/districts/?id_country=${formData.id_country}`
         );
         return response.data;
       },

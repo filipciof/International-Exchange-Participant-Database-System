@@ -3,26 +3,32 @@ import axiosClient from "../utils/axiosClient";
 import queryClient from "../utils/queryClient";
 import type { Country, PaginationModel, ClubFormData } from "../utils/types";
 
+import type { ClubFilters } from "../components/clubs/ClubFilter";
+
 interface UseClubsParams {
   paginationModel: PaginationModel;
-  searchInput: string;
+  filters: ClubFilters;
 }
 
-export function useClubs({ paginationModel, searchInput }: UseClubsParams) {
+export function useClubs({ paginationModel, filters }: UseClubsParams) {
   const {
     data: clubs,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["clubs", paginationModel, searchInput],
+    queryKey: ["clubs", paginationModel, filters],
     queryFn: async () => {
       const params = new URLSearchParams({
         page: paginationModel.page.toString(),
         page_size: paginationModel.pageSize.toString(),
       });
 
-      if (searchInput) {
-        params.append("search", searchInput);
+      if (filters.search) {
+        params.append("search", filters.search);
+      }
+
+      if (filters.countryId) {
+        params.append("id_country", filters.countryId.toString());
       }
 
       const response = await axiosClient.get(`/clubs/?${params.toString()}`);

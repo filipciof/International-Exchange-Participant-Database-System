@@ -4,6 +4,7 @@ import { useRef, useEffect } from "react";
 import { useClubs } from "../hooks/useClubs";
 import {
   useQueryState,
+  useQueryStates,
   parseAsInteger,
   parseAsString,
   parseAsStringLiteral,
@@ -31,10 +32,10 @@ export default function Clubs() {
     setPageSize(model.pageSize);
   };
   const [selectedId, setSelectedId] = useQueryState("id", parseAsInteger);
-  const [searchInput, setSearchInput] = useQueryState(
-    "search",
-    parseAsString.withDefault(""),
-  );
+  const [filters, setFilters] = useQueryStates({
+    search: parseAsString.withDefault(""),
+    countryId: parseAsInteger,
+  });
   const [currentView, setCurrentView] = useQueryState(
     "view",
     parseAsStringLiteral([
@@ -71,7 +72,7 @@ export default function Clubs() {
     addClubMutation,
     updateClubMutation,
     deleteClubMutation,
-  } = useClubs({ paginationModel, searchInput });
+  } = useClubs({ paginationModel, filters });
 
   const handleClose = () => {
     setSelectedId(null);
@@ -146,10 +147,11 @@ export default function Clubs() {
       )}
 
       <ClubFilter
-        searchInput={searchInput}
-        setSearchInput={setSearchInput}
-        paginationModel={paginationModel}
-        setPaginationModel={setPaginationModel}
+        filters={filters}
+        onFilterChange={(update) => {
+          setFilters(update);
+          setPage(1);
+        }}
       />
 
       <MyPagination

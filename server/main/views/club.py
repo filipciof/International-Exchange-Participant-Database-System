@@ -9,6 +9,7 @@ from main.selectors import club_queryset_for, district_queryset_for
 
 class ClubFilter(filters.FilterSet):
     search = filters.CharFilter(method="filter_search")
+    id_country = filters.NumberFilter(field_name="id_district__id_country")
 
     class Meta:
         model = Club
@@ -26,7 +27,7 @@ class CountryView(ListAPIView):
 
 class DistrictFilter(filters.FilterSet):
     search = filters.CharFilter(method="filter_search")
-    country = filters.NumberFilter(field_name="id_country")
+    id_country = filters.NumberFilter(field_name="id_country")
 
     class Meta:
         model = District
