@@ -103,7 +103,6 @@ export default function StaffProfile({}: StaffProfileProps) {
           <EditablePersonalInfo
             gender={staff.gender}
             genderName={staff.gender_name}
-            email={staff.email}
             phone={staff.phone}
             endpoint="/staff/me/"
             queryKey="staff"

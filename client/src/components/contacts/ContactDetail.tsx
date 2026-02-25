@@ -13,7 +13,7 @@ import axiosClient from "../../utils/axiosClient";
 import Loading from "../Loading";
 import { useTranslation } from "react-i18next";
 import EditableNotes from "../EditableNotes";
-import EditablePersonalInfo from "../EditablePersonalInfo";
+import EditablePersonalInfo from "./EditablePersonalInfo";
 import EditableLocation from "./EditableLocation";
 import EditableHeader from "./EditableHeader";
 

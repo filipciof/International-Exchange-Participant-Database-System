@@ -96,7 +96,6 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
           <EditablePersonalInfo
             gender={staff.gender}
             genderName={staff.gender_name}
-            email={staff.email}
             phone={staff.phone}
             endpoint={`/staff/${id}/`}
             queryKey="staff"

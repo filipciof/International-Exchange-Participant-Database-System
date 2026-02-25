@@ -34,21 +34,54 @@ const getSearchableFields = (t: (key: string) => string): SearchableField[] => [
   { value: "last_name", label: t("students.searchFields.lastName") },
   { value: "nick_name", label: t("students.searchFields.nickname") },
   { value: "city_of_birth", label: t("students.searchFields.cityOfBirth") },
-  { value: "city_of_residence", label: t("students.searchFields.cityOfResidence") },
+  {
+    value: "city_of_residence",
+    label: t("students.searchFields.cityOfResidence"),
+  },
   { value: "address", label: t("students.searchFields.address") },
-  { value: "dietary_restrictions", label: t("students.searchFields.dietaryRestrictions") },
+  {
+    value: "dietary_restrictions",
+    label: t("students.searchFields.dietaryRestrictions"),
+  },
   { value: "first_language", label: t("students.searchFields.firstLanguage") },
-  { value: "second_language", label: t("students.searchFields.secondLanguage") },
+  {
+    value: "second_language",
+    label: t("students.searchFields.secondLanguage"),
+  },
   { value: "third_language", label: t("students.searchFields.thirdLanguage") },
-  { value: "passport_number", label: t("students.searchFields.passportNumber") },
-  { value: "first_parent_full_name", label: t("students.searchFields.firstParentName") },
-  { value: "first_parent_email", label: t("students.searchFields.firstParentEmail") },
-  { value: "second_parent_full_name", label: t("students.searchFields.secondParentName") },
-  { value: "second_parent_email", label: t("students.searchFields.secondParentEmail") },
-  { value: "polish_phone_number", label: t("students.searchFields.polishPhoneNumber") },
-  { value: "insurance_company", label: t("students.searchFields.insuranceCompany") },
+  {
+    value: "passport_number",
+    label: t("students.searchFields.passportNumber"),
+  },
+  {
+    value: "first_parent_full_name",
+    label: t("students.searchFields.firstParentName"),
+  },
+  {
+    value: "first_parent_email",
+    label: t("students.searchFields.firstParentEmail"),
+  },
+  {
+    value: "second_parent_full_name",
+    label: t("students.searchFields.secondParentName"),
+  },
+  {
+    value: "second_parent_email",
+    label: t("students.searchFields.secondParentEmail"),
+  },
+  {
+    value: "polish_phone_number",
+    label: t("students.searchFields.polishPhoneNumber"),
+  },
+  {
+    value: "insurance_company",
+    label: t("students.searchFields.insuranceCompany"),
+  },
   { value: "insurance_type", label: t("students.searchFields.insuranceType") },
-  { value: "insurance_serial_number", label: t("students.searchFields.insuranceSerialNumber") },
+  {
+    value: "insurance_serial_number",
+    label: t("students.searchFields.insuranceSerialNumber"),
+  },
   { value: "notes", label: t("students.searchFields.notes") },
 ];
 
@@ -61,7 +94,7 @@ export type StudentFilters = {
   shirtSizes: string[];
   genders: number[];
   startYear: number | null;
-  isInbound: string;
+  isInbound: "both" | "false" | "true" | null;
   dateOfBirthBefore: string;
   dateOfBirthAfter: string;
   passportExpirationDateBefore: string;
@@ -88,9 +121,11 @@ export default function StudentFilter({
   const selectedCountryOfBirth =
     countries.find((c: Country) => c.id === filters.countryOfBirthId) ?? null;
   const selectedCountryOfDeparture =
-    countries.find((c: Country) => c.id === filters.countryOfDepartureId) ?? null;
+    countries.find((c: Country) => c.id === filters.countryOfDepartureId) ??
+    null;
   const selectedCountryOfPassport =
-    countries.find((c: Country) => c.id === filters.countryOfPassportId) ?? null;
+    countries.find((c: Country) => c.id === filters.countryOfPassportId) ??
+    null;
 
   return (
     <>
@@ -106,7 +141,9 @@ export default function StudentFilter({
             filters.searchFields.includes(field.value),
           )}
           onChange={(_event, newValue) => {
-            onFilterChange({ searchFields: newValue.map((field) => field.value) });
+            onFilterChange({
+              searchFields: newValue.map((field) => field.value),
+            });
           }}
           options={SEARCHABLE_FIELDS}
           getOptionLabel={(option) => option.label}
@@ -171,7 +208,9 @@ export default function StudentFilter({
               <ToggleButtonGroup
                 value={filters.genders.map((g) => g.toString())}
                 onChange={(_event, newValues) => {
-                  onFilterChange({ genders: newValues.map((v: string) => parseInt(v)) });
+                  onFilterChange({
+                    genders: newValues.map((v: string) => parseInt(v)),
+                  });
                 }}
                 aria-label="gender filter"
                 sx={{
@@ -328,7 +367,9 @@ export default function StudentFilter({
                 value={filters.startYear ?? ""}
                 onChange={(event) => {
                   const value = event.target.value;
-                  onFilterChange({ startYear: value === "" ? null : Number(value) });
+                  onFilterChange({
+                    startYear: value === "" ? null : Number(value),
+                  });
                 }}
                 size="small"
                 sx={{ minWidth: 150 }}
@@ -391,7 +432,9 @@ export default function StudentFilter({
               <Autocomplete
                 value={selectedCountryOfDeparture}
                 onChange={(_event, newValue) => {
-                  onFilterChange({ countryOfDepartureId: newValue?.id ?? null });
+                  onFilterChange({
+                    countryOfDepartureId: newValue?.id ?? null,
+                  });
                 }}
                 options={countries}
                 getOptionLabel={(option: Country) => option.name}
@@ -468,10 +511,16 @@ export default function StudentFilter({
                   <DatePicker
                     label={t("common.after")}
                     format="YYYY-MM-DD"
-                    value={filters.dateOfBirthAfter ? dayjs(filters.dateOfBirthAfter) : null}
+                    value={
+                      filters.dateOfBirthAfter
+                        ? dayjs(filters.dateOfBirthAfter)
+                        : null
+                    }
                     onChange={(newValue) => {
                       onFilterChange({
-                        dateOfBirthAfter: newValue ? newValue.format("YYYY-MM-DD") : "",
+                        dateOfBirthAfter: newValue
+                          ? newValue.format("YYYY-MM-DD")
+                          : "",
                       });
                     }}
                     slotProps={{
@@ -484,10 +533,16 @@ export default function StudentFilter({
                   <DatePicker
                     label={t("common.before")}
                     format="YYYY-MM-DD"
-                    value={filters.dateOfBirthBefore ? dayjs(filters.dateOfBirthBefore) : null}
+                    value={
+                      filters.dateOfBirthBefore
+                        ? dayjs(filters.dateOfBirthBefore)
+                        : null
+                    }
                     onChange={(newValue) => {
                       onFilterChange({
-                        dateOfBirthBefore: newValue ? newValue.format("YYYY-MM-DD") : "",
+                        dateOfBirthBefore: newValue
+                          ? newValue.format("YYYY-MM-DD")
+                          : "",
                       });
                     }}
                     slotProps={{
@@ -529,7 +584,9 @@ export default function StudentFilter({
                     }
                     onChange={(newValue) => {
                       onFilterChange({
-                        passportExpirationDateAfter: newValue ? newValue.format("YYYY-MM-DD") : "",
+                        passportExpirationDateAfter: newValue
+                          ? newValue.format("YYYY-MM-DD")
+                          : "",
                       });
                     }}
                     slotProps={{
@@ -549,7 +606,9 @@ export default function StudentFilter({
                     }
                     onChange={(newValue) => {
                       onFilterChange({
-                        passportExpirationDateBefore: newValue ? newValue.format("YYYY-MM-DD") : "",
+                        passportExpirationDateBefore: newValue
+                          ? newValue.format("YYYY-MM-DD")
+                          : "",
                       });
                     }}
                     slotProps={{
