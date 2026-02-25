@@ -54,12 +54,11 @@ When admins create staff members provide pretty much the same information: name,
 TODO:
 
 <!-- - Test filling in forms differently. -->
-- Don't show form fields until the object is fetched.
-- Database clearing script.
-- Can't remove club completely (cause it's required/ FamilyDetail).
-- AddEditDocument flashes when closing on edit back to add.
+<!-- - Don't show form fields until the object is fetched. (it's usually rather fast).-->
+<!-- - Can't remove club completely (cause it's required/ FamilyDetail). -->
 - Pass active role (not necessarily for scoping but just in general).
 - Filter students by sending and receiving club (exchange information).
+- More filters in general.
 
 Less important refactors:
 - Editable (EditableHeaders and clubs/EditableLocation use it for now).
@@ -72,6 +71,7 @@ Tests:
 Major features:
 - Exporting dialog/logic.
 - Custom form creation.
+- django-auditlog.
 
 - Istnieje już club o tej wartości pola number.
 ---
