@@ -2,27 +2,37 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import queryClient from "../utils/queryClient";
 import type { Country, PaginationModel, StaffFormData } from "../utils/types";
+import type { StaffFilters } from "../components/staff/StaffFilter";
 
 interface UseStaffParams {
   paginationModel: PaginationModel;
-  searchInput: string;
+  filters: StaffFilters;
 }
 
-export function useStaff({ paginationModel, searchInput }: UseStaffParams) {
+export function useStaff({ paginationModel, filters }: UseStaffParams) {
   const {
     data: staff,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["staff", paginationModel, searchInput],
+    queryKey: ["staff", paginationModel, filters],
     queryFn: async () => {
       const params = new URLSearchParams({
         page: paginationModel.page.toString(),
         page_size: paginationModel.pageSize.toString(),
       });
 
-      if (searchInput) {
-        params.append("search", searchInput);
+      if (filters.search) {
+        params.append("search", filters.search);
+      }
+      if (filters.countryId) {
+        params.append("id_country", filters.countryId.toString());
+      }
+      if (filters.districtId) {
+        params.append("id_district", filters.districtId.toString());
+      }
+      if (filters.clubId) {
+        params.append("id_club", filters.clubId.toString());
       }
 
       const response = await axiosClient.get(`/staff/?${params.toString()}`);

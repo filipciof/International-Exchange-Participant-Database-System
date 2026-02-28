@@ -1,9 +1,10 @@
 import AddIcon from "@mui/icons-material/Add";
 import type { ViewType, StaffFormData } from "../utils/types";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import { useStaff } from "../hooks/useStaff";
 import {
   useQueryState,
+  useQueryStates,
   parseAsInteger,
   parseAsString,
   parseAsStringLiteral,
@@ -32,10 +33,12 @@ export default function Staff() {
     setPageSize(model.pageSize);
   };
   const [selectedId, setSelectedId] = useQueryState("id", parseAsInteger);
-  const [searchInput, setSearchInput] = useQueryState(
-    "search",
-    parseAsString.withDefault(""),
-  );
+  const [filters, setFilters] = useQueryStates({
+    search: parseAsString.withDefault(""),
+    countryId: parseAsInteger,
+    districtId: parseAsInteger,
+    clubId: parseAsInteger,
+  });
   const [currentView, setCurrentView] = useQueryState(
     "view",
     parseAsStringLiteral([
@@ -65,13 +68,21 @@ export default function Staff() {
     setCurrentView(newView);
   };
 
+  const handleFilterChange = useCallback(
+    (update: Parameters<typeof setFilters>[0]) => {
+      setFilters(update);
+      setPage(1);
+    },
+    [setFilters, setPage],
+  );
+
   const {
     staff,
     isLoading,
     error,
     updateStaffMutation,
     deleteStaffMutation,
-  } = useStaff({ paginationModel, searchInput });
+  } = useStaff({ paginationModel, filters });
 
   const handleClose = () => {
     setSelectedId(null);
@@ -149,10 +160,8 @@ export default function Staff() {
       )}
 
       <StaffFilter
-        searchInput={searchInput}
-        setSearchInput={setSearchInput}
-        paginationModel={paginationModel}
-        setPaginationModel={setPaginationModel}
+        filters={filters}
+        onFilterChange={handleFilterChange}
       />
 
       <MyPagination

@@ -30,6 +30,8 @@ User = get_user_model()
 class StaffFilter(filters.FilterSet):
     search = filters.CharFilter(method="filter_search")
     id_club = filters.NumberFilter(field_name="id_club")
+    id_district = filters.NumberFilter(field_name="id_club__id_district")
+    id_country = filters.NumberFilter(field_name="id_club__id_district__id_country")
 
     class Meta:
         model = Staff
