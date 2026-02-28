@@ -20,7 +20,7 @@ export default function ContactCard({
     queryKey: ["contactPhoto", contact.id],
     queryFn: async () => {
       const response = await axiosClient.get(
-        `/contacts/${contact.id}/photo/`,
+        `/contacts/${contact.id}/photo/?_=${Date.now()}`,
         { responseType: "blob" }
       );
       return URL.createObjectURL(response.data);

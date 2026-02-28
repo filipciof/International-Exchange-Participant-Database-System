@@ -38,7 +38,7 @@ export default function ContactDetail({ id, handleClose }: ContactDetailProps) {
     queryKey: ["contactPhoto", id],
     queryFn: async () => {
       const response = await axiosClient.get(
-        `/contacts/${id}/photo/`,
+        `/contacts/${id}/photo/?_=${Date.now()}`,
         { responseType: "blob" },
       );
       return URL.createObjectURL(response.data);

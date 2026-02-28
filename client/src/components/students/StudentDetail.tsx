@@ -42,7 +42,7 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
     queryKey: ["studentPhoto", id],
     queryFn: async () => {
       const response = await axiosClient.get(
-        `/students/${id}/photo/`,
+        `/students/${id}/photo/?_=${Date.now()}`,
         { responseType: "blob" },
       );
       return URL.createObjectURL(response.data);

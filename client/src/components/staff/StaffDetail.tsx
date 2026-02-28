@@ -37,7 +37,7 @@ export default function StaffDetail({ id, handleClose }: StaffDetailProps) {
     queryKey: ["staffPhoto", id],
     queryFn: async () => {
       const response = await axiosClient.get(
-        `/staff/${id}/photo/`,
+        `/staff/${id}/photo/?_=${Date.now()}`,
         { responseType: "blob" },
       );
       return URL.createObjectURL(response.data);

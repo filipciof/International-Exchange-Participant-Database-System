@@ -35,7 +35,7 @@ export default function StaffProfile({}: StaffProfileProps) {
     queryKey: ["staffPhoto", staff?.id],
     queryFn: async () => {
       const response = await axiosClient.get(
-        `/staff/${staff.id}/photo/`,
+        `/staff/${staff.id}/photo/?_=${Date.now()}`,
         { responseType: "blob" },
       );
       return URL.createObjectURL(response.data);
