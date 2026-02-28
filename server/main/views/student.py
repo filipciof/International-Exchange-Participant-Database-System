@@ -123,25 +123,22 @@ class Echo:
 class StudentFilter(filters.FilterSet):
     search = filters.CharFilter(method="filter_search")
     search_field = filters.CharFilter(method="noop")
-    start_year = filters.NumberFilter(method="filter_start_year")
     is_inbound = filters.BooleanFilter()
     gender = filters.BaseInFilter(field_name="gender")
     shirt_size = filters.BaseInFilter(field_name="shirt_size")
-    country_of_birth = filters.NumberFilter(field_name="id_country_of_birth")
-    country_of_departure = filters.NumberFilter(field_name="id_country_of_departure")
-    country_of_passport = filters.NumberFilter(field_name="id_country_of_passport")
+    sending_club = filters.NumberFilter(method="filter_sending_club")
+    receiving_club = filters.NumberFilter(method="filter_receiving_club")
     date_of_birth_before = filters.DateFilter(
         field_name="date_of_birth", lookup_expr="lte"
     )
     date_of_birth_after = filters.DateFilter(
         field_name="date_of_birth", lookup_expr="gte"
     )
-    passport_expiration_date_before = filters.DateFilter(
-        field_name="passport_expiration_date", lookup_expr="lte"
-    )
-    passport_expiration_date_after = filters.DateFilter(
-        field_name="passport_expiration_date", lookup_expr="gte"
-    )
+    exchange_start_date_before = filters.DateFilter(method="filter_exchange_start_date_before")
+    exchange_start_date_after = filters.DateFilter(method="filter_exchange_start_date_after")
+    exchange_end_date_before = filters.DateFilter(method="filter_exchange_end_date_before")
+    exchange_end_date_after = filters.DateFilter(method="filter_exchange_end_date_after")
+    start_year = filters.CharFilter(method="filter_start_year")
 
     class Meta:
         model = Student
@@ -150,9 +147,39 @@ class StudentFilter(filters.FilterSet):
     def noop(self, queryset, name, value):
         return queryset
 
+    def filter_sending_club(self, queryset, name, value):
+        return queryset.filter(
+            exchange__id_sending_club=value, exchange__is_active=True
+        ).distinct()
+
+    def filter_receiving_club(self, queryset, name, value):
+        return queryset.filter(
+            exchange__id_receiving_club=value, exchange__is_active=True
+        ).distinct()
+
+    def filter_exchange_start_date_before(self, queryset, name, value):
+        return queryset.filter(
+            exchange__start_date__lte=value, exchange__is_active=True
+        ).distinct()
+
+    def filter_exchange_start_date_after(self, queryset, name, value):
+        return queryset.filter(
+            exchange__start_date__gte=value, exchange__is_active=True
+        ).distinct()
+
+    def filter_exchange_end_date_before(self, queryset, name, value):
+        return queryset.filter(
+            exchange__end_date__lte=value, exchange__is_active=True
+        ).distinct()
+
+    def filter_exchange_end_date_after(self, queryset, name, value):
+        return queryset.filter(
+            exchange__end_date__gte=value, exchange__is_active=True
+        ).distinct()
+
     def filter_start_year(self, queryset, name, value):
         return queryset.filter(
-            exchange__start_date__year=value, exchange__is_active=True
+            exchange__year=value, exchange__is_active=True
         ).distinct()
 
     def filter_search(self, queryset, name, value):

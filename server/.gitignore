@@ -12,3 +12,4 @@ media/
 create_test_db.py
 clubs.json
 districts.json
+fixture.json

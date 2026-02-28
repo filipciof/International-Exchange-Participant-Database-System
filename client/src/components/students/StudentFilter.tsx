@@ -5,7 +5,6 @@ import {
   CardContent,
   Collapse,
   IconButton,
-  MenuItem,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
@@ -14,19 +13,13 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useState } from "react";
 import SearchInput from "../SearchInput";
-import type { Country, SearchableField } from "../../utils/types";
+import type { Country, District, Club, SearchableField } from "../../utils/types";
 import { getGenderOptions, ShirtSize } from "../../utils/types";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import useCountryDistrictClub from "../../hooks/useCountryDistrictClub";
-
-// Generate year options (from 2010 to current year + 2)
-const currentYear = new Date().getFullYear();
-const YEAR_OPTIONS = Array.from(
-  { length: currentYear - 2010 + 3 },
-  (_, i) => 2010 + i,
-);
+import { getCurrentAcademicYear } from "../../utils/dateUtils";
 
 const getSearchableFields = (t: (key: string) => string): SearchableField[] => [
   { value: "first_name", label: t("students.searchFields.firstName") },
@@ -88,17 +81,18 @@ const getSearchableFields = (t: (key: string) => string): SearchableField[] => [
 export type StudentFilters = {
   search: string;
   searchFields: string[];
-  countryOfBirthId: number | null;
-  countryOfDepartureId: number | null;
-  countryOfPassportId: number | null;
   shirtSizes: string[];
   genders: number[];
-  startYear: number | null;
   isInbound: "both" | "false" | "true" | null;
+  startYear: string;
   dateOfBirthBefore: string;
   dateOfBirthAfter: string;
-  passportExpirationDateBefore: string;
-  passportExpirationDateAfter: string;
+  sendingClubId: number | null;
+  receivingClubId: number | null;
+  exchangeStartDateBefore: string;
+  exchangeStartDateAfter: string;
+  exchangeEndDateBefore: string;
+  exchangeEndDateAfter: string;
 };
 
 type StudentFilterProps = {
@@ -111,21 +105,21 @@ export default function StudentFilter({
   onFilterChange,
 }: StudentFilterProps) {
   const { t } = useTranslation();
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const SEARCHABLE_FIELDS = getSearchableFields(t);
-  const { countries } = useCountryDistrictClub();
+
+  const [sendingCountryId, setSendingCountryId] = useState<number | null>(null);
+  const [sendingDistrictId, setSendingDistrictId] = useState<number | null>(null);
+  const [receivingCountryId, setReceivingCountryId] = useState<number | null>(null);
+  const [receivingDistrictId, setReceivingDistrictId] = useState<number | null>(null);
+
+  const { countries, districts: sendingDistricts, clubs: sendingClubs } =
+    useCountryDistrictClub(sendingCountryId, sendingDistrictId);
+  const { districts: receivingDistricts, clubs: receivingClubs } =
+    useCountryDistrictClub(receivingCountryId, receivingDistrictId);
 
   const isInbound =
     filters.isInbound === "both" ? null : filters.isInbound === "true";
-
-  const selectedCountryOfBirth =
-    countries.find((c: Country) => c.id === filters.countryOfBirthId) ?? null;
-  const selectedCountryOfDeparture =
-    countries.find((c: Country) => c.id === filters.countryOfDepartureId) ??
-    null;
-  const selectedCountryOfPassport =
-    countries.find((c: Country) => c.id === filters.countryOfPassportId) ??
-    null;
 
   return (
     <>
@@ -363,123 +357,121 @@ export default function StudentFilter({
                 {t("students.filter.startYear")}
               </Typography>
               <TextField
-                select
-                value={filters.startYear ?? ""}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  onFilterChange({
-                    startYear: value === "" ? null : Number(value),
-                  });
-                }}
+                value={filters.startYear}
+                onChange={(e) => onFilterChange({ startYear: e.target.value })}
                 size="small"
-                sx={{ minWidth: 150 }}
-              >
-                <MenuItem value="">{t("common.allYears")}</MenuItem>
-                {YEAR_OPTIONS.map((year) => (
-                  <MenuItem key={year} value={year}>
-                    {year}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: { xs: "column", sm: "row" },
-                alignItems: { xs: "stretch", sm: "center" },
-                gap: 2,
-              }}
-            >
-              <Typography
-                variant="body2"
-                sx={{ color: "text.secondary", minWidth: "fit-content" }}
-              >
-                {t("students.filter.countryOfBirth")}
-              </Typography>
-              <Autocomplete
-                value={selectedCountryOfBirth}
-                onChange={(_event, newValue) => {
-                  onFilterChange({ countryOfBirthId: newValue?.id ?? null });
-                }}
-                options={countries}
-                getOptionLabel={(option: Country) => option.name}
-                sx={{ minWidth: 200, flex: 1 }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder={t("common.selectCountry")}
-                    size="small"
-                  />
-                )}
+                placeholder={getCurrentAcademicYear()}
+                slotProps={{ htmlInput: { maxLength: 7 } }}
+                sx={{ width: 120 }}
               />
             </Box>
 
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: { xs: "column", sm: "row" },
-                alignItems: { xs: "stretch", sm: "center" },
-                gap: 2,
-              }}
-            >
-              <Typography
-                variant="body2"
-                sx={{ color: "text.secondary", minWidth: "fit-content" }}
-              >
-                {t("students.filter.countryOfDeparture")}
-              </Typography>
-              <Autocomplete
-                value={selectedCountryOfDeparture}
-                onChange={(_event, newValue) => {
-                  onFilterChange({
-                    countryOfDepartureId: newValue?.id ?? null,
-                  });
+            {(
+              [
+                {
+                  label: t("students.filter.sendingClub"),
+                  countryId: sendingCountryId,
+                  setCountryId: setSendingCountryId,
+                  districtId: sendingDistrictId,
+                  setDistrictId: setSendingDistrictId,
+                  districts: sendingDistricts,
+                  clubs: sendingClubs,
+                  clubId: filters.sendingClubId,
+                  onClubChange: (id: number | null) =>
+                    onFilterChange({ sendingClubId: id }),
+                },
+                {
+                  label: t("students.filter.receivingClub"),
+                  countryId: receivingCountryId,
+                  setCountryId: setReceivingCountryId,
+                  districtId: receivingDistrictId,
+                  setDistrictId: setReceivingDistrictId,
+                  districts: receivingDistricts,
+                  clubs: receivingClubs,
+                  clubId: filters.receivingClubId,
+                  onClubChange: (id: number | null) =>
+                    onFilterChange({ receivingClubId: id }),
+                },
+              ] as const
+            ).map((cfg) => (
+              <Box
+                key={cfg.label}
+                sx={{
+                  gridColumn: { xs: "1", lg: "1 / -1" },
+                  display: "flex",
+                  flexDirection: { xs: "column", sm: "row" },
+                  alignItems: { xs: "stretch", sm: "center" },
+                  gap: 2,
                 }}
-                options={countries}
-                getOptionLabel={(option: Country) => option.name}
-                sx={{ minWidth: 200, flex: 1 }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder={t("common.selectCountry")}
-                    size="small"
-                  />
-                )}
-              />
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: { xs: "column", sm: "row" },
-                alignItems: { xs: "stretch", sm: "center" },
-                gap: 2,
-              }}
-            >
-              <Typography
-                variant="body2"
-                sx={{ color: "text.secondary", minWidth: "fit-content" }}
               >
-                {t("students.filter.countryOfPassport")}
-              </Typography>
-              <Autocomplete
-                value={selectedCountryOfPassport}
-                onChange={(_event, newValue) => {
-                  onFilterChange({ countryOfPassportId: newValue?.id ?? null });
-                }}
-                options={countries}
-                getOptionLabel={(option: Country) => option.name}
-                sx={{ minWidth: 200, flex: 1 }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder={t("common.selectCountry")}
-                    size="small"
-                  />
-                )}
-              />
-            </Box>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "text.secondary", minWidth: "fit-content" }}
+                >
+                  {cfg.label}
+                </Typography>
+                <Autocomplete
+                  value={
+                    countries.find((c: Country) => c.id === cfg.countryId) ??
+                    null
+                  }
+                  onChange={(_e, v) => {
+                    cfg.setCountryId(v?.id ?? null);
+                    cfg.setDistrictId(null);
+                    cfg.onClubChange(null);
+                  }}
+                  options={countries}
+                  getOptionLabel={(o: Country) => o.name}
+                  sx={{ minWidth: 270 }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder={t("common.selectCountry")}
+                      size="small"
+                    />
+                  )}
+                />
+                <Autocomplete
+                  value={
+                    cfg.districts.find(
+                      (d: District) => d.id === cfg.districtId,
+                    ) ?? null
+                  }
+                  onChange={(_e, v) => {
+                    cfg.setDistrictId(v?.id ?? null);
+                    cfg.onClubChange(null);
+                  }}
+                  options={cfg.districts}
+                  getOptionLabel={(o: District) => o.number.toString()}
+                  disabled={!cfg.countryId}
+                  sx={{ minWidth: 190 }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder={t("common.selectDistrict")}
+                      size="small"
+                    />
+                  )}
+                />
+                <Autocomplete
+                  value={
+                    cfg.clubs.find((c: Club) => c.id === cfg.clubId) ?? null
+                  }
+                  onChange={(_e, v) => cfg.onClubChange(v?.id ?? null)}
+                  options={cfg.clubs}
+                  getOptionLabel={(o: Club) => o.name}
+                  disabled={!cfg.districtId}
+                  sx={{ minWidth: 500, maxWidth: 700 }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder={t("common.selectClub")}
+                      size="small"
+                    />
+                  )}
+                />
+              </Box>
+            ))}
 
             <Box
               sx={{
@@ -498,7 +490,7 @@ export default function StudentFilter({
                 }}
               >
                 <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                  {t("students.filter.dateOfBirth")}
+                  {t("students.filter.exchangeStartDate")}
                 </Typography>
                 <Box
                   sx={{
@@ -512,13 +504,13 @@ export default function StudentFilter({
                     label={t("common.after")}
                     format="YYYY-MM-DD"
                     value={
-                      filters.dateOfBirthAfter
-                        ? dayjs(filters.dateOfBirthAfter)
+                      filters.exchangeStartDateAfter
+                        ? dayjs(filters.exchangeStartDateAfter)
                         : null
                     }
                     onChange={(newValue) => {
                       onFilterChange({
-                        dateOfBirthAfter: newValue
+                        exchangeStartDateAfter: newValue
                           ? newValue.format("YYYY-MM-DD")
                           : "",
                       });
@@ -534,13 +526,13 @@ export default function StudentFilter({
                     label={t("common.before")}
                     format="YYYY-MM-DD"
                     value={
-                      filters.dateOfBirthBefore
-                        ? dayjs(filters.dateOfBirthBefore)
+                      filters.exchangeStartDateBefore
+                        ? dayjs(filters.exchangeStartDateBefore)
                         : null
                     }
                     onChange={(newValue) => {
                       onFilterChange({
-                        dateOfBirthBefore: newValue
+                        exchangeStartDateBefore: newValue
                           ? newValue.format("YYYY-MM-DD")
                           : "",
                       });
@@ -564,7 +556,7 @@ export default function StudentFilter({
                 }}
               >
                 <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                  {t("students.filter.passportExpiration")}
+                  {t("students.filter.exchangeEndDate")}
                 </Typography>
                 <Box
                   sx={{
@@ -578,13 +570,13 @@ export default function StudentFilter({
                     label={t("common.after")}
                     format="YYYY-MM-DD"
                     value={
-                      filters.passportExpirationDateAfter
-                        ? dayjs(filters.passportExpirationDateAfter)
+                      filters.exchangeEndDateAfter
+                        ? dayjs(filters.exchangeEndDateAfter)
                         : null
                     }
                     onChange={(newValue) => {
                       onFilterChange({
-                        passportExpirationDateAfter: newValue
+                        exchangeEndDateAfter: newValue
                           ? newValue.format("YYYY-MM-DD")
                           : "",
                       });
@@ -600,13 +592,13 @@ export default function StudentFilter({
                     label={t("common.before")}
                     format="YYYY-MM-DD"
                     value={
-                      filters.passportExpirationDateBefore
-                        ? dayjs(filters.passportExpirationDateBefore)
+                      filters.exchangeEndDateBefore
+                        ? dayjs(filters.exchangeEndDateBefore)
                         : null
                     }
                     onChange={(newValue) => {
                       onFilterChange({
-                        passportExpirationDateBefore: newValue
+                        exchangeEndDateBefore: newValue
                           ? newValue.format("YYYY-MM-DD")
                           : "",
                       });
@@ -619,6 +611,73 @@ export default function StudentFilter({
                     }}
                   />
                 </Box>
+              </Box>
+
+            </Box>
+
+            <Box
+              sx={{
+                gridColumn: { xs: "1", lg: "1 / -1" },
+                display: "flex",
+                flexDirection: "column",
+                gap: 1,
+              }}
+            >
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                {t("students.filter.dateOfBirth")}
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                  flexWrap: "wrap",
+                }}
+              >
+                <DatePicker
+                  label={t("common.after")}
+                  format="YYYY-MM-DD"
+                  value={
+                    filters.dateOfBirthAfter
+                      ? dayjs(filters.dateOfBirthAfter)
+                      : null
+                  }
+                  onChange={(newValue) => {
+                    onFilterChange({
+                      dateOfBirthAfter: newValue
+                        ? newValue.format("YYYY-MM-DD")
+                        : "",
+                    });
+                  }}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      sx: { minWidth: 150 },
+                    },
+                  }}
+                />
+                <DatePicker
+                  label={t("common.before")}
+                  format="YYYY-MM-DD"
+                  value={
+                    filters.dateOfBirthBefore
+                      ? dayjs(filters.dateOfBirthBefore)
+                      : null
+                  }
+                  onChange={(newValue) => {
+                    onFilterChange({
+                      dateOfBirthBefore: newValue
+                        ? newValue.format("YYYY-MM-DD")
+                        : "",
+                    });
+                  }}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      sx: { minWidth: 150 },
+                    },
+                  }}
+                />
               </Box>
             </Box>
           </CardContent>

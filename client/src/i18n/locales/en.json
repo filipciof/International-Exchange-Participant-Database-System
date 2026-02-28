@@ -173,7 +173,11 @@
       "countryOfDeparture": "Country of departure:",
       "countryOfPassport": "Country of passport:",
       "dateOfBirth": "Date of birth:",
-      "passportExpiration": "Passport expiration date:"
+      "passportExpiration": "Passport expiration date:",
+      "sendingClub": "Sending club:",
+      "receivingClub": "Receiving club:",
+      "exchangeStartDate": "Exchange start date:",
+      "exchangeEndDate": "Exchange end date:"
     },
     "searchFields": {
       "firstName": "First Name",

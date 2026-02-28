@@ -173,7 +173,11 @@
       "countryOfDeparture": "Kraj wyjazdu:",
       "countryOfPassport": "Kraj paszportu:",
       "dateOfBirth": "Data urodzenia:",
-      "passportExpiration": "Data ważności paszportu:"
+      "passportExpiration": "Data ważności paszportu:",
+      "sendingClub": "Klub wysyłający:",
+      "receivingClub": "Klub odbierający:",
+      "exchangeStartDate": "Data rozpoczęcia wymiany:",
+      "exchangeEndDate": "Data zakończenia wymiany:"
     },
     "searchFields": {
       "firstName": "Imię",

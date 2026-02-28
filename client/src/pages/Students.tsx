@@ -20,6 +20,7 @@ import {
   parseAsArrayOf,
 } from "nuqs";
 import { useTranslation } from "react-i18next";
+import { getCurrentAcademicYear } from "../utils/dateUtils";
 
 export default function Students() {
   const { t } = useTranslation();
@@ -51,17 +52,18 @@ export default function Students() {
   const [filters, setFilters] = useQueryStates({
     search: parseAsString.withDefault(""),
     searchFields: parseAsArrayOf(parseAsString).withDefault([]),
-    countryOfBirthId: parseAsInteger,
-    countryOfDepartureId: parseAsInteger,
-    countryOfPassportId: parseAsInteger,
     shirtSizes: parseAsArrayOf(parseAsString).withDefault([]),
     genders: parseAsArrayOf(parseAsInteger).withDefault([]),
-    startYear: parseAsInteger,
-    isInbound: parseAsStringLiteral(["true", "false", "both"]).withDefault("true"),
+    isInbound: parseAsStringLiteral(["true", "false", "both"]).withDefault("both"),
+    startYear: parseAsString.withDefault(getCurrentAcademicYear()),
     dateOfBirthBefore: parseAsString.withDefault(""),
     dateOfBirthAfter: parseAsString.withDefault(""),
-    passportExpirationDateBefore: parseAsString.withDefault(""),
-    passportExpirationDateAfter: parseAsString.withDefault(""),
+    sendingClubId: parseAsInteger,
+    receivingClubId: parseAsInteger,
+    exchangeStartDateBefore: parseAsString.withDefault(""),
+    exchangeStartDateAfter: parseAsString.withDefault(""),
+    exchangeEndDateBefore: parseAsString.withDefault(""),
+    exchangeEndDateAfter: parseAsString.withDefault(""),
   });
 
   const scrollPositionRef = useRef<number>(0);

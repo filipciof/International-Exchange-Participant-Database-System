@@ -24,27 +24,10 @@ import InfoItem from "../../InfoItem";
 import EditableExchangeFamilies from "./EditableExchangeFamilies";
 import { useTranslation } from "react-i18next";
 import usePermissions from "../../../hooks/usePermissions";
+import { getCurrentAcademicYear } from "../../../utils/dateUtils";
 
 type EditableExchangesProps = {
   studentId: number;
-};
-
-// Helper function to get current academic year in YYYY/YY format
-const getCurrentAcademicYear = (): string => {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth(); // 0-11
-
-  // Academic year typically starts in September (month 8)
-  // If we're in Jan-Aug, the academic year is (previous year)/(current year last 2 digits)
-  // If we're in Sep-Dec, the academic year is (current year)/(next year last 2 digits)
-  if (currentMonth < 8) {
-    const prevYear = currentYear - 1;
-    return `${prevYear}/${String(currentYear).slice(-2)}`;
-  } else {
-    const nextYear = currentYear + 1;
-    return `${currentYear}/${String(nextYear).slice(-2)}`;
-  }
 };
 
 export default function EditableExchanges({

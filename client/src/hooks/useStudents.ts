@@ -77,26 +77,8 @@ export function useStudents({
       params.append("shirt_size", shirtSize);
     });
 
-    if (filters.countryOfBirthId) {
-      params.append("country_of_birth", filters.countryOfBirthId.toString());
-    }
-
-    if (filters.countryOfDepartureId) {
-      params.append(
-        "country_of_departure",
-        filters.countryOfDepartureId.toString(),
-      );
-    }
-
-    if (filters.countryOfPassportId) {
-      params.append(
-        "country_of_passport",
-        filters.countryOfPassportId.toString(),
-      );
-    }
-
     if (filters.startYear) {
-      params.append("start_year", filters.startYear.toString());
+      params.append("start_year", filters.startYear);
     }
 
     if (isInbound === true) {
@@ -113,18 +95,28 @@ export function useStudents({
       params.append("date_of_birth_after", filters.dateOfBirthAfter);
     }
 
-    if (filters.passportExpirationDateBefore) {
-      params.append(
-        "passport_expiration_date_before",
-        filters.passportExpirationDateBefore,
-      );
+    if (filters.sendingClubId) {
+      params.append("sending_club", filters.sendingClubId.toString());
     }
 
-    if (filters.passportExpirationDateAfter) {
-      params.append(
-        "passport_expiration_date_after",
-        filters.passportExpirationDateAfter,
-      );
+    if (filters.receivingClubId) {
+      params.append("receiving_club", filters.receivingClubId.toString());
+    }
+
+    if (filters.exchangeStartDateBefore) {
+      params.append("exchange_start_date_before", filters.exchangeStartDateBefore);
+    }
+
+    if (filters.exchangeStartDateAfter) {
+      params.append("exchange_start_date_after", filters.exchangeStartDateAfter);
+    }
+
+    if (filters.exchangeEndDateBefore) {
+      params.append("exchange_end_date_before", filters.exchangeEndDateBefore);
+    }
+
+    if (filters.exchangeEndDateAfter) {
+      params.append("exchange_end_date_after", filters.exchangeEndDateAfter);
     }
 
     return params;

@@ -56,9 +56,6 @@ TODO:
 <!-- - Test filling in forms differently. -->
 <!-- - Don't show form fields until the object is fetched. (it's usually rather fast).-->
 <!-- - Can't remove club completely (cause it's required/ FamilyDetail). -->
-- Pass active role (not necessarily for scoping but just in general).
-- Filter students by sending and receiving club (exchange information).
-- More filters in general.
 
 Less important refactors:
 - Editable (EditableHeaders and clubs/EditableLocation use it for now).
