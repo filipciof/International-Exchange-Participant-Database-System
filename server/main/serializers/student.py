@@ -3,10 +3,7 @@ from rest_framework import serializers
 from main.models import Student, GENDER_MAP, LANG_PROF_MAP, Club
 from main.permissions import (
     is_club_from_home_country,
-    is_admin,
-    is_correspondent,
-    is_kwm_officer,
-    is_club_officer,
+    Roles,
 )
 
 from django.contrib.auth import get_user_model
@@ -101,11 +98,15 @@ class CreateStudentSerializer(serializers.Serializer):
         if not user:
             return attrs
 
+        active_role = self.context.get("active_role")
         is_inbound = attrs.get("is_inbound")
-        can_create_inbound = (
-            is_admin(user) or is_correspondent(user) or is_kwm_officer(user)
+
+        can_create_inbound = active_role in (
+            Roles.ADMIN,
+            Roles.CORRESPONDENT,
+            Roles.KWM_OFFICER,
         )
-        can_create_outbound = is_admin(user) or is_club_officer(user)
+        can_create_outbound = active_role in (Roles.ADMIN, Roles.CLUB_OFFICER)
 
         if is_inbound and not can_create_inbound:
             raise serializers.ValidationError(
@@ -125,7 +126,7 @@ class CreateStudentSerializer(serializers.Serializer):
                 }
             )
 
-        if is_club_officer(user) and not is_inbound:
+        if active_role == Roles.CLUB_OFFICER and not is_inbound:
             staff = getattr(user, "id_staff", None)
             if staff and staff.id_club_id and attrs["id_club"] != staff.id_club_id:
                 raise serializers.ValidationError(

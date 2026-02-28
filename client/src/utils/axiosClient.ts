@@ -24,6 +24,10 @@ axiosClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     config.headers["Accept-Language"] = i18n.language.split("-")[0];
+    const activeGroup = localStorage.getItem("activeGroup");
+    if (activeGroup) {
+      config.headers["X-Active-Role"] = activeGroup;
+    }
     return config;
   },
   (error) => {

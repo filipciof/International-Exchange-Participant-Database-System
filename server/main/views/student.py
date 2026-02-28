@@ -25,7 +25,11 @@ from main.serializers import (
     StudentSerializer,
     StudentUserAccountUpdateSerializer,
 )
-from main.permissions import StudentPermission, is_correspondent, is_kwm_officer
+from main.permissions import (
+    StudentPermission,
+    get_active_role,
+    Roles,
+)
 from main.selectors import student_queryset_for
 from django.shortcuts import get_object_or_404
 from eauth.utils import send_activation_email, send_email_change_verification
@@ -193,8 +197,20 @@ class StudentListView(ListCreateAPIView):
         return student_queryset_for(self.request.user).order_by("-id")
 
     def create(self, request, *args, **kwargs):
+        active_role = get_active_role(request)
+        if not active_role:
+            return Response(
+                {
+                    "detail": _(
+                        "X-Active-Role header is required and must match one of your roles."
+                    )
+                },
+                status=400,
+            )
+
         serializer = CreateStudentSerializer(
-            data=request.data, context={"user": request.user}
+            data=request.data,
+            context={"user": request.user, "active_role": active_role},
         )
         serializer.is_valid(raise_exception=True)
 
@@ -222,7 +238,7 @@ class StudentListView(ListCreateAPIView):
                 "is_active": True,
             }
 
-            if is_correspondent(request.user) or is_kwm_officer(request.user):
+            if active_role in (Roles.CORRESPONDENT, Roles.KWM_OFFICER):
                 exchange_kwargs["id_counsellor"] = request.user.id_staff
 
             Exchange.objects.create(**exchange_kwargs)

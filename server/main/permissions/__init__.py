@@ -11,6 +11,7 @@ from .base import (
     student_has_exchange_with_club,
     student_has_exchange_with_staff,
     student_has_exchange_with_family,
+    get_active_role,
     is_club_from_home_country,
 )
 from .policy_permissions import (

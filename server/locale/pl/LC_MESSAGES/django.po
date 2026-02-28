@@ -275,3 +275,7 @@ msgstr "Nie znaleziono profilu uczestnika dla tego użytkownika."
 #: main/student_views.py:514
 msgid "Student does not have a user account."
 msgstr "Uczestnik nie posiada konta użytkownika."
+
+#: main/views/student.py
+msgid "X-Active-Role header is required and must match one of your roles."
+msgstr "Nagłówek X-Active-Role jest wymagany i musi odpowiadać jednej z Twoich ról."

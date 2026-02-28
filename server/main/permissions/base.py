@@ -80,6 +80,13 @@ def student_has_exchange_with_family(student, family) -> bool:
     ).exists()
 
 
+def get_active_role(request) -> str | None:
+    role = request.headers.get("X-Active-Role")
+    if role and has_role(request.user, role):
+        return role
+    return None
+
+
 def is_club_from_home_country(club) -> bool:
     """Check if a club belongs to the home country"""
     if not club or not club.id_district or not club.id_district.id_country:
