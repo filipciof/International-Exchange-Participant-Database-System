@@ -36,6 +36,9 @@ pg_dump -U admin -h localhost -d iepds > ~/repos/IEPDS/server/pg_iepds.sql
 Loading the dump (drop all schema before doing this):
 psql -U admin -h localhost -d iepds < ~/repos/IEPDS/server/pg_iepds.sql
 
+That's why I can't load after migrating the database.
+python manage.py dumpdata --exclude contenttypes --exclude auth.permission > fixture.json
+
 High level description of the system.
 
 The system is designed for managing international student exchanges for a country level branch of an international organization. The country of this branch of the organization is further referred to as the "home" country. The organization works in different countries. Each country can be further split into districts. Within those districts there are clubs. At the beginning of the lifecycle of the system there will be the home country, its districts and clubs. Only admins should be able to add or modify those. For now, let's assume that there will be a fixed set of foreign countries and districts. Foreign clubs might need to be added as the system grows.
