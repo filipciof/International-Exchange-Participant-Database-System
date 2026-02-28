@@ -40,8 +40,8 @@
   },
   "gender": {
     "gender": "Płeć",
-    "male": "męska",
-    "female": "żeńska",
+    "male": "mężczyzna",
+    "female": "kobieta",
     "nonbinary": "niebinarna",
     "unknown": "—"
   },
