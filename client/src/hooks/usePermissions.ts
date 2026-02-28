@@ -39,6 +39,7 @@ type Permissions = {
   canEditStaffClubInfo: boolean;
   canEditStudentName: boolean;
   canEditStaffName: boolean;
+  hasLockedFamilyClubFilter: boolean;
 };
 
 function resolvePermissions(group: string): Permissions {
@@ -65,6 +66,7 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffClubInfo: true,
         canEditStudentName: true,
         canEditStaffName: true,
+        hasLockedFamilyClubFilter: false,
       };
     case "correspondent":
       return {
@@ -88,6 +90,7 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffClubInfo: false,
         canEditStudentName: true,
         canEditStaffName: false,
+        hasLockedFamilyClubFilter: false,
       };
     case "kwm_officer":
       return {
@@ -111,6 +114,7 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffClubInfo: false,
         canEditStudentName: true,
         canEditStaffName: false,
+        hasLockedFamilyClubFilter: false,
       };
     case "club_officer":
       return {
@@ -134,6 +138,7 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffClubInfo: false,
         canEditStudentName: true,
         canEditStaffName: false,
+        hasLockedFamilyClubFilter: true,
       };
     case "student":
       return {
@@ -157,6 +162,7 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffClubInfo: false,
         canEditStudentName: false,
         canEditStaffName: false,
+        hasLockedFamilyClubFilter: false,
       };
     default:
       return {
@@ -180,6 +186,7 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffClubInfo: false,
         canEditStudentName: false,
         canEditStaffName: false,
+        hasLockedFamilyClubFilter: false,
       };
   }
 }

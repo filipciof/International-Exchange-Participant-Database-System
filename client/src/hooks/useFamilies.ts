@@ -2,27 +2,37 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import axiosClient from "../utils/axiosClient";
 import queryClient from "../utils/queryClient";
 import type { PaginationModel, FamilyFormData } from "../utils/types";
+import type { FamilyFilters } from "../components/families/FamilyFilter";
 
 interface UseFamiliesParams {
   paginationModel: PaginationModel;
-  searchInput: string;
+  filters: FamilyFilters;
 }
 
-export function useFamilies({ paginationModel, searchInput }: UseFamiliesParams) {
+export function useFamilies({ paginationModel, filters }: UseFamiliesParams) {
   const {
     data: families,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["families", paginationModel, searchInput],
+    queryKey: ["families", paginationModel, filters],
     queryFn: async () => {
       const params = new URLSearchParams({
         page: paginationModel.page.toString(),
         page_size: paginationModel.pageSize.toString(),
       });
 
-      if (searchInput) {
-        params.append("search", searchInput);
+      if (filters.search) {
+        params.append("search", filters.search);
+      }
+      if (filters.countryId) {
+        params.append("id_country", filters.countryId.toString());
+      }
+      if (filters.districtId) {
+        params.append("id_district", filters.districtId.toString());
+      }
+      if (filters.clubId) {
+        params.append("id_club", filters.clubId.toString());
       }
 
       const response = await axiosClient.get(`/families/?${params.toString()}`);

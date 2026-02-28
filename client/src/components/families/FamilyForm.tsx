@@ -8,11 +8,13 @@ import type {
   Country,
   District,
   Club,
+  Staff,
 } from "../../utils/types";
 import { familySchema } from "../../utils/types";
 import axiosClient from "../../utils/axiosClient";
 import { useTranslation } from "react-i18next";
 import useCountryDistrictClub from "../../hooks/useCountryDistrictClub";
+import usePermissions from "../../hooks/usePermissions";
 import {
   ControlledTextField,
   ControlledAutocomplete,
@@ -39,6 +41,7 @@ export default function FamilyForm({
   submitButtonText,
 }: FamilyFormProps) {
   const { t } = useTranslation();
+  const { hasLockedFamilyClubFilter } = usePermissions();
 
   const { data: existingFamily } = useQuery({
     queryKey: ["families", editingId],
@@ -63,6 +66,15 @@ export default function FamilyForm({
       },
     });
 
+  const { data: currentStaff } = useQuery<Staff>({
+    queryKey: ["staff", "me"],
+    queryFn: async () => {
+      const response = await axiosClient.get("/staff/me/");
+      return response.data;
+    },
+    enabled: hasLockedFamilyClubFilter,
+  });
+
   useEffect(() => {
     if (existingFamily) {
       reset(existingFamily);
@@ -72,6 +84,15 @@ export default function FamilyForm({
       }
     }
   }, [existingFamily, reset, setValue]);
+
+  useEffect(() => {
+    if (hasLockedFamilyClubFilter && !editingId && currentStaff?.club) {
+      setValue("id_country", currentStaff.club.id_country);
+      setValue("id_district", currentStaff.club.id_district);
+      setValue("id_club", currentStaff.club.id);
+      setValue("city", currentStaff.club.city);
+    }
+  }, [hasLockedFamilyClubFilter, editingId, currentStaff, setValue]);
 
   const selectedCountry = watch("id_country");
   const selectedDistrict = watch("id_district");
@@ -124,6 +145,7 @@ export default function FamilyForm({
             getOptionValue={(c: Country) => c.id}
             label={t("familyForm.country")}
             loading={isLoadingCountries}
+            disabled={hasLockedFamilyClubFilter}
           />
           <ControlledAutocomplete
             name="id_district"
@@ -132,7 +154,7 @@ export default function FamilyForm({
             getOptionLabel={(d: District) => d.number.toString()}
             getOptionValue={(d: District) => d.id}
             label={t("familyForm.district")}
-            disabled={!selectedCountry || isLoadingDistricts}
+            disabled={hasLockedFamilyClubFilter || !selectedCountry || isLoadingDistricts}
             loading={isLoadingDistricts}
           />
         </Stack>
@@ -143,7 +165,7 @@ export default function FamilyForm({
           getOptionLabel={(c: Club) => c.name}
           getOptionValue={(c: Club) => c.id}
           label={t("familyForm.club")}
-          disabled={!selectedDistrict || isLoadingClubs}
+          disabled={hasLockedFamilyClubFilter || !selectedDistrict || isLoadingClubs}
           loading={isLoadingClubs}
         />
         <Stack direction="row" spacing={1}>

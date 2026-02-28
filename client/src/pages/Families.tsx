@@ -1,9 +1,11 @@
 import AddIcon from "@mui/icons-material/Add";
 import type { ViewType, FamilyFormData } from "../utils/types";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import { useFamilies } from "../hooks/useFamilies";
+import usePermissions from "../hooks/usePermissions";
 import {
   useQueryState,
+  useQueryStates,
   parseAsInteger,
   parseAsString,
   parseAsStringLiteral,
@@ -20,6 +22,7 @@ import { useTranslation } from "react-i18next";
 
 export default function Families() {
   const { t } = useTranslation();
+  const { hasLockedFamilyClubFilter } = usePermissions();
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [pageSize, setPageSize] = useQueryState(
     "pageSize",
@@ -31,10 +34,12 @@ export default function Families() {
     setPageSize(model.pageSize);
   };
   const [selectedId, setSelectedId] = useQueryState("id", parseAsInteger);
-  const [searchInput, setSearchInput] = useQueryState(
-    "search",
-    parseAsString.withDefault(""),
-  );
+  const [filters, setFilters] = useQueryStates({
+    search: parseAsString.withDefault(""),
+    countryId: parseAsInteger,
+    districtId: parseAsInteger,
+    clubId: parseAsInteger,
+  });
   const [currentView, setCurrentView] = useQueryState(
     "view",
     parseAsStringLiteral([
@@ -64,6 +69,14 @@ export default function Families() {
     setCurrentView(newView);
   };
 
+  const handleFilterChange = useCallback(
+    (update: Parameters<typeof setFilters>[0]) => {
+      setFilters(update);
+      setPage(1);
+    },
+    [setFilters, setPage],
+  );
+
   const {
     families,
     isLoading,
@@ -71,7 +84,7 @@ export default function Families() {
     addFamilyMutation,
     updateFamilyMutation,
     deleteFamilyMutation,
-  } = useFamilies({ paginationModel, searchInput });
+  } = useFamilies({ paginationModel, filters });
 
   const handleClose = () => {
     setSelectedId(null);
@@ -148,10 +161,9 @@ export default function Families() {
       )}
 
       <FamilyFilter
-        searchInput={searchInput}
-        setSearchInput={setSearchInput}
-        paginationModel={paginationModel}
-        setPaginationModel={setPaginationModel}
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        hasLockedFamilyClubFilter={hasLockedFamilyClubFilter}
       />
 
       <MyPagination
