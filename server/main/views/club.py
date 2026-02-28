@@ -1,6 +1,10 @@
 from django_filters import rest_framework as filters
 from django.db.models import Q
-from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import (
+    ListAPIView,
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
 from main.models import Country, District, Club
 from main.serializers import CountrySerializer, DistrictSerializer, ClubSerializer
 from main.permissions import ClubPermission, DistrictPermission
@@ -16,7 +20,11 @@ class ClubFilter(filters.FilterSet):
         fields = ["id_district"]
 
     def filter_search(self, queryset, name, value):
-        return queryset.filter(Q(name__icontains=value) | Q(city__icontains=value))
+        return queryset.filter(
+            Q(name__icontains=value)
+            | Q(city__icontains=value)
+            | Q(number__icontains=value)
+        )
 
 
 class CountryView(ListAPIView):
