@@ -75,6 +75,13 @@ export default function CreateStaffForm({
     }
   }, [countries, selectedCountry, setValue]);
 
+  // Pre-select district if only one exists
+  useEffect(() => {
+    if (districts.length === 1 && !selectedDistrict) {
+      setValue("id_district", districts[0].id);
+    }
+  }, [districts, selectedDistrict, setValue]);
+
   const mutation = useMutation({
     mutationFn: async (data: CreateStaffFormData) => {
       const response = await axiosClient.post("/staff/", data, {
