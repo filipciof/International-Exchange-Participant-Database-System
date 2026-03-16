@@ -80,7 +80,7 @@ def student_has_exchange_with_family(student, family) -> bool:
     ).exists()
 
 
-def get_active_role(request) -> str | None:
+def get_active_role(request):
     role = request.headers.get("X-Active-Role")
     if role and has_role(request.user, role):
         return role

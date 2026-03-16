@@ -86,3 +86,7 @@ python manage.py makemessages -l pl
 python manage.py compilemessages
 
 The app disregards region code in the language settings.
+
+ErrorDocument 404 /index.html
+
+On the server, there is Python 3.9 so I cannot use all the typing annotations like, eg. "str | None".
