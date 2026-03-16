@@ -279,3 +279,11 @@ msgstr "Uczestnik nie posiada konta użytkownika."
 #: main/views/student.py
 msgid "X-Active-Role header is required and must match one of your roles."
 msgstr "Nagłówek X-Active-Role jest wymagany i musi odpowiadać jednej z Twoich ról."
+
+#: main/serializers/club.py
+msgid "District with this ID already exists."
+msgstr "Dystrykt o tym ID już istnieje."
+
+#: main/serializers/club.py
+msgid "Club with this ID already exists."
+msgstr "Klub o tym ID już istnieje."

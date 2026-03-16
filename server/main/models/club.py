@@ -19,7 +19,7 @@ class District(models.Model):
         Country, null=True, on_delete=models.SET_NULL, db_column="id_country"
     )
     number = models.CharField(
-        max_length=10, unique=True, validators=[RegexValidator(regex=r"^\d+$")]
+        max_length=10, validators=[RegexValidator(regex=r"^\d+$")]
     )
     is_active = models.BooleanField(default=True)
 
@@ -34,7 +34,7 @@ class Club(models.Model):
     name = models.CharField(max_length=60)
     city = models.CharField(max_length=30, blank=True, default="")
     number = models.CharField(
-        max_length=10, unique=True, validators=[RegexValidator(regex=r"^\d+$")]
+        max_length=10, validators=[RegexValidator(regex=r"^\d+$")]
     )
 
     is_active = models.BooleanField(default=True)

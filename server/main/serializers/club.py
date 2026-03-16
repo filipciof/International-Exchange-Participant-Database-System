@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from rest_framework import serializers
 from main.models import Country, District, Club
 
@@ -14,6 +15,14 @@ class DistrictSerializer(serializers.ModelSerializer):
         fields = "__all__"
         extra_kwargs = {"is_active": {"required": False, "default": True}}
 
+    def validate_number(self, value):
+        qs = District.objects.filter(number=value, is_active=True)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError(_("District with this number already exists."))
+        return value
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation["country"] = (
@@ -27,6 +36,14 @@ class ClubSerializer(serializers.ModelSerializer):
         model = Club
         fields = "__all__"
         extra_kwargs = {"is_active": {"required": False, "default": True}}
+
+    def validate_number(self, value):
+        qs = Club.objects.filter(number=value, is_active=True)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError(_("Club with this number already exists."))
+        return value
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
