@@ -122,7 +122,6 @@ class Echo:
 
 class StudentFilter(filters.FilterSet):
     search = filters.CharFilter(method="filter_search")
-    search_field = filters.CharFilter(method="noop")
     is_inbound = filters.BooleanFilter()
     gender = filters.BaseInFilter(field_name="gender")
     shirt_size = filters.BaseInFilter(field_name="shirt_size")
@@ -143,9 +142,6 @@ class StudentFilter(filters.FilterSet):
     class Meta:
         model = Student
         fields = []
-
-    def noop(self, queryset, name, value):
-        return queryset
 
     def filter_sending_club(self, queryset, name, value):
         return queryset.filter(
@@ -183,32 +179,29 @@ class StudentFilter(filters.FilterSet):
         ).distinct()
 
     def filter_search(self, queryset, name, value):
-        search_fields = self.request.GET.getlist("search_field")
-        if not search_fields:
-            search_fields = [
-                "first_name",
-                "middle_name",
-                "last_name",
-                "nick_name",
-                "city_of_birth",
-                "city_of_residence",
-                "address",
-                "dietary_restrictions",
-                "first_language",
-                "second_language",
-                "third_language",
-                "passport_number",
-                "first_parent_full_name",
-                "first_parent_email",
-                "second_parent_full_name",
-                "second_parent_email",
-                "polish_phone_number",
-                "insurance_company",
-                "insurance_type",
-                "insurance_serial_number",
-                "notes",
-            ]
-
+        search_fields = [
+            "first_name",
+            "middle_name",
+            "last_name",
+            "nick_name",
+            "city_of_birth",
+            "city_of_residence",
+            "address",
+            "dietary_restrictions",
+            "first_language",
+            "second_language",
+            "third_language",
+            "passport_number",
+            "first_parent_full_name",
+            "first_parent_email",
+            "second_parent_full_name",
+            "second_parent_email",
+            "polish_phone_number",
+            "insurance_company",
+            "insurance_type",
+            "insurance_serial_number",
+            "notes",
+        ]
         query = Q()
         for field in search_fields:
             query |= Q(**{f"{field}__icontains": value})

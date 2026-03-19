@@ -51,7 +51,6 @@ export default function Students() {
   // Filters
   const [filters, setFilters] = useQueryStates({
     search: parseAsString.withDefault(""),
-    searchFields: parseAsArrayOf(parseAsString).withDefault([]),
     shirtSizes: parseAsArrayOf(parseAsString).withDefault([]),
     genders: parseAsArrayOf(parseAsInteger).withDefault([]),
     isInbound: parseAsStringLiteral(["true", "false", "both"]).withDefault("both"),

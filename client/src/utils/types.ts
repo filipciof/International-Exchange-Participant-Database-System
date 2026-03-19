@@ -407,8 +407,3 @@ export type DocumentFormInputs = z.infer<typeof documentSchema>;
 export type DocumentFormData = DocumentFormInputs & {
   file: File | null;
 };
-
-export type SearchableField = {
-  value: string;
-  label: string;
-};

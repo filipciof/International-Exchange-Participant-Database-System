@@ -65,10 +65,6 @@ export function useStudents({
       params.append("search", filters.search);
     }
 
-    filters.searchFields.forEach((searchField) => {
-      params.append("search_field", searchField);
-    });
-
     filters.genders.forEach((gender) => {
       params.append("gender", gender.toString());
     });

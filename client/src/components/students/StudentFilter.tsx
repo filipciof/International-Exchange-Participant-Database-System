@@ -13,7 +13,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useState } from "react";
 import SearchInput from "../SearchInput";
-import type { Country, District, Club, SearchableField } from "../../utils/types";
+import type { Country, District, Club } from "../../utils/types";
 import { getGenderOptions, ShirtSize } from "../../utils/types";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
@@ -21,66 +21,8 @@ import { useTranslation } from "react-i18next";
 import useCountryDistrictClub from "../../hooks/useCountryDistrictClub";
 import { getCurrentAcademicYear } from "../../utils/dateUtils";
 
-const getSearchableFields = (t: (key: string) => string): SearchableField[] => [
-  { value: "first_name", label: t("students.searchFields.firstName") },
-  { value: "middle_name", label: t("students.searchFields.middleName") },
-  { value: "last_name", label: t("students.searchFields.lastName") },
-  { value: "nick_name", label: t("students.searchFields.nickname") },
-  { value: "city_of_birth", label: t("students.searchFields.cityOfBirth") },
-  {
-    value: "city_of_residence",
-    label: t("students.searchFields.cityOfResidence"),
-  },
-  { value: "address", label: t("students.searchFields.address") },
-  {
-    value: "dietary_restrictions",
-    label: t("students.searchFields.dietaryRestrictions"),
-  },
-  { value: "first_language", label: t("students.searchFields.firstLanguage") },
-  {
-    value: "second_language",
-    label: t("students.searchFields.secondLanguage"),
-  },
-  { value: "third_language", label: t("students.searchFields.thirdLanguage") },
-  {
-    value: "passport_number",
-    label: t("students.searchFields.passportNumber"),
-  },
-  {
-    value: "first_parent_full_name",
-    label: t("students.searchFields.firstParentName"),
-  },
-  {
-    value: "first_parent_email",
-    label: t("students.searchFields.firstParentEmail"),
-  },
-  {
-    value: "second_parent_full_name",
-    label: t("students.searchFields.secondParentName"),
-  },
-  {
-    value: "second_parent_email",
-    label: t("students.searchFields.secondParentEmail"),
-  },
-  {
-    value: "polish_phone_number",
-    label: t("students.searchFields.polishPhoneNumber"),
-  },
-  {
-    value: "insurance_company",
-    label: t("students.searchFields.insuranceCompany"),
-  },
-  { value: "insurance_type", label: t("students.searchFields.insuranceType") },
-  {
-    value: "insurance_serial_number",
-    label: t("students.searchFields.insuranceSerialNumber"),
-  },
-  { value: "notes", label: t("students.searchFields.notes") },
-];
-
 export type StudentFilters = {
   search: string;
-  searchFields: string[];
   shirtSizes: string[];
   genders: number[];
   isInbound: "both" | "false" | "true" | null;
@@ -105,8 +47,7 @@ export default function StudentFilter({
   onFilterChange,
 }: StudentFilterProps) {
   const { t } = useTranslation();
-  const [expanded, setExpanded] = useState(true);
-  const SEARCHABLE_FIELDS = getSearchableFields(t);
+  const [expanded, setExpanded] = useState(false);
 
   const [sendingCountryId, setSendingCountryId] = useState<number | null>(null);
   const [sendingDistrictId, setSendingDistrictId] = useState<number | null>(null);
@@ -128,29 +69,6 @@ export default function StudentFilter({
         onChange={(search) => onFilterChange({ search })}
         placeholder={t("students.searchPlaceholder")}
       />
-      <Box sx={{ my: 2 }}>
-        <Autocomplete
-          multiple
-          value={SEARCHABLE_FIELDS.filter((field) =>
-            filters.searchFields.includes(field.value),
-          )}
-          onChange={(_event, newValue) => {
-            onFilterChange({
-              searchFields: newValue.map((field) => field.value),
-            });
-          }}
-          options={SEARCHABLE_FIELDS}
-          getOptionLabel={(option) => option.label}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              placeholder={t("students.selectFields")}
-              size="small"
-            />
-          )}
-          sx={{ width: "100%" }}
-        />
-      </Box>
       <Card sx={{ my: 2 }}>
         <Box
           sx={{
