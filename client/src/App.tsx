@@ -3,7 +3,7 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import MainPage from "./pages/MainPage";
 import Students from "./pages/Students";
@@ -46,7 +46,8 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<UserProfile />} />
+            <Route index element={<Navigate to={permissions.canViewStudents ? "students" : "profile"} replace />} />
+            <Route path="profile" element={<UserProfile />} />
             <Route
               path="students"
               element={

@@ -9,7 +9,6 @@ import SchoolIcon from "@mui/icons-material/School";
 import WorkIcon from "@mui/icons-material/Work";
 import HouseIcon from "@mui/icons-material/House";
 import GroupsIcon from "@mui/icons-material/Groups";
-import PersonIcon from "@mui/icons-material/Person";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
 import PublicIcon from "@mui/icons-material/Public";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -29,9 +28,7 @@ export default function SideBarList() {
   const permissions = usePermissions();
 
   const getMenuItems = (): MenuItem[] => {
-    const items: MenuItem[] = [
-      { text: t("navigation.home"), icon: <PersonIcon />, path: "/" },
-    ];
+    const items: MenuItem[] = [];
 
     if (permissions.canViewStudents) {
       items.push({ text: t("navigation.students"), icon: <SchoolIcon />, path: "/students" });

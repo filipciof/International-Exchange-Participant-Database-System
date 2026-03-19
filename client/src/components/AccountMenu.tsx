@@ -7,6 +7,9 @@ import axiosClient, { clearAuthData } from "../utils/axiosClient";
 import LanguageSwitcher from "./LanguageSwitcher";
 import GroupSwitcher from "./GroupSwitcher";
 import LogoutIcon from "@mui/icons-material/Logout";
+import PersonIcon from "@mui/icons-material/Person";
+import GroupsIcon from "@mui/icons-material/Groups";
+import LanguageIcon from "@mui/icons-material/Language";
 
 type AccountMenuProps = {
   setLoading: (loading: boolean) => void;
@@ -42,7 +45,6 @@ export default function AccountMenu({ setLoading }: AccountMenuProps) {
 
   return <>
     <IconButton
-      color="inherit"
       onClick={handleMenuOpen}
       aria-controls={menuOpen ? "account-menu" : undefined}
       aria-haspopup="true"
@@ -65,15 +67,28 @@ export default function AccountMenu({ setLoading }: AccountMenuProps) {
         horizontal: "right",
       }}
     >
-      <MenuItem disableRipple sx={{ "&:hover": { backgroundColor: "transparent" } }}>
+      <MenuItem onClick={() => { navigate("/profile"); handleMenuClose(); }} sx={{ py: "4px" }}>
+        <ListItemIcon>
+          <PersonIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText>{t("navigation.myProfile")}</ListItemText>
+      </MenuItem>
+      <Divider />
+      <MenuItem disableRipple sx={{ py: "4px", "&:hover": { backgroundColor: "transparent" } }}>
+        <ListItemIcon>
+          <GroupsIcon fontSize="small" />
+        </ListItemIcon>
         <GroupSwitcher />
       </MenuItem>
       <Divider />
-      <MenuItem disableRipple sx={{ "&:hover": { backgroundColor: "transparent" } }}>
+      <MenuItem disableRipple sx={{ py: "4px", "&:hover": { backgroundColor: "transparent" } }}>
+        <ListItemIcon>
+          <LanguageIcon fontSize="small" />
+        </ListItemIcon>
         <LanguageSwitcher />
       </MenuItem>
       <Divider />
-      <MenuItem onClick={handleLogout}>
+      <MenuItem onClick={handleLogout} sx={{ py: "4px" }}>
         <ListItemIcon>
           <LogoutIcon fontSize="small" />
         </ListItemIcon>

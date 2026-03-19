@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { MenuItem, Select, Box } from "@mui/material";
+import { MenuItem, Select } from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material";
-import LanguageIcon from "@mui/icons-material/Language";
 
 export default function LanguageSwitcher() {
   const { t, i18n } = useTranslation();
@@ -11,19 +10,16 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1, width: "100%" }}>
-      <LanguageIcon fontSize="small" />
-      <Select
-        value={i18n.language.split("-")[0]}
-        onChange={handleChange}
-        size="small"
-        variant="standard"
-        disableUnderline
-        sx={{ minWidth: 80 }}
-      >
-        <MenuItem value="en">{t('languages.english')}</MenuItem>
-        <MenuItem value="pl">{t('languages.polish')}</MenuItem>
-      </Select>
-    </Box>
+    <Select
+      value={i18n.language.split("-")[0]}
+      onChange={handleChange}
+      size="small"
+      variant="standard"
+      disableUnderline
+      sx={{ minWidth: 80, "& .MuiSelect-select": { py: 0 } }}
+    >
+      <MenuItem value="en">{t('languages.english')}</MenuItem>
+      <MenuItem value="pl">{t('languages.polish')}</MenuItem>
+    </Select>
   );
 }
