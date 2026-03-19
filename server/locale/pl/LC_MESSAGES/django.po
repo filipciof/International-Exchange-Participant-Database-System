@@ -254,11 +254,11 @@ msgstr "Nie podano danych."
 
 #: main/staff_views.py:54 main/staff_views.py:125
 msgid "Staff profile not found for this user."
-msgstr "Nie znaleziono profilu pracownika dla tego użytkownika."
+msgstr "Nie znaleziono profilu wolontariusza dla tego użytkownika."
 
 #: main/staff_views.py:207
 msgid "Staff member does not have a user account."
-msgstr "Pracownik nie posiada konta użytkownika."
+msgstr "Wolontariusz nie posiada konta użytkownika."
 
 #: main/staff_views.py:236 main/student_views.py:536
 msgid "User account updated successfully."

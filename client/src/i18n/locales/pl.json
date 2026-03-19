@@ -89,7 +89,7 @@
   "notes": {
     "noNotes": "Brak notatek.",
     "addStudentNotes": "Dodaj notatki o uczestniku...",
-    "addStaffNotes": "Dodaj notatki o pracowniku...",
+    "addStaffNotes": "Dodaj notatki o wolontariuszu...",
     "addFamilyNotes": "Dodaj notatki o rodzinie...",
     "addContactNotes": "Dodaj notatki o wizytówce..."
   },
@@ -104,7 +104,7 @@
   "navigation": {
     "home": "Strona główna",
     "students": "Uczestnicy",
-    "staff": "Pracownicy",
+    "staff": "Wolontariusze",
     "clubs": "Kluby",
     "districts": "Dystrykty",
     "families": "Rodziny",
@@ -321,11 +321,11 @@
     }
   },
   "staff": {
-    "newStaff": "Nowy pracownik",
-    "updateStaff": "Zaktualizuj pracownika",
-    "profile": "Profil pracownika",
+    "newStaff": "Nowy wolontariusz",
+    "updateStaff": "Zaktualizuj wolontariusza",
+    "profile": "Profil wolontariusza",
     "createProfile": "Utwórz profil",
-    "searchPlaceholder": "Wyszukaj pracowników...",
+    "searchPlaceholder": "Wyszukaj wolontariuszy...",
     "tabs": {
       "all": "Wszystko",
       "club": "Klub",
