@@ -87,6 +87,7 @@ export default function EditableHeader({
                 size="small"
                 onClick={handleSave}
                 disabled={isPending}
+                color="primary"
               >
                 {isPending ? <CircularProgress size={20} /> : <Save />}
               </IconButton>

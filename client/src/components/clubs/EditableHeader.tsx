@@ -65,6 +65,7 @@ export default function EditableHeader({ club }: EditableHeaderProps) {
                 size="small"
                 onClick={handleSave}
                 disabled={isPending}
+                color="primary"
               >
                 {isPending ? <CircularProgress size={20} /> : <Save />}
               </IconButton>
