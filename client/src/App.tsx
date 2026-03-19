@@ -32,7 +32,7 @@ function App() {
 
   return (
     <>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <Routes>
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/activate/:uid/:token" element={<ActivateAccount />} />

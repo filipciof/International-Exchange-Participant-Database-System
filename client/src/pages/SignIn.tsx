@@ -113,7 +113,7 @@ export default function SignIn() {
           sx={{
             display: { xs: "none", md: "block" },
             width: "50%",
-            backgroundImage: "url(/sign-in-picture.jpg)",
+            backgroundImage: `url(${import.meta.env.BASE_URL}sign-in-picture.jpg)`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -138,7 +138,7 @@ export default function SignIn() {
           <Stack spacing={3} sx={{ width: "100%", maxWidth: 400 }}>
             <Box sx={{ textAlign: "center" }}>
               <img
-                src="/logo.png"
+                src={`${import.meta.env.BASE_URL}logo.png`}
                 alt="Rotary Youth Exchange"
                 style={{ height: 64, marginBottom: 16 }}
               />

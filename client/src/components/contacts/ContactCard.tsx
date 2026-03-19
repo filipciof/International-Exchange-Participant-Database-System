@@ -51,7 +51,7 @@ export default function ContactCard({
 
   return (
     <ActionAreaCard
-      imageUrl={imageUrl || "/blank-profile-1024x1024.png"}
+      imageUrl={imageUrl || `${import.meta.env.BASE_URL}blank-profile-1024x1024.png`}
       header={`${contact.first_name} ${contact.middle_name} ${contact.last_name}`}
       description={[
         contact.country,
