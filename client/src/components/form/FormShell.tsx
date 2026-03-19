@@ -42,7 +42,10 @@ export default function FormShell({
   useEffect(() => {
     if (isSuccess) {
       setShowSuccess(true);
-      const timer = setTimeout(() => setShowSuccess(false), 3000);
+      const timer = setTimeout(() => {
+        setShowSuccess(false);
+        onClose();
+      }, 1000);
       return () => clearTimeout(timer);
     }
   }, [isSuccess]);
