@@ -73,8 +73,8 @@ export function useStudents({
       params.append("shirt_size", shirtSize);
     });
 
-    if (filters.startYear) {
-      params.append("start_year", filters.startYear);
+    if (filters.year) {
+      params.append("year", filters.year);
     }
 
     if (isInbound === true) {

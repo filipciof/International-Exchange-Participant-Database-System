@@ -24,7 +24,6 @@ import InfoItem from "../../InfoItem";
 import EditableExchangeFamilies from "./EditableExchangeFamilies";
 import { useTranslation } from "react-i18next";
 import usePermissions from "../../../hooks/usePermissions";
-import { getCurrentAcademicYear } from "../../../utils/dateUtils";
 
 type EditableExchangesProps = {
   studentId: number;
@@ -251,7 +250,6 @@ export default function EditableExchanges({
           handleClose={handleCloseDialog}
           editingExchange={editingExchange}
           studentId={studentId}
-          defaultYear={getCurrentAcademicYear()}
         />
       )}
 

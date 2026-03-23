@@ -82,6 +82,8 @@ class ExchangeSerializer(serializers.ModelSerializer):
             )
         )
 
+        representation["year"] = instance.id_year.value if instance.id_year else ""
+
         return representation
 
 

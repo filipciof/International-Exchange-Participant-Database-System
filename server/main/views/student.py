@@ -19,7 +19,7 @@ from rest_framework.generics import (
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_404_NOT_FOUND
-from main.models import Club, Student, Exchange, GENDER_MAP, LANG_PROF_MAP
+from main.models import Club, Student, Exchange, Year, GENDER_MAP, LANG_PROF_MAP
 from main.serializers import (
     CreateStudentSerializer,
     StudentSerializer,
@@ -137,7 +137,7 @@ class StudentFilter(filters.FilterSet):
     exchange_start_date_after = filters.DateFilter(method="filter_exchange_start_date_after")
     exchange_end_date_before = filters.DateFilter(method="filter_exchange_end_date_before")
     exchange_end_date_after = filters.DateFilter(method="filter_exchange_end_date_after")
-    start_year = filters.CharFilter(method="filter_start_year")
+    year = filters.CharFilter(method="filter_year")
 
     class Meta:
         model = Student
@@ -173,9 +173,9 @@ class StudentFilter(filters.FilterSet):
             exchange__end_date__gte=value, exchange__is_active=True
         ).distinct()
 
-    def filter_start_year(self, queryset, name, value):
+    def filter_year(self, queryset, name, value):
         return queryset.filter(
-            exchange__year=value, exchange__is_active=True
+            exchange__id_year__value=value, exchange__is_active=True
         ).distinct()
 
     def filter_search(self, queryset, name, value):
@@ -237,6 +237,8 @@ class StudentListView(ListCreateAPIView):
         data = serializer.validated_data
         club = Club.objects.get(id=data["id_club"], is_active=True)
 
+        year = Year.objects.get(id=data["id_year"])
+
         with transaction.atomic():
             user = User.objects.create_user(email=data["email"], password=None)
             user.set_unusable_password()
@@ -255,6 +257,7 @@ class StudentListView(ListCreateAPIView):
             exchange_kwargs = {
                 "id_student": student,
                 "id_sending_club": club,
+                "id_year": year,
                 "is_active": True,
             }
 

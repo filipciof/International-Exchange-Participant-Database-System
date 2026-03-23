@@ -17,12 +17,14 @@ import type {
   Country,
   District,
   Staff,
+  Year,
 } from "../../utils/types";
 import { createStudentSchema } from "../../utils/types";
 import axiosClient from "../../utils/axiosClient";
 import { useTranslation } from "react-i18next";
 import usePermissions from "../../hooks/usePermissions";
 import useCountryDistrictClub from "../../hooks/useCountryDistrictClub";
+import { useYear } from "../../hooks/useYear";
 import {
   ControlledTextField,
   ControlledAutocomplete,
@@ -47,6 +49,7 @@ export default function CreateStudentForm({
   const queryClient = useQueryClient();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const { years, currentYear } = useYear();
   const { canToggleIsInbound, defaultIsInbound, hasLockedSendingClub } =
     usePermissions();
   const inboundConfig = useMemo(
@@ -67,6 +70,7 @@ export default function CreateStudentForm({
         id_country: undefined,
         id_district: undefined,
         id_club: undefined,
+        id_year: currentYear?.id,
         is_inbound: inboundConfig.value,
       },
     });
@@ -78,6 +82,12 @@ export default function CreateStudentForm({
   useEffect(() => {
     setValue("is_inbound", inboundConfig.value);
   }, [inboundConfig.value, setValue]);
+
+  useEffect(() => {
+    if (currentYear) {
+      setValue("id_year", currentYear.id);
+    }
+  }, [currentYear?.id, setValue]);
 
   // Fetch current staff member's club when hasLockedSendingClub is true
   const { data: currentStaff } = useQuery<Staff>({
@@ -125,8 +135,8 @@ export default function CreateStudentForm({
       if (currentCountry) {
         const shouldBeHomeCountry = !isInbound;
         if (currentCountry.is_home_country !== shouldBeHomeCountry) {
-          setValue("id_country", undefined);
-          setValue("id_district", undefined);
+          setValue("id_country", 0);
+          setValue("id_district", 0);
           setValue("id_club", 0);
         }
       }
@@ -145,11 +155,7 @@ export default function CreateStudentForm({
     },
   });
 
-  const onSubmit = ({
-    id_country,
-    id_district,
-    ...data
-  }: CreateStudentFormData) => {
+  const onSubmit = (data: CreateStudentFormData) => {
     mutation.mutate(data);
   };
 
@@ -202,6 +208,7 @@ export default function CreateStudentForm({
             label={t("clubForm.country")}
             loading={isLoadingCountries}
             disabled={hasLockedSendingClub}
+            required
           />
           <ControlledAutocomplete
             name="id_district"
@@ -214,6 +221,7 @@ export default function CreateStudentForm({
               hasLockedSendingClub || !selectedCountry || isLoadingDistricts
             }
             loading={isLoadingDistricts}
+            required
           />
         </Stack>
         <ControlledAutocomplete
@@ -225,6 +233,16 @@ export default function CreateStudentForm({
           label={t("staffForm.club")}
           disabled={hasLockedSendingClub || !selectedDistrict || isLoadingClubs}
           loading={isLoadingClubs}
+          required
+        />
+        <ControlledAutocomplete
+          name="id_year"
+          control={control}
+          options={years}
+          getOptionLabel={(y: Year) => y.value}
+          getOptionValue={(y: Year) => y.id}
+          label={t("exchanges.year")}
+          required
         />
         <Controller
           name="is_inbound"

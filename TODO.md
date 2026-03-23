@@ -1,0 +1,2 @@
+- Edytuj otwiera z edytowalnymi sekcjami.
+- Zod schema do okienek dialogowych.

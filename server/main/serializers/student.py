@@ -1,6 +1,6 @@
 from django.utils.translation import gettext as _
 from rest_framework import serializers
-from main.models import Student, GENDER_MAP, LANG_PROF_MAP, Club
+from main.models import Student, GENDER_MAP, LANG_PROF_MAP, Club, Year
 from main.permissions import (
     is_club_from_home_country,
     Roles,
@@ -62,6 +62,7 @@ class CreateStudentSerializer(serializers.Serializer):
     last_name = serializers.CharField(max_length=50)
     email = serializers.EmailField()
     id_club = serializers.IntegerField()
+    id_year = serializers.IntegerField()
     is_inbound = serializers.BooleanField()
 
     def validate_email(self, value):
@@ -72,6 +73,11 @@ class CreateStudentSerializer(serializers.Serializer):
     def validate_id_club(self, value):
         if not Club.objects.filter(id=value, is_active=True).exists():
             raise serializers.ValidationError(_("Club does not exist."))
+        return value
+
+    def validate_id_year(self, value):
+        if not Year.objects.filter(id=value).exists():
+            raise serializers.ValidationError(_("Year does not exist."))
         return value
 
     def validate(self, attrs):

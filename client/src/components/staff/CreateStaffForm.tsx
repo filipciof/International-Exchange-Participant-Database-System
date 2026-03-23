@@ -94,11 +94,7 @@ export default function CreateStaffForm({
     },
   });
 
-  const onSubmit = ({
-    id_country,
-    id_district,
-    ...data
-  }: CreateStaffFormData) => {
+  const onSubmit = (data: CreateStaffFormData) => {
     mutation.mutate(data);
   };
 
@@ -150,6 +146,7 @@ export default function CreateStaffForm({
             getOptionValue={(c: Country) => c.id}
             label={t("clubForm.country")}
             loading={isLoadingCountries}
+            required
           />
           <ControlledAutocomplete
             name="id_district"
@@ -160,6 +157,7 @@ export default function CreateStaffForm({
             label={t("clubForm.district")}
             disabled={!selectedCountry || isLoadingDistricts}
             loading={isLoadingDistricts}
+            required
           />
         </Stack>
         <ControlledAutocomplete
@@ -171,6 +169,7 @@ export default function CreateStaffForm({
           label={t("staffForm.club")}
           disabled={!selectedDistrict || isLoadingClubs}
           loading={isLoadingClubs}
+          required
         />
         <ControlledMultiSelect
           name="groups"

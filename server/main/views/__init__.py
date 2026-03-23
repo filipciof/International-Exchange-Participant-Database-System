@@ -1,6 +1,7 @@
 from .club import CountryView, DistrictListView, DistrictDetailView, ClubListView, ClubDetailView
 from .contact import ContactListView, ContactDetailView, ContactPhotoView
 from .document import DocumentListView, DocumentDetailView, DocumentFileView
+from .year import YearListView, YearDetailView
 from .exchange import (
     ExchangeTypeView,
     ExchangeListView, ExchangeDetailView,

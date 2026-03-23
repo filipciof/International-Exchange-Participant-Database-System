@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission
 from main.policies import club as club_policy
+from main.policies import year as year_policy
 from main.policies import district as district_policy
 from main.policies import document as document_policy
 from main.policies import exchange_family as exchange_family_policy
@@ -69,3 +70,7 @@ class StudentPermission(PolicyPermission):
 
 class ContactPermission(PolicyPermission):
     policy = contact_policy
+
+
+class YearPermission(PolicyPermission):
+    policy = year_policy

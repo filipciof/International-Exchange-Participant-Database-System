@@ -19,14 +19,13 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import useCountryDistrictClub from "../../hooks/useCountryDistrictClub";
-import { getCurrentAcademicYear } from "../../utils/dateUtils";
 
 export type StudentFilters = {
   search: string;
   shirtSizes: string[];
   genders: number[];
   isInbound: "both" | "false" | "true" | null;
-  startYear: string;
+  year: string | null;
   dateOfBirthBefore: string;
   dateOfBirthAfter: string;
   sendingClubId: number | null;
@@ -258,30 +257,6 @@ export default function StudentFilter({
                   {t("students.filter.both")}
                 </ToggleButton>
               </ToggleButtonGroup>
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: { xs: "column", sm: "row" },
-                alignItems: { xs: "stretch", sm: "center" },
-                gap: 2,
-              }}
-            >
-              <Typography
-                variant="body2"
-                sx={{ color: "text.secondary", minWidth: "fit-content" }}
-              >
-                {t("students.filter.startYear")}
-              </Typography>
-              <TextField
-                value={filters.startYear}
-                onChange={(e) => onFilterChange({ startYear: e.target.value })}
-                size="small"
-                placeholder={getCurrentAcademicYear()}
-                slotProps={{ htmlInput: { maxLength: 7 } }}
-                sx={{ width: 120 }}
-              />
             </Box>
 
             {(

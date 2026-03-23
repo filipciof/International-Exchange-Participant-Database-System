@@ -8,4 +8,5 @@ from . import family
 from . import family_member
 from . import staff
 from . import student
+from . import year
 from .fail_closed import fail_closed

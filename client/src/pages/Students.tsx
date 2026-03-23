@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import StudentList from "../components/students/StudentList";
 import Loading from "../components/Loading";
-import { Box, Button, Typography, CircularProgress } from "@mui/material";
+import { Box, Button, Typography, CircularProgress, MenuItem, Select } from "@mui/material";
 import MyPagination from "../components/MyPagination";
 import type { ViewType } from "../utils/types";
 import StudentDetail from "../components/students/StudentDetail";
@@ -20,10 +20,11 @@ import {
   parseAsArrayOf,
 } from "nuqs";
 import { useTranslation } from "react-i18next";
-import { getCurrentAcademicYear } from "../utils/dateUtils";
+import { useYear } from "../hooks/useYear";
 
 export default function Students() {
   const { t } = useTranslation();
+  const { years, currentYear } = useYear();
   const [currentView, setCurrentView] = useQueryState(
     "view",
     parseAsStringLiteral([
@@ -54,7 +55,7 @@ export default function Students() {
     shirtSizes: parseAsArrayOf(parseAsString).withDefault([]),
     genders: parseAsArrayOf(parseAsInteger).withDefault([]),
     isInbound: parseAsStringLiteral(["true", "false", "both"]).withDefault("both"),
-    startYear: parseAsString.withDefault(getCurrentAcademicYear()),
+    year: parseAsString,
     dateOfBirthBefore: parseAsString.withDefault(""),
     dateOfBirthAfter: parseAsString.withDefault(""),
     sendingClubId: parseAsInteger,
@@ -64,6 +65,16 @@ export default function Students() {
     exchangeEndDateBefore: parseAsString.withDefault(""),
     exchangeEndDateAfter: parseAsString.withDefault(""),
   });
+
+  useEffect(() => {
+    if (currentYear) {
+      if (filters.year === null) {
+        setFilters({ year: currentYear.value });
+      }
+    } else {
+      setFilters({ year: null });
+    }
+  }, [currentYear?.id, years.length]);
 
   const scrollPositionRef = useRef<number>(0);
 
@@ -135,13 +146,29 @@ export default function Students() {
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-        <Button
-          variant="outlined"
-          startIcon={<AddIcon />}
-          onClick={handleAddOpen}
-        >
-          {t("students.newStudent")}
-        </Button>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Button
+            variant="outlined"
+            startIcon={<AddIcon />}
+            onClick={handleAddOpen}
+          >
+            {t("students.newStudent")}
+          </Button>
+          <Select
+            value={filters.year ?? ""}
+            onChange={(e) => {
+              setFilters({ year: e.target.value || null });
+              setPage(1);
+            }}
+            size="small"
+            displayEmpty
+          >
+            <MenuItem value="">{t("common.allYears")}</MenuItem>
+            {years.map((year) => (
+              <MenuItem key={year.id} value={year.value}>{year.value}</MenuItem>
+            ))}
+          </Select>
+        </Box>
 
         <Box>
           <Button

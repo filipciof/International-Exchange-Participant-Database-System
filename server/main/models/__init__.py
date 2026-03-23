@@ -1,4 +1,5 @@
 from .club import Country, District, Club
+from .year import Year
 from .contact import Contact, ContactDistrict
 from .document import Document
 from .exchange import Exchange, ExchangeFamily, ExchangeType

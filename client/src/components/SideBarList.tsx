@@ -1,4 +1,5 @@
 import {
+  Divider,
   List,
   ListItem,
   ListItemText,
@@ -14,6 +15,7 @@ import PublicIcon from "@mui/icons-material/Public";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import usePermissions from "../hooks/usePermissions";
+import YearSwitcher from "./YearSwitcher";
 
 interface MenuItem {
   text: string;
@@ -65,6 +67,14 @@ export default function SideBarList() {
           </ListItemButton>
         </ListItem>
       ))}
+      {permissions.canSetCurrentYear && (
+        <>
+          <Divider sx={{ my: 1 }} />
+          <ListItem sx={{ px: 1 }}>
+            <YearSwitcher />
+          </ListItem>
+        </>
+      )}
     </List>
   );
 }

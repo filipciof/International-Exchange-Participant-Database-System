@@ -20,6 +20,7 @@ type ControlledAutocompleteProps<T extends FieldValues, Option> = {
   label: string;
   loading?: boolean;
   disabled?: boolean;
+  required?: boolean;
   textFieldProps?: Omit<TextFieldProps, "label">;
 };
 
@@ -35,6 +36,7 @@ export default function ControlledAutocomplete<
   label,
   loading,
   disabled,
+  required,
   textFieldProps,
 }: ControlledAutocompleteProps<T, Option>) {
   return (
@@ -45,7 +47,7 @@ export default function ControlledAutocomplete<
         <Autocomplete
           value={options.find((o) => getOptionValue(o) === field.value) || null}
           onChange={(_event, newValue) => {
-            field.onChange(newValue ? getOptionValue(newValue) : undefined);
+            field.onChange(newValue ? getOptionValue(newValue) : null);
           }}
           options={options}
           getOptionLabel={getOptionLabel}
@@ -56,6 +58,7 @@ export default function ControlledAutocomplete<
             <TextField
               {...params}
               label={label}
+              required={required}
               error={!!error}
               helperText={error?.message}
               size="small"

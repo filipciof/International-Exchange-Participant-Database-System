@@ -12,13 +12,14 @@ import type {
   Country,
   District,
   Club,
+  Year,
 } from "../../../utils/types";
 import { exchangeSchema } from "../../../utils/types";
 import axiosClient from "../../../utils/axiosClient";
 import { useExchangeMutations } from "../../../hooks/useExchangeMutations";
 import useCountryDistrictClub from "../../../hooks/useCountryDistrictClub";
+import { useYear } from "../../../hooks/useYear";
 import {
-  ControlledTextField,
   ControlledAutocomplete,
   ControlledDatePicker,
   FormShell,
@@ -29,16 +30,15 @@ type AddEditExchangeDialogProps = {
   handleClose: () => void;
   editingExchange: Exchange | null;
   studentId: number;
-  defaultYear: string;
 };
 
 export default function AddEditExchangeDialog({
   handleClose,
   editingExchange,
   studentId,
-  defaultYear,
 }: AddEditExchangeDialogProps) {
   const { t } = useTranslation();
+  const { years, currentYear } = useYear();
 
   const { data: student } = useQuery({
     queryKey: ["student", studentId],
@@ -55,7 +55,7 @@ export default function AddEditExchangeDialog({
     defaultValues: editingExchange
       ? {
           id_student: studentId,
-          year: editingExchange.year,
+          id_year: editingExchange.id_year,
           id_type: editingExchange.id_type,
           start_date: editingExchange.start_date || "",
           end_date: editingExchange.end_date || "",
@@ -73,7 +73,7 @@ export default function AddEditExchangeDialog({
         }
       : {
           id_student: studentId,
-          year: defaultYear,
+          id_year: currentYear?.id ?? null,
           id_type: null,
           start_date: "",
           end_date: "",
@@ -205,12 +205,13 @@ export default function AddEditExchangeDialog({
           getOptionValue={(o: ExchangeType) => o.id}
           label={t("exchanges.exchangeType")}
         />
-        <ControlledTextField
-          name="year"
+        <ControlledAutocomplete
+          name="id_year"
           control={control}
+          options={years}
+          getOptionLabel={(y: Year) => y.value}
+          getOptionValue={(y: Year) => y.id}
           label={t("exchanges.year")}
-          placeholder="YYYY/YY"
-          helperText="Format: YYYY/YY (e.g., 2024/25)"
         />
         <Stack direction="row" spacing={1}>
           <ControlledDatePicker

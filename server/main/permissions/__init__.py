@@ -26,4 +26,5 @@ from .policy_permissions import (
     StaffPermission,
     StudentPermission,
     ContactPermission,
+    YearPermission,
 )

@@ -141,10 +141,11 @@ export type StudentFormData = StudentFormInputs & {
 export const createStudentSchema = z.object({
   first_name: z.string().min(1, i18next.t("schema.firstNameRequired")),
   last_name: z.string().min(1, i18next.t("schema.lastNameRequired")),
-  email: z.email().min(1, i18next.t("schema.emailRequired")),
-  id_country: z.number().nullable().optional(),
-  id_district: z.number().nullable().optional(),
-  id_club: z.number().min(1, i18next.t("schema.clubRequired")),
+  email: z.email({ error: i18next.t("schema.emailRequired") }),
+  id_country: z.number({ error: i18next.t("schema.countryRequired") }),
+  id_district: z.number({ error: i18next.t("schema.districtRequired") }),
+  id_club: z.number({ error: i18next.t("schema.clubRequired") }).min(1, i18next.t("schema.clubRequired")),
+  id_year: z.number({ error: i18next.t("schema.yearRequired") }).min(1, i18next.t("schema.yearRequired")),
   is_inbound: z.boolean(),
 });
 
@@ -153,16 +154,22 @@ export type CreateStudentFormData = z.infer<typeof createStudentSchema>;
 export const createStaffSchema = z.object({
   first_name: z.string().min(1, i18next.t("schema.firstNameRequired")),
   last_name: z.string().min(1, i18next.t("schema.lastNameRequired")),
-  email: z.email().min(1, i18next.t("schema.emailRequired")),
-  id_country: z.number().nullable().optional(),
-  id_district: z.number().nullable().optional(),
-  id_club: z.number().min(1, i18next.t("schema.clubRequired")),
+  email: z.email({ error: i18next.t("schema.emailRequired") }),
+  id_country: z.number({ error: i18next.t("schema.countryRequired") }),
+  id_district: z.number({ error: i18next.t("schema.districtRequired") }),
+  id_club: z.number({ error: i18next.t("schema.clubRequired") }).min(1, i18next.t("schema.clubRequired")),
   groups: z.array(z.string()).min(1, i18next.t("schema.groupRequired")),
 });
 
 export type CreateStaffFormData = z.infer<typeof createStaffSchema>;
 
 export type ViewType = "list" | "add" | "update" | "delete" | "detail";
+
+export type Year = {
+  id: number;
+  value: string;
+  is_current: boolean;
+};
 
 export type Student = {
   id: number;
@@ -243,14 +250,15 @@ export type Exchange = {
   kwm_officer: string;
   id_type: number | null;
   type: string;
+  id_year: number | null;
+  year: string;
   start_date: string;
   end_date: string;
-  year: string;
 };
 
 export const exchangeSchema = z.object({
   id_student: z.number(),
-  year: z.string(),
+  id_year: z.number().nullable().optional(),
   id_type: z.number().nullable().optional(),
   start_date: z.string().optional(),
   end_date: z.string().optional(),

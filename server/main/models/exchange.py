@@ -1,9 +1,9 @@
 from django.db import models
-from django.core.validators import RegexValidator
 from main.models.student import Student
 from main.models.club import Club
 from main.models.staff import Staff
 from main.models.family import Family
+from main.models.year import Year
 
 
 class ExchangeType(models.Model):
@@ -49,18 +49,15 @@ class Exchange(models.Model):
     id_type = models.ForeignKey(
         ExchangeType, null=True, on_delete=models.SET_NULL, db_column="id_type"
     )
+    id_year = models.ForeignKey(
+        Year,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        db_column="id_year",
+    )
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
-    year = models.CharField(
-        max_length=9,
-        validators=[
-            RegexValidator(
-                regex=r"^\d{4}/\d{2}$",
-            )
-        ],
-        blank=True,
-        default="",
-    )
 
     is_active = models.BooleanField(default=True)
 

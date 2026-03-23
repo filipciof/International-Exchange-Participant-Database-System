@@ -287,3 +287,7 @@ msgstr "Dystrykt o tym ID już istnieje."
 #: main/serializers/club.py
 msgid "Club with this ID already exists."
 msgstr "Klub o tym ID już istnieje."
+
+#: main/serializers/year.py
+msgid "Year with this value already exists."
+msgstr "Rok o tej wartości już istnieje."
