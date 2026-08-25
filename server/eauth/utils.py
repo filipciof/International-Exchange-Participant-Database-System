@@ -13,7 +13,7 @@ EMAIL_CHANGE_MAX_AGE = 259200  # 3 days
 def get_frontend_url():
     if settings.DEBUG:
         return "http://localhost:5173"
-    return f"https://{settings.PROD_HOST}"
+    return f"https://{settings.FRONTEND_URL}"
 
 
 def _make_link(user, mode="activate"):

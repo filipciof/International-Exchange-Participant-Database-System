@@ -2,8 +2,6 @@ Uczestnicy
  
 Coś nie działa z edycją (np. Pleć)
  
-Adresy z linków i inne ustawienia typu mail, … powinny być w konfiguracji - nie działa link do aktywacji bo brakuje LTEP
- 
 Tylko admin może usunąć uczestnika
  
 (poza samym uczestnikiem) Tylko admin może edytować jego dane

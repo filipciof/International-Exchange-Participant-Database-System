@@ -48,6 +48,8 @@ REST_FRAMEWORK = {
 PROD_HOST = config("PROD_HOST")
 ALLOWED_HOSTS = ["localhost", PROD_HOST]
 
+FRONTEND_URL = config("FRONTEND_URL")
+
 
 # Application definition
 
@@ -81,7 +83,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    f"https://{config("PROD_HOST")}",
+    f"https://{config('PROD_HOST')}",
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [*default_headers, "x-active-role"]
