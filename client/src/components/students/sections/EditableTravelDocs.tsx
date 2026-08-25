@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Box, Grid, IconButton, TextField, Autocomplete, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Grid,
+  IconButton,
+  TextField,
+  Autocomplete,
+  CircularProgress,
+} from "@mui/material";
 import { Edit as EditIcon, Save, Close, Flight } from "@mui/icons-material";
 import type { Student, Country } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
@@ -14,11 +21,13 @@ import { useTranslation } from "react-i18next";
 type EditableTravelDocsProps = {
   student: Student;
   countries: Country[];
+  canEdit: boolean;
 };
 
 export default function EditableTravelDocs({
   student,
   countries,
+  canEdit,
 }: EditableTravelDocsProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
@@ -63,7 +72,7 @@ export default function EditableTravelDocs({
   const selectedPassportCountry =
     countries.find((c) => c.id === formData.id_country_of_passport) || null;
 
-  const actions = !isEditing ? (
+  const actions = !canEdit ? null : !isEditing ? (
     <IconButton size="small" onClick={() => setIsEditing(true)}>
       <EditIcon />
     </IconButton>
@@ -93,7 +102,7 @@ export default function EditableTravelDocs({
       icon={<Flight />}
       actions={actions}
     >
-      {!isEditing ? (
+      {!canEdit || !isEditing ? (
         <Grid container rowSpacing={2} columnSpacing={8}>
           <InfoItem
             label={t("studentForm.labels.countryOfDeparture")}

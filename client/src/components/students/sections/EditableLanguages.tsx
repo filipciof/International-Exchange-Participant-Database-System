@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Box, Grid, IconButton, TextField, MenuItem, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Grid,
+  IconButton,
+  TextField,
+  MenuItem,
+  CircularProgress,
+} from "@mui/material";
 import { Edit as EditIcon, Save, Close, Language } from "@mui/icons-material";
 import type { Student } from "../../../utils/types";
 import { getLanguageProficiencyOptions } from "../../../utils/types";
@@ -12,9 +19,13 @@ import { useTranslation } from "react-i18next";
 
 type EditableLanguagesProps = {
   student: Student;
+  canEdit: boolean;
 };
 
-export default function EditableLanguages({ student }: EditableLanguagesProps) {
+export default function EditableLanguages({
+  student,
+  canEdit,
+}: EditableLanguagesProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -61,7 +72,7 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
     setIsEditing(false);
   };
 
-  const actions = !isEditing ? (
+  const actions = !canEdit ? null : !isEditing ? (
     <IconButton size="small" onClick={() => setIsEditing(true)}>
       <EditIcon />
     </IconButton>
@@ -91,7 +102,7 @@ export default function EditableLanguages({ student }: EditableLanguagesProps) {
       icon={<Language />}
       actions={actions}
     >
-      {!isEditing ? (
+      {!canEdit || !isEditing ? (
         <Grid container rowSpacing={2} columnSpacing={8}>
           <InfoItem
             label={t("students.searchFields.firstLanguage")}

@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Box, Grid, IconButton, TextField, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Grid,
+  IconButton,
+  TextField,
+  CircularProgress,
+} from "@mui/material";
 import {
   Edit as EditIcon,
   Save,
@@ -16,9 +22,13 @@ import { useTranslation } from "react-i18next";
 
 type EditableInsuranceProps = {
   student: Student;
+  canEdit: boolean;
 };
 
-export default function EditableInsurance({ student }: EditableInsuranceProps) {
+export default function EditableInsurance({
+  student,
+  canEdit,
+}: EditableInsuranceProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -57,7 +67,7 @@ export default function EditableInsurance({ student }: EditableInsuranceProps) {
     setIsEditing(false);
   };
 
-  const actions = !isEditing ? (
+  const actions = !canEdit ? null : !isEditing ? (
     <IconButton size="small" onClick={() => setIsEditing(true)}>
       <EditIcon />
     </IconButton>
@@ -87,7 +97,7 @@ export default function EditableInsurance({ student }: EditableInsuranceProps) {
       icon={<HealthAndSafety />}
       actions={actions}
     >
-      {!isEditing ? (
+      {!canEdit || !isEditing ? (
         <Grid container rowSpacing={2} columnSpacing={8}>
           <InfoItem
             label={t("students.searchFields.insuranceCompany")}

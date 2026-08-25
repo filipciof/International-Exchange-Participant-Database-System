@@ -23,11 +23,13 @@ import { useTranslation } from "react-i18next";
 type EditablePersonalInfoProps = {
   student: Student;
   countries: Country[];
+  canEdit: boolean;
 };
 
 export default function EditablePersonalInfo({
   student,
   countries,
+  canEdit,
 }: EditablePersonalInfoProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
@@ -82,7 +84,7 @@ export default function EditablePersonalInfo({
   const selectedCountry =
     countries.find((c) => c.id === formData.id_country_of_birth) || null;
 
-  const actions = !isEditing ? (
+  const actions = !canEdit ? null : !isEditing ? (
     <IconButton size="small" onClick={() => setIsEditing(true)}>
       <EditIcon />
     </IconButton>
@@ -112,7 +114,7 @@ export default function EditablePersonalInfo({
       icon={<Person />}
       actions={actions}
     >
-      {!isEditing ? (
+      {!canEdit || !isEditing ? (
         <Grid container rowSpacing={2} columnSpacing={8}>
           <InfoItem
             label={t("studentForm.labels.dateOfBirth")}

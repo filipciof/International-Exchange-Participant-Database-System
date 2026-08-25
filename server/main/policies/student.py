@@ -7,6 +7,7 @@ from main.permissions.base import (
     is_student,
     student_has_exchange_with_club,
 )
+
 from main.policies.fail_closed import fail_closed
 
 
@@ -26,12 +27,21 @@ def can_view(user, student) -> bool:
 
 @fail_closed()
 def can_edit(user, student, data=None) -> bool:
-    return can_view(user, student)
+    if is_admin(user):
+        return True
+
+    if is_student(user) and student.id_user == user:
+        return True
+
+    if is_staff(user) and data and set(data.keys()) <= {"notes"}:
+        return True
+
+    return False
 
 
 @fail_closed()
 def can_delete(user, student) -> bool:
-    return can_edit(user, student, None)
+    return is_admin(user)
 
 
 @fail_closed()

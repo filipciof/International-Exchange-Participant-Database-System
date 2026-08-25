@@ -38,6 +38,7 @@ type Permissions = {
   hasLockedSendingClub: boolean;
   canEditStaffClubInfo: boolean;
   canEditStudentName: boolean;
+  canEditStudent: boolean;
   canEditStaffName: boolean;
   hasLockedFamilyClubFilter: boolean;
   canSetCurrentYear: boolean;
@@ -66,6 +67,7 @@ function resolvePermissions(group: string): Permissions {
         hasLockedSendingClub: false,
         canEditStaffClubInfo: true,
         canEditStudentName: true,
+        canEditStudent: true,
         canEditStaffName: true,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: true,
@@ -90,7 +92,8 @@ function resolvePermissions(group: string): Permissions {
         canCreateHomeCountryDistricts: false,
         hasLockedSendingClub: false,
         canEditStaffClubInfo: false,
-        canEditStudentName: true,
+        canEditStudentName: false,
+        canEditStudent: false,
         canEditStaffName: false,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: false,
@@ -115,7 +118,8 @@ function resolvePermissions(group: string): Permissions {
         canCreateHomeCountryDistricts: false,
         hasLockedSendingClub: false,
         canEditStaffClubInfo: false,
-        canEditStudentName: true,
+        canEditStudentName: false,
+        canEditStudent: false,
         canEditStaffName: false,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: false,
@@ -140,7 +144,8 @@ function resolvePermissions(group: string): Permissions {
         canCreateHomeCountryDistricts: false,
         hasLockedSendingClub: true,
         canEditStaffClubInfo: false,
-        canEditStudentName: true,
+        canEditStudentName: false,
+        canEditStudent: false,
         canEditStaffName: false,
         hasLockedFamilyClubFilter: true,
         canSetCurrentYear: false,
@@ -166,6 +171,7 @@ function resolvePermissions(group: string): Permissions {
         hasLockedSendingClub: false,
         canEditStaffClubInfo: false,
         canEditStudentName: false,
+        canEditStudent: false,
         canEditStaffName: false,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: false,
@@ -191,6 +197,7 @@ function resolvePermissions(group: string): Permissions {
         hasLockedSendingClub: false,
         canEditStaffClubInfo: false,
         canEditStudentName: false,
+        canEditStudent: false,
         canEditStaffName: false,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: false,

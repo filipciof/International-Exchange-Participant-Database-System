@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Box, Grid, IconButton, TextField, Alert, Typography, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Grid,
+  IconButton,
+  TextField,
+  Alert,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import {
   Edit as EditIcon,
   Save,
@@ -16,10 +24,12 @@ import { useTranslation } from "react-i18next";
 
 type EditableUserAccountProps = {
   student: Student;
+  canEdit: boolean;
 };
 
 export default function EditableUserAccount({
   student,
+  canEdit,
 }: EditableUserAccountProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
@@ -64,7 +74,7 @@ export default function EditableUserAccount({
   const isLoading = updateMutation.isPending;
   const error = updateMutation.error;
 
-  const actions = !isEditing ? (
+  const actions = !canEdit ? null : !isEditing ? (
     hasUserAccount ? (
       <IconButton size="small" onClick={handleEdit}>
         <EditIcon />
@@ -106,7 +116,7 @@ export default function EditableUserAccount({
         </Alert>
       )}
 
-      {!isEditing ? (
+      {!canEdit || !isEditing ? (
         <>
           {hasUserAccount ? (
             <Grid container rowSpacing={2} columnSpacing={8}>

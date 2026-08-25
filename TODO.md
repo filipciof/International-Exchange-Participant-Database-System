@@ -1,4 +1,4 @@
-Uczestnicy
+Dopytać się, czy inni wolontariusze mogą edytować wymiany/dokumenty/notatki.
  
 Tylko admin może usunąć uczestnika
  

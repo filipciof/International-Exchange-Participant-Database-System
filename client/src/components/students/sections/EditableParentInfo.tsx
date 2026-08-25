@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Box, Grid, Typography, IconButton, TextField, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Typography,
+  IconButton,
+  TextField,
+  CircularProgress,
+} from "@mui/material";
 import {
   Edit as EditIcon,
   Save,
@@ -16,10 +23,12 @@ import { useTranslation } from "react-i18next";
 
 type EditableParentInfoProps = {
   student: Student;
+  canEdit: boolean;
 };
 
 export default function EditableParentInfo({
   student,
+  canEdit,
 }: EditableParentInfoProps) {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
@@ -61,7 +70,7 @@ export default function EditableParentInfo({
     setIsEditing(false);
   };
 
-  const actions = !isEditing ? (
+  const actions = !canEdit ? null : !isEditing ? (
     <IconButton size="small" onClick={() => setIsEditing(true)}>
       <EditIcon />
     </IconButton>
@@ -91,7 +100,7 @@ export default function EditableParentInfo({
       icon={<ContactPhone />}
       actions={actions}
     >
-      {!isEditing ? (
+      {!canEdit || !isEditing ? (
         <Grid container rowSpacing={2} columnSpacing={8}>
           <Grid size={{ xs: 12, sm: 6 }}>
             <Box sx={{ p: 2, bgcolor: "grey.50", borderRadius: 1 }}>

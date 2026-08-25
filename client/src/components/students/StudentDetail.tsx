@@ -16,6 +16,7 @@ import EditableUserAccount from "./sections/EditableUserAccount";
 import Loading from "../Loading";
 import EditableDocuments from "../EditableDocuments";
 import { useTranslation } from "react-i18next";
+import usePermissions from "../../hooks/usePermissions";
 
 type StudentDetailProps = {
   id: number;
@@ -25,6 +26,7 @@ type StudentDetailProps = {
 export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
+  const { canEditStudent } = usePermissions();
 
   const {
     data: student,
@@ -89,6 +91,7 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
         student={student}
         imageUrl={imageUrl}
         isLoading={isImageLoading}
+        canEdit={canEditStudent}
       />
 
       {/* Tabs */}
@@ -115,12 +118,20 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
       {/* All sections */}
       {activeTab === 0 && (
         <>
-          <EditablePersonalInfo student={student} countries={countries} />
-          <EditableLanguages student={student} />
-          <EditableTravelDocs student={student} countries={countries} />
-          <EditableParentInfo student={student} />
-          <EditableInsurance student={student} />
-          <EditableUserAccount student={student} />
+          <EditablePersonalInfo
+            student={student}
+            countries={countries}
+            canEdit={canEditStudent}
+          />
+          <EditableLanguages student={student} canEdit={canEditStudent} />
+          <EditableTravelDocs
+            student={student}
+            countries={countries}
+            canEdit={canEditStudent}
+          />
+          <EditableParentInfo student={student} canEdit={canEditStudent} />
+          <EditableInsurance student={student} canEdit={canEditStudent} />
+          <EditableUserAccount student={student} canEdit={canEditStudent} />
           <EditableExchanges studentId={student.id} />
           <EditableDocuments ownerType="student" ownerId={student.id} />
           <EditableNotes
@@ -136,25 +147,41 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
 
       {/* Personal Information */}
       {activeTab === 1 && (
-        <EditablePersonalInfo student={student} countries={countries} />
+        <EditablePersonalInfo
+          student={student}
+          countries={countries}
+          canEdit={canEditStudent}
+        />
       )}
 
       {/* Languages */}
-      {activeTab === 2 && <EditableLanguages student={student} />}
+      {activeTab === 2 && (
+        <EditableLanguages student={student} canEdit={canEditStudent} />
+      )}
 
       {/* Travel Documents */}
       {activeTab === 3 && (
-        <EditableTravelDocs student={student} countries={countries} />
+        <EditableTravelDocs
+          student={student}
+          countries={countries}
+          canEdit={canEditStudent}
+        />
       )}
 
       {/* Parent/Guardian Information */}
-      {activeTab === 4 && <EditableParentInfo student={student} />}
+      {activeTab === 4 && (
+        <EditableParentInfo student={student} canEdit={canEditStudent} />
+      )}
 
       {/* Insurance Information */}
-      {activeTab === 5 && <EditableInsurance student={student} />}
+      {activeTab === 5 && (
+        <EditableInsurance student={student} canEdit={canEditStudent} />
+      )}
 
       {/* User Account */}
-      {activeTab === 6 && <EditableUserAccount student={student} />}
+      {activeTab === 6 && (
+        <EditableUserAccount student={student} canEdit={canEditStudent} />
+      )}
 
       {/* Exchange History */}
       {activeTab === 7 && <EditableExchanges studentId={student.id} />}
@@ -165,14 +192,16 @@ export default function StudentDetail({ id, handleClose }: StudentDetailProps) {
       )}
 
       {/* Notes */}
-      {activeTab === 9 && <EditableNotes
-            notes={student.notes}
-            endpoint={`/students/${student.id}/`}
-            queryKey="students"
-            title={t("studentForm.steps.additionalInfo")}
-            placeholder={t("notes.addStudentNotes")}
-            noNotesText={t("notes.noNotes")}
-          />}
+      {activeTab === 9 && (
+        <EditableNotes
+          notes={student.notes}
+          endpoint={`/students/${student.id}/`}
+          queryKey="students"
+          title={t("studentForm.steps.additionalInfo")}
+          placeholder={t("notes.addStudentNotes")}
+          noNotesText={t("notes.noNotes")}
+        />
+      )}
     </Box>
   );
 }

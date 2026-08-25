@@ -25,12 +25,14 @@ type EditableHeaderProps = {
   student: Student;
   imageUrl?: string;
   isLoading: boolean;
+  canEdit: boolean;
 };
 
 export default function EditableHeader({
   student,
   imageUrl,
   isLoading,
+  canEdit,
 }: EditableHeaderProps) {
   const { t } = useTranslation();
   const { canEditStudentName } = usePermissions();
@@ -74,35 +76,37 @@ export default function EditableHeader({
       }}
     >
       <CardContent>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
-          {!isEditing ? (
-            <IconButton
-              size="small"
-              onClick={() => setIsEditing(true)}
-              sx={{ color: "white" }}
-            >
-              <EditIcon />
-            </IconButton>
-          ) : (
-            <Box sx={{ display: "flex", gap: 1 }}>
+        {canEdit && (
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
+            {!isEditing ? (
               <IconButton
                 size="small"
-                onClick={handleSave}
-                disabled={isPending}
-                color="primary"
+                onClick={() => setIsEditing(true)}
+                sx={{ color: "white" }}
               >
-                {isPending ? <CircularProgress size={20} /> : <Save />}
+                <EditIcon />
               </IconButton>
-              <IconButton
-                size="small"
-                onClick={handleCancel}
-                disabled={isPending}
-              >
-                <Close />
-              </IconButton>
-            </Box>
-          )}
-        </Box>
+            ) : (
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <IconButton
+                  size="small"
+                  onClick={handleSave}
+                  disabled={isPending}
+                  color="primary"
+                >
+                  {isPending ? <CircularProgress size={20} /> : <Save />}
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={handleCancel}
+                  disabled={isPending}
+                >
+                  <Close />
+                </IconButton>
+              </Box>
+            )}
+          </Box>
+        )}
 
         {!isEditing ? (
           <Box

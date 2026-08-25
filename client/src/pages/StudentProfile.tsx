@@ -68,11 +68,9 @@ export default function StudentProfile({}: StudentProfileProps) {
       studentError.response?.status == 404;
 
     if (is404) {
-      return (
-        <Typography>{t("notFound.message")}</Typography>
-      );
+      return <Typography>{t("notFound.message")}</Typography>;
     }
-    
+
     return (
       <Typography sx={{ color: "error.main" }}>
         {t("common.error", { message: studentError.message })}
@@ -94,6 +92,7 @@ export default function StudentProfile({}: StudentProfileProps) {
         student={student}
         imageUrl={imageUrl}
         isLoading={isImageLoading}
+        canEdit={true}
       />
 
       {/* Tabs */}
@@ -120,12 +119,20 @@ export default function StudentProfile({}: StudentProfileProps) {
       {/* All sections */}
       {activeTab === 0 && (
         <>
-          <EditablePersonalInfo student={student} countries={countries} />
-          <EditableLanguages student={student} />
-          <EditableTravelDocs student={student} countries={countries} />
-          <EditableParentInfo student={student} />
-          <EditableInsurance student={student} />
-          <EditableUserAccount student={student} />
+          <EditablePersonalInfo
+            student={student}
+            countries={countries}
+            canEdit={true}
+          />
+          <EditableLanguages student={student} canEdit={true} />
+          <EditableTravelDocs
+            student={student}
+            countries={countries}
+            canEdit={true}
+          />
+          <EditableParentInfo student={student} canEdit={true} />
+          <EditableInsurance student={student} canEdit={true} />
+          <EditableUserAccount student={student} canEdit={true} />
           <EditableExchanges studentId={student.id} />
           <EditableDocuments ownerType="student" ownerId={student.id} />
           <EditableNotes
@@ -141,25 +148,41 @@ export default function StudentProfile({}: StudentProfileProps) {
 
       {/* Personal Information */}
       {activeTab === 1 && (
-        <EditablePersonalInfo student={student} countries={countries} />
+        <EditablePersonalInfo
+          student={student}
+          countries={countries}
+          canEdit={true}
+        />
       )}
 
       {/* Languages */}
-      {activeTab === 2 && <EditableLanguages student={student} />}
+      {activeTab === 2 && (
+        <EditableLanguages student={student} canEdit={true} />
+      )}
 
       {/* Travel Documents */}
       {activeTab === 3 && (
-        <EditableTravelDocs student={student} countries={countries} />
+        <EditableTravelDocs
+          student={student}
+          countries={countries}
+          canEdit={true}
+        />
       )}
 
       {/* Parent/Guardian Information */}
-      {activeTab === 4 && <EditableParentInfo student={student} />}
+      {activeTab === 4 && (
+        <EditableParentInfo student={student} canEdit={true} />
+      )}
 
       {/* Insurance Information */}
-      {activeTab === 5 && <EditableInsurance student={student} />}
+      {activeTab === 5 && (
+        <EditableInsurance student={student} canEdit={true} />
+      )}
 
       {/* User Account */}
-      {activeTab === 6 && <EditableUserAccount student={student} />}
+      {activeTab === 6 && (
+        <EditableUserAccount student={student} canEdit={true} />
+      )}
 
       {/* Exchange History */}
       {activeTab === 7 && <EditableExchanges studentId={student.id} />}
@@ -170,14 +193,16 @@ export default function StudentProfile({}: StudentProfileProps) {
       )}
 
       {/* Notes */}
-      {activeTab === 9 && <EditableNotes
-            notes={student.notes}
-            endpoint={`/students/${student.id}/`}
-            queryKey="students"
-            title={t("studentForm.steps.additionalInfo")}
-            placeholder={t("notes.addStudentNotes")}
-            noNotesText={t("notes.noNotes")}
-          />}
+      {activeTab === 9 && (
+        <EditableNotes
+          notes={student.notes}
+          endpoint={`/students/${student.id}/`}
+          queryKey="students"
+          title={t("studentForm.steps.additionalInfo")}
+          placeholder={t("notes.addStudentNotes")}
+          noNotesText={t("notes.noNotes")}
+        />
+      )}
     </Box>
   );
 }
