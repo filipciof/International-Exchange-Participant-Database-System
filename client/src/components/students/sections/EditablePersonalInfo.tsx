@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Box, Grid, IconButton, TextField, Autocomplete, MenuItem, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Grid,
+  IconButton,
+  TextField,
+  Autocomplete,
+  MenuItem,
+  CircularProgress,
+} from "@mui/material";
 import { Edit as EditIcon, Save, Close, Person } from "@mui/icons-material";
 import type { Student, Country } from "../../../utils/types";
 import { getGenderOptions, ShirtSize } from "../../../utils/types";
@@ -38,10 +46,11 @@ export default function EditablePersonalInfo({
 
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await axiosClient.patch(
-        `/students/${student.id}/`,
-        data,
-      );
+      const response = await axiosClient.patch(`/students/${student.id}/`, {
+        ...data,
+        date_of_birth: data.date_of_birth || null,
+        height: data.height === "" ? null : data.height,
+      });
       return response.data;
     },
     onSuccess: () => {

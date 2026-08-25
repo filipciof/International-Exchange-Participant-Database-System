@@ -1,7 +1,5 @@
 Uczestnicy
  
-Coś nie działa z edycją (np. Pleć)
- 
 Tylko admin może usunąć uczestnika
  
 (poza samym uczestnikiem) Tylko admin może edytować jego dane
