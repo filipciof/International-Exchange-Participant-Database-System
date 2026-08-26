@@ -7,12 +7,14 @@ import {
   Alert,
   Typography,
   CircularProgress,
+  Button,
 } from "@mui/material";
 import {
   Edit as EditIcon,
   Save,
   Close,
   AccountCircle,
+  LockReset,
 } from "@mui/icons-material";
 import type { Student } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
@@ -21,6 +23,7 @@ import queryClient from "../../../utils/queryClient";
 import Section from "../../Section";
 import InfoItem from "../../InfoItem";
 import { useTranslation } from "react-i18next";
+import usePermissions from "../../../hooks/usePermissions";
 
 type EditableUserAccountProps = {
   student: Student;
@@ -32,8 +35,10 @@ export default function EditableUserAccount({
   canEdit,
 }: EditableUserAccountProps) {
   const { t } = useTranslation();
+  const { canResetStudentPasswords } = usePermissions();
   const [isEditing, setIsEditing] = useState(false);
   const [emailVerificationSent, setEmailVerificationSent] = useState(false);
+  const [passwordResetSent, setPasswordResetSent] = useState(false);
   const [email, setEmail] = useState("");
 
   const hasUserAccount = Boolean(student.user_email);
@@ -56,6 +61,17 @@ export default function EditableUserAccount({
     },
   });
 
+  const passwordResetMutation = useMutation({
+    mutationFn: async () => {
+      await axiosClient.post("/auth/password-reset/", {
+        email: student.user_email,
+      });
+    },
+    onSuccess: () => {
+      setPasswordResetSent(true);
+    },
+  });
+
   const handleSave = () => {
     updateMutation.mutate({ email });
   };
@@ -67,18 +83,40 @@ export default function EditableUserAccount({
 
   const handleEdit = () => {
     setEmailVerificationSent(false);
+    setPasswordResetSent(false);
     setEmail(student.user_email || "");
     setIsEditing(true);
   };
 
   const isLoading = updateMutation.isPending;
-  const error = updateMutation.error;
+  const error = updateMutation.error || passwordResetMutation.error;
 
-  const actions = !canEdit ? null : !isEditing ? (
-    hasUserAccount ? (
-      <IconButton size="small" onClick={handleEdit}>
-        <EditIcon />
-      </IconButton>
+  const actions = !isEditing ? (
+    hasUserAccount && (canResetStudentPasswords || canEdit) ? (
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        {canResetStudentPasswords && (
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={
+              passwordResetMutation.isPending ? (
+                <CircularProgress size={16} />
+              ) : (
+                <LockReset />
+              )
+            }
+            onClick={() => passwordResetMutation.mutate()}
+            disabled={passwordResetMutation.isPending}
+          >
+            {t("auth.resetPassword")}
+          </Button>
+        )}
+        {canEdit && (
+          <IconButton size="small" onClick={handleEdit}>
+            <EditIcon />
+          </IconButton>
+        )}
+      </Box>
     ) : null
   ) : (
     <Box sx={{ display: "flex", gap: 1 }}>
@@ -116,6 +154,14 @@ export default function EditableUserAccount({
         </Alert>
       )}
 
+      {passwordResetSent && (
+        <Alert severity="success" sx={{ mb: 2 }}>
+          {t("forgotPassword.confirmation_with_email", {
+            email: student.user_email,
+          })}
+        </Alert>
+      )}
+
       {!canEdit || !isEditing ? (
         <>
           {hasUserAccount ? (
@@ -147,7 +193,7 @@ export default function EditableUserAccount({
           sx={{ maxWidth: 400, width: "100%" }}
           size="small"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(event) => setEmail(event.target.value)}
           disabled={isLoading}
           type="email"
         />

@@ -1,8 +1,5 @@
 Dopytać się, czy inni wolontariusze mogą edytować wymiany/dokumenty/notatki.
  
-Dalej brakuje czynności ponowna aktywacja (jak ktoś zapomni hasło) - to samo dla woluntariuszy
- 
- 
 W sekcji rodzice/opiekunowie powinno być miejsce na 2 numery telefonu
  
 Brak numeru telefonu samego uczestnika (powinny być przynajmniej jeden m)

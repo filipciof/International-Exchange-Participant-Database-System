@@ -44,6 +44,8 @@ type Permissions = {
   canEditStaffName: boolean;
   hasLockedFamilyClubFilter: boolean;
   canSetCurrentYear: boolean;
+  canResetStudentPasswords: boolean;
+  canResetStaffPasswords: boolean;
 };
 
 function resolvePermissions(group: string): Permissions {
@@ -74,6 +76,8 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffName: true,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: true,
+        canResetStudentPasswords: true,
+        canResetStaffPasswords: true,
       };
 
     case "correspondent":
@@ -102,6 +106,8 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffName: false,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: false,
+        canResetStudentPasswords: false,
+        canResetStaffPasswords: false,
       };
 
     case "kwm_officer":
@@ -130,6 +136,8 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffName: false,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: false,
+        canResetStudentPasswords: false,
+        canResetStaffPasswords: false,
       };
 
     case "club_officer":
@@ -158,6 +166,8 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffName: false,
         hasLockedFamilyClubFilter: true,
         canSetCurrentYear: false,
+        canResetStudentPasswords: false,
+        canResetStaffPasswords: false,
       };
 
     case "student":
@@ -186,6 +196,8 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffName: false,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: false,
+        canResetStudentPasswords: false,
+        canResetStaffPasswords: false,
       };
 
     default:
@@ -214,6 +226,8 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffName: false,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: false,
+        canResetStudentPasswords: false,
+        canResetStaffPasswords: false,
       };
   }
 }

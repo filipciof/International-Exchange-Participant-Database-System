@@ -143,7 +143,8 @@
     "description": "Podaj adres email swojego konta, a wyślemy Ci link do zresetowania hasła.",
     "emailLabel": "Adres email",
     "continue": "Kontynuuj",
-    "confirmation": "Link do zresetowania hasła został wysłany. Sprawdź swoją skrzynkę odbiorczą."
+    "confirmation": "Link do zresetowania hasła został wysłany. Sprawdź swoją skrzynkę odbiorczą.",
+    "confirmation_with_email": "Link do zresetowania hasła został wysłany na adres {{email}}."
   },
   "deleteDialog": {
     "title": "Potwierdź usunięcie",

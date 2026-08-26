@@ -13,12 +13,14 @@ import {
   type SelectChangeEvent,
   Typography,
   CircularProgress,
+  Button,
 } from "@mui/material";
 import {
   Edit as EditIcon,
   Save,
   Close,
   AccountCircle,
+  LockReset,
 } from "@mui/icons-material";
 import type { Staff } from "../../../utils/types";
 import { useMutation } from "@tanstack/react-query";
@@ -39,15 +41,14 @@ export default function EditableUserAccount({
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [emailVerificationSent, setEmailVerificationSent] = useState(false);
-
+  const [passwordResetSent, setPasswordResetSent] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     groups: [] as string[],
   });
 
   const hasUserAccount = Boolean(staff.user_email);
-
-  const { canAssignGroups } = usePermissions();
+  const { canResetStaffPasswords, canAssignGroups } = usePermissions();
 
   const updateMutation = useMutation({
     mutationFn: async (data: { email?: string; groups?: string[] }) => {
@@ -67,12 +68,25 @@ export default function EditableUserAccount({
     },
   });
 
+  const passwordResetMutation = useMutation({
+    mutationFn: async () => {
+      await axiosClient.post("/auth/password-reset/", {
+        email: staff.user_email,
+      });
+    },
+    onSuccess: () => {
+      setPasswordResetSent(true);
+    },
+  });
+
   const handleSave = () => {
     const updateData: { email?: string; groups?: string[] } = {};
-    if (formData.email && formData.email !== staff.user_email)
+    if (formData.email && formData.email !== staff.user_email) {
       updateData.email = formData.email;
-    if (formData.groups.length > 0 && canAssignGroups)
+    }
+    if (formData.groups.length > 0 && canAssignGroups) {
       updateData.groups = formData.groups;
+    }
     updateMutation.mutate(updateData);
   };
 
@@ -83,6 +97,7 @@ export default function EditableUserAccount({
 
   const handleEdit = () => {
     setEmailVerificationSent(false);
+    setPasswordResetSent(false);
     setFormData({
       email: staff.user_email || "",
       groups: staff.user_groups || [],
@@ -90,14 +105,33 @@ export default function EditableUserAccount({
     setIsEditing(true);
   };
 
-  const isLoading = updateMutation.isPending;
-  const error = updateMutation.error;
+  const isLoading = updateMutation.isPending || passwordResetMutation.isPending;
+  const error = updateMutation.error || passwordResetMutation.error;
 
   const actions = !isEditing ? (
     hasUserAccount ? (
-      <IconButton size="small" onClick={handleEdit}>
-        <EditIcon />
-      </IconButton>
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        {canResetStaffPasswords && (
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={
+              passwordResetMutation.isPending ? (
+                <CircularProgress size={16} />
+              ) : (
+                <LockReset />
+              )
+            }
+            onClick={() => passwordResetMutation.mutate()}
+            disabled={passwordResetMutation.isPending}
+          >
+            {t("auth.resetPassword")}
+          </Button>
+        )}
+        <IconButton size="small" onClick={handleEdit}>
+          <EditIcon />
+        </IconButton>
+      </Box>
     ) : null
   ) : (
     <Box sx={{ display: "flex", gap: 1 }}>
@@ -107,7 +141,7 @@ export default function EditableUserAccount({
         disabled={isLoading}
         color="primary"
       >
-        {isLoading ? <CircularProgress size={20} /> : <Save />}
+        {updateMutation.isPending ? <CircularProgress size={20} /> : <Save />}
       </IconButton>
       <IconButton size="small" onClick={handleCancel} disabled={isLoading}>
         <Close />
@@ -135,6 +169,14 @@ export default function EditableUserAccount({
         </Alert>
       )}
 
+      {passwordResetSent && (
+        <Alert severity="success" sx={{ mb: 2 }}>
+          {t("forgotPassword.confirmation_with_email", {
+            email: staff.user_email,
+          })}
+        </Alert>
+      )}
+
       {!isEditing ? (
         <>
           {hasUserAccount ? (
@@ -145,7 +187,7 @@ export default function EditableUserAccount({
                 value={
                   staff.user_groups?.length > 0
                     ? staff.user_groups
-                        .map((group) => t(`account.${group}`))
+                        .map((groupName) => t(`account.${groupName}`))
                         .join(", ")
                     : t("account.noGroups")
                 }
@@ -175,8 +217,8 @@ export default function EditableUserAccount({
               size="small"
               sx={{ maxWidth: 400, width: "100%" }}
               value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
+              onChange={(event) =>
+                setFormData({ ...formData, email: event.target.value })
               }
               disabled={isLoading}
               type="email"
@@ -197,10 +239,10 @@ export default function EditableUserAccount({
                 multiple
                 value={formData.groups}
                 label={t("account.groups")}
-                onChange={(e: SelectChangeEvent<string[]>) =>
+                onChange={(event: SelectChangeEvent<string[]>) =>
                   setFormData({
                     ...formData,
-                    groups: e.target.value as string[],
+                    groups: event.target.value as string[],
                   })
                 }
                 renderValue={(selected) => (
