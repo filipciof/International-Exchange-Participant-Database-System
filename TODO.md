@@ -1,9 +1,5 @@
 Dopytać się, czy inni wolontariusze mogą edytować wymiany/dokumenty/notatki.
  
-Tylko admin może usunąć uczestnika
- 
-(poza samym uczestnikiem) Tylko admin może edytować jego dane
- 
 Dalej brakuje czynności ponowna aktywacja (jak ktoś zapomni hasło) - to samo dla woluntariuszy
  
  

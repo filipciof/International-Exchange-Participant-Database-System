@@ -4,6 +4,7 @@ let listeners: (() => void)[] = [];
 
 function subscribe(listener: () => void) {
   listeners.push(listener);
+
   return () => {
     listeners = listeners.filter((l) => l !== listener);
   };
@@ -39,6 +40,7 @@ type Permissions = {
   canEditStaffClubInfo: boolean;
   canEditStudentName: boolean;
   canEditStudent: boolean;
+  canDeleteStudent: boolean;
   canEditStaffName: boolean;
   hasLockedFamilyClubFilter: boolean;
   canSetCurrentYear: boolean;
@@ -68,10 +70,12 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffClubInfo: true,
         canEditStudentName: true,
         canEditStudent: true,
+        canDeleteStudent: true,
         canEditStaffName: true,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: true,
       };
+
     case "correspondent":
       return {
         group,
@@ -94,10 +98,12 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffClubInfo: false,
         canEditStudentName: false,
         canEditStudent: false,
+        canDeleteStudent: false,
         canEditStaffName: false,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: false,
       };
+
     case "kwm_officer":
       return {
         group,
@@ -120,10 +126,12 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffClubInfo: false,
         canEditStudentName: false,
         canEditStudent: false,
+        canDeleteStudent: false,
         canEditStaffName: false,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: false,
       };
+
     case "club_officer":
       return {
         group,
@@ -146,10 +154,12 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffClubInfo: false,
         canEditStudentName: false,
         canEditStudent: false,
+        canDeleteStudent: false,
         canEditStaffName: false,
         hasLockedFamilyClubFilter: true,
         canSetCurrentYear: false,
       };
+
     case "student":
       return {
         group,
@@ -172,10 +182,12 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffClubInfo: false,
         canEditStudentName: false,
         canEditStudent: false,
+        canDeleteStudent: false,
         canEditStaffName: false,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: false,
       };
+
     default:
       return {
         group,
@@ -198,6 +210,7 @@ function resolvePermissions(group: string): Permissions {
         canEditStaffClubInfo: false,
         canEditStudentName: false,
         canEditStudent: false,
+        canDeleteStudent: false,
         canEditStaffName: false,
         hasLockedFamilyClubFilter: false,
         canSetCurrentYear: false,
@@ -207,5 +220,6 @@ function resolvePermissions(group: string): Permissions {
 
 export default function usePermissions(): Permissions {
   const group = useSyncExternalStore(subscribe, getSnapshot);
+
   return resolvePermissions(group);
 }

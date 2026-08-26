@@ -8,6 +8,7 @@ import { Box, IconButton, Tooltip } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useTranslation } from "react-i18next";
 import useDataGridLocale from "../../hooks/useDataGridLocale";
+import usePermissions from "../../hooks/usePermissions";
 
 type StudentListProps = {
   students: PaginatedData<Student>;
@@ -29,6 +30,7 @@ export default function StudentList({
 }: StudentListProps) {
   const { t } = useTranslation();
   const localeText = useDataGridLocale();
+  const { canDeleteStudent } = usePermissions();
 
   const columns: GridColDef<Student>[] = [
     {
@@ -98,30 +100,39 @@ export default function StudentList({
       headerName: t("students.searchFields.secondLanguage"),
       width: 150,
     },
-    {
-      field: "actions",
-      headerName: t("common.actions"),
-      width: 100,
-      sortable: false,
-      filterable: false,
-      disableColumnMenu: true,
-      renderCell: (params) => (
-        <Box
-          sx={{ display: "flex", gap: 1, alignItems: "center", height: "100%" }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Tooltip title={t("common.delete")}>
-            <IconButton
-              size="small"
-              onClick={() => onDelete?.(params.row.id)}
-              color="error"
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      ),
-    },
+    ...(canDeleteStudent
+      ? [
+          {
+            field: "actions",
+            headerName: t("common.actions"),
+            width: 100,
+            sortable: false,
+            filterable: false,
+            disableColumnMenu: true,
+            renderCell: (params) => (
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  alignItems: "center",
+                  height: "100%",
+                }}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <Tooltip title={t("common.delete")}>
+                  <IconButton
+                    size="small"
+                    onClick={() => onDelete?.(params.row.id)}
+                    color="error"
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            ),
+          } satisfies GridColDef<Student>,
+        ]
+      : []),
   ];
 
   return (
