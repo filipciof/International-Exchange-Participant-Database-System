@@ -122,8 +122,10 @@ export const studentSchema = z.object({
   passport_expiration_date: z.string().nullable().optional(),
   first_parent_full_name: z.string().optional(),
   first_parent_email: z.email().or(z.literal("")),
+  first_parent_phone_number: z.string().optional(),
   second_parent_full_name: z.string().optional(),
   second_parent_email: z.email().or(z.literal("")),
+  second_parent_phone_number: z.string().optional(),
   polish_phone_number: z.string().optional(),
   insurance_company: z.string().optional(),
   insurance_type: z.string().optional(),
@@ -203,8 +205,10 @@ export type Student = {
   passport_expiration_date: string;
   first_parent_full_name: string;
   first_parent_email: string;
+  first_parent_phone_number: string;
   second_parent_full_name: string;
   second_parent_email: string;
+  second_parent_phone_number: string;
   polish_phone_number: string;
   insurance_company: string;
   insurance_type: string;

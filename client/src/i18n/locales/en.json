@@ -298,6 +298,7 @@
       "secondParent": "Second Parent/Guardian",
       "fullName": "Full Name",
       "email": "Email",
+      "phoneNumber": "Phone number",
       "insuranceCoverage": "Coverage Amount",
       "noExchanges": "No exchanges recorded yet.",
       "exchange": "Exchange",

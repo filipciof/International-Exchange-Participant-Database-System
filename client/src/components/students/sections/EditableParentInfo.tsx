@@ -33,13 +33,17 @@ export default function EditableParentInfo({
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const getFormData = () => ({
     first_parent_full_name: student.first_parent_full_name || "",
     first_parent_email: student.first_parent_email || "",
+    first_parent_phone_number: student.first_parent_phone_number || "",
     second_parent_full_name: student.second_parent_full_name || "",
     second_parent_email: student.second_parent_email || "",
+    second_parent_phone_number: student.second_parent_phone_number || "",
     polish_phone_number: student.polish_phone_number || "",
   });
+
+  const [formData, setFormData] = useState(getFormData);
 
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -51,6 +55,7 @@ export default function EditableParentInfo({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["students"] });
+      queryClient.invalidateQueries({ queryKey: ["student", student.id] });
       setIsEditing(false);
     },
   });
@@ -60,13 +65,7 @@ export default function EditableParentInfo({
   };
 
   const handleCancel = () => {
-    setFormData({
-      first_parent_full_name: student.first_parent_full_name || "",
-      first_parent_email: student.first_parent_email || "",
-      second_parent_full_name: student.second_parent_full_name || "",
-      second_parent_email: student.second_parent_email || "",
-      polish_phone_number: student.polish_phone_number || "",
-    });
+    setFormData(getFormData());
     setIsEditing(false);
   };
 
@@ -121,6 +120,11 @@ export default function EditableParentInfo({
                 value={student.first_parent_email}
                 fullWidth
               />
+              <InfoItem
+                label={t("studentForm.labels.phoneNumber")}
+                value={student.first_parent_phone_number}
+                fullWidth
+              />
             </Box>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
@@ -142,12 +146,19 @@ export default function EditableParentInfo({
                 value={student.second_parent_email}
                 fullWidth
               />
+              <InfoItem
+                label={t("studentForm.labels.phoneNumber")}
+                value={student.second_parent_phone_number}
+                fullWidth
+              />
             </Box>
           </Grid>
-          <InfoItem
-            label={t("students.searchFields.polishPhoneNumber")}
-            value={student.polish_phone_number}
-          />
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <InfoItem
+              label={t("students.searchFields.polishPhoneNumber")}
+              value={student.polish_phone_number}
+            />
+          </Grid>
         </Grid>
       ) : (
         <Grid container rowSpacing={2} columnSpacing={8}>
@@ -174,7 +185,7 @@ export default function EditableParentInfo({
               />
               <TextField
                 size="small"
-                sx={{ maxWidth: 400, width: "100%" }}
+                sx={{ maxWidth: 400, width: "100%", mb: 2 }}
                 label={t("studentForm.labels.email")}
                 type="email"
                 value={formData.first_parent_email}
@@ -182,6 +193,19 @@ export default function EditableParentInfo({
                   setFormData({
                     ...formData,
                     first_parent_email: e.target.value,
+                  })
+                }
+              />
+              <TextField
+                size="small"
+                sx={{ maxWidth: 400, width: "100%" }}
+                label={t("studentForm.labels.phoneNumber")}
+                type="tel"
+                value={formData.first_parent_phone_number}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    first_parent_phone_number: e.target.value,
                   })
                 }
               />
@@ -210,7 +234,7 @@ export default function EditableParentInfo({
               />
               <TextField
                 size="small"
-                sx={{ maxWidth: 400, width: "100%" }}
+                sx={{ maxWidth: 400, width: "100%", mb: 2 }}
                 label={t("studentForm.labels.email")}
                 type="email"
                 value={formData.second_parent_email}
@@ -221,6 +245,19 @@ export default function EditableParentInfo({
                   })
                 }
               />
+              <TextField
+                size="small"
+                sx={{ maxWidth: 400, width: "100%" }}
+                label={t("studentForm.labels.phoneNumber")}
+                type="tel"
+                value={formData.second_parent_phone_number}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    second_parent_phone_number: e.target.value,
+                  })
+                }
+              />
             </Box>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
@@ -228,6 +265,7 @@ export default function EditableParentInfo({
               size="small"
               sx={{ maxWidth: 400, width: "100%" }}
               label={t("students.searchFields.polishPhoneNumber")}
+              type="tel"
               value={formData.polish_phone_number}
               onChange={(e) =>
                 setFormData({

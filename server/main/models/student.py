@@ -74,8 +74,10 @@ class Student(models.Model):
     # Parents
     first_parent_full_name = models.CharField(max_length=100, blank=True, default="")
     first_parent_email = models.EmailField(blank=True, default="")
+    first_parent_phone_number = PhoneNumberField(blank=True, default="")
     second_parent_full_name = models.CharField(max_length=100, blank=True, default="")
     second_parent_email = models.EmailField(blank=True, default="")
+    second_parent_phone_number = PhoneNumberField(blank=True, default="")
 
     # Insurance
     polish_phone_number = PhoneNumberField(blank=True, default="")
