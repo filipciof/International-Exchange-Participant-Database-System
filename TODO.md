@@ -4,8 +4,6 @@ W sekcji rodzice/opiekunowie powinno być miejsce na 2 numery telefonu
  
 Brak numeru telefonu samego uczestnika (powinny być przynajmniej jeden m)
  
-W zakładce historia wymian brakuje w wymianie listy opcji do typu wymiany
- 
 Kraj, dystrykt, klub: goszczący a nie odbierający
  
 Zamiast opiekun wymiany  - po prostu opiekun patrz dalszy opis
