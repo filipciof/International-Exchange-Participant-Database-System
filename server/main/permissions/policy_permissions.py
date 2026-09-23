@@ -10,6 +10,7 @@ from main.policies import family as family_policy
 from main.policies import staff as staff_policy
 from main.policies import student as student_policy
 from main.policies import contact as contact_policy
+from main.policies import counsellor as counsellor_policy
 
 
 class PolicyPermission(BasePermission):
@@ -74,3 +75,7 @@ class ContactPermission(PolicyPermission):
 
 class YearPermission(PolicyPermission):
     policy = year_policy
+
+
+class CounsellorPermission(PolicyPermission):
+    policy = counsellor_policy

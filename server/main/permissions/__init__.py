@@ -27,4 +27,5 @@ from .policy_permissions import (
     StudentPermission,
     ContactPermission,
     YearPermission,
+    CounsellorPermission,
 )

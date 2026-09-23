@@ -16,6 +16,7 @@ from main.views import (
     StaffListView, StaffDetailView, StaffMeView,
     StaffPhotoView, StaffUserAccountView,
     ContactListView, ContactDetailView, ContactPhotoView,
+    CounsellorListView, CounsellorDetailView, CounsellorPhotoView,
 )
 
 
@@ -59,6 +60,9 @@ urlpatterns = [
     path("contacts/", ContactListView.as_view()),
     path("contacts/<int:pk>/", ContactDetailView.as_view()),
     path("contacts/<int:pk>/photo/", ContactPhotoView.as_view()),
+    path("counsellors/", CounsellorListView.as_view()),
+    path("counsellors/<int:pk>/", CounsellorDetailView.as_view()),
+    path("counsellors/<int:pk>/photo/", CounsellorPhotoView.as_view()),
 ]
 
 if DEBUG is False:

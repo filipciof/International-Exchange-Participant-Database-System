@@ -4,6 +4,7 @@ from main.models.club import Club
 from main.models.staff import Staff
 from main.models.family import Family
 from main.models.year import Year
+from main.models.counsellor import Counsellor
 
 
 class ExchangeType(models.Model):
@@ -33,7 +34,7 @@ class Exchange(models.Model):
         db_column="id_sending_club",
     )
     id_counsellor = models.ForeignKey(
-        Staff,
+        Counsellor,
         null=True,
         on_delete=models.SET_NULL,
         related_name="exchange_counsellor",

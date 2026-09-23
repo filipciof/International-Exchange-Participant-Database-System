@@ -1,18 +1,39 @@
-from .club import CountryView, DistrictListView, DistrictDetailView, ClubListView, ClubDetailView
+from .club import (
+    CountryView,
+    DistrictListView,
+    DistrictDetailView,
+    ClubListView,
+    ClubDetailView,
+)
 from .contact import ContactListView, ContactDetailView, ContactPhotoView
 from .document import DocumentListView, DocumentDetailView, DocumentFileView
 from .year import YearListView, YearDetailView
 from .exchange import (
     ExchangeTypeView,
-    ExchangeListView, ExchangeDetailView,
-    ExchangeFamilyListView, ExchangeFamilyDetailView,
+    ExchangeListView,
+    ExchangeDetailView,
+    ExchangeFamilyListView,
+    ExchangeFamilyDetailView,
 )
-from .family import FamilyListView, FamilyDetailView, FamilyMemberListView, FamilyMemberDetailView
+from .family import (
+    FamilyListView,
+    FamilyDetailView,
+    FamilyMemberListView,
+    FamilyMemberDetailView,
+)
 from .staff import (
-    StaffListView, StaffDetailView, StaffMeView,
-    StaffPhotoView, StaffUserAccountView,
+    StaffListView,
+    StaffDetailView,
+    StaffMeView,
+    StaffPhotoView,
+    StaffUserAccountView,
 )
 from .student import (
-    StudentListView, StudentDetailView, StudentMeView,
-    StudentExportView, StudentPhotoView, StudentUserAccountView,
+    StudentListView,
+    StudentDetailView,
+    StudentMeView,
+    StudentExportView,
+    StudentPhotoView,
+    StudentUserAccountView,
 )
+from .counsellor import CounsellorListView, CounsellorDetailView, CounsellorPhotoView

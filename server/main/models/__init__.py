@@ -8,3 +8,4 @@ from .gender import Gender, GENDER_MAP
 from .language_proficiency import LanguageProficiency, LANG_PROF_MAP
 from .staff import Staff
 from .student import Student
+from .counsellor import Counsellor

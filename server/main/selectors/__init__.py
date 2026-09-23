@@ -8,3 +8,4 @@ from .family import family_queryset_for
 from .family_member import family_member_queryset_for
 from .staff import staff_queryset_for
 from .student import student_queryset_for
+from .counsellor import counsellor_queryset_for

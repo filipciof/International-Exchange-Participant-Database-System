@@ -248,6 +248,9 @@ msgstr "Nie masz uprawnień do tworzenia uczestników wyjeżdżających."
 msgid "Club officers can only create students for their own club."
 msgstr "Oficerowie klubowi mogą tworzyć uczestników tylko dla swojego klubu."
 
+msgid "Club officers can only create counsellors for their own club."
+msgstr "Oficerowie klubowi mogą tworzyć opiekunów tylko dla swojego klubu."
+
 #: main/serializers.py:382
 msgid "No data provided."
 msgstr "Nie podano danych."
